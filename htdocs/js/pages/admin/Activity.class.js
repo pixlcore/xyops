@@ -176,7 +176,7 @@ Page.ActivityLog = class ActivityLog extends Page.Base {
 			
 			return tds;
 			
-		} ); // getPaginatedTable
+		} ); // getPaginatedGrid
 		
 		html += '</div>'; // box_content
 		html += '</div>'; // box
