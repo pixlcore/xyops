@@ -166,7 +166,7 @@ Page.Servers = class Servers extends Page.ServerUtils {
 		html += '</div>'; // box_content
 		
 		html += '<div class="box_buttons">';
-			html += '<div class="button" onMouseUp="$P().go_server_search()">Search History...</div>';
+			html += '<div class="button secondary" onMouseUp="$P().go_server_search()">Search History...</div>';
 			html += '<div class="button secondary" onMouseUp="$P().go_add_server()">Add Server...</div>';
 		html += '</div>'; // box_buttons
 		
@@ -318,7 +318,7 @@ Page.Servers = class Servers extends Page.ServerUtils {
 		
 		var field_menus = {};
 		for (var field_id in resp.summaries) {
-			var labels = resp.summaries[field_id].labels;
+			var labels = resp.summaries[field_id].labels || {};
 			field_menus[field_id] = Object.keys(labels).sort().map( function(id) {
 				return { id: id, title: labels[id] };
 			} );
@@ -681,8 +681,6 @@ Page.Servers = class Servers extends Page.ServerUtils {
 		this.doSearch();
 	}
 	
-	// TODO: Server View Page:
-	
 	gosub_view(args) {
 		// page activation
 		if (!this.requireLogin(args)) return true;
@@ -694,49 +692,52 @@ Page.Servers = class Servers extends Page.ServerUtils {
 		app.showSidebar(true);
 		app.setHeaderTitle( '...' );
 		
-		this.snapshot = null;
-		this.charts = {};
-		
 		this.loading();
 		app.api.get( 'app/get_server', { id: args.id }, this.receive_snapshot.bind(this), this.fullPageError.bind(this) );
 		return true;
 	}
 	
-	receive_snapshot(resp) { // TODO: all this here
+	receive_snapshot(resp) {
 		// render snapshot details
 		var self = this;
 		var args = this.args;
+		var { server, data, online } = resp;
 		var html = '';
 		
 		// make sure page is still active (API may be slow)
 		if (!this.active) return;
 		
-		var snapshot = this.snapshot = resp.server;
-		if (!snapshot) return this.doFullPageError("Server not found: " + this.args.id);
+		this.server = server;
+		this.snapshot = data;
+		this.online = online;
+		this.charts = {};
 		
-		var server = this.server = app.servers[ snapshot.server ] || null;
-		// var is_live = this.live = !!(server && !args.yyyy && !args.mm && !args.dd && !args.hh);
+		var snapshot = this.snapshot;
+		var server_icon = server.icon || (online ? 'router-network' : 'close-network-outline');
+		var badge_icon = online ? 'check-circle' : 'circle-outline';
 		
-		if (!args.yyyy && !server) {
-			// quickly switch from real-time to historical mode, as server is offline
-			// use date/time from snapshot (last known live timestamp)
-			
-			// TODO: this
-		}
+		app.setHeaderNav([
+			{ icon: 'server', loc: '#Servers?sub=list', title: 'Servers' },
+			{ icon: server_icon, title: server.title || server.hostname },
+			{ type: 'badge', color: online ? 'green' : 'gray', icon: badge_icon, title: online ? 'Online' : 'Offline' }
+		]);
 		
-		var icon = '<i class="mdi mdi-' + (server ? 'router-network' : 'close-network-outline') + '">&nbsp;</i>';
-		var nav_spacer = '<i class="mdi mdi-chevron-right" style="padding-left:5px; padding-right:5px;"></i>';
+		// var icon = '<i class="mdi mdi-' + (online ? 'router-network' : 'close-network-outline') + '">&nbsp;</i>';
+		// var nav_spacer = '<i class="mdi mdi-chevron-right" style="padding-left:5px; padding-right:5px;"></i>';
 		
-		app.setHeaderTitle( '<a href="#Servers?sub=list" style="text-decoration:none;"><i class="mdi mdi-server">&nbsp;</i>Servers</a>' + nav_spacer + icon + snapshot.hostname );
+		// app.setHeaderTitle( '<a href="#Servers?sub=list" style="text-decoration:none;"><i class="mdi mdi-server">&nbsp;</i>Servers</a>' + nav_spacer + icon + snapshot.hostname );
 		app.setWindowTitle( "Viewing Server: " + snapshot.hostname + "" );
 		
 		html += '<div class="box" style="border:none;">';
 			html += '<div class="box_title">';
-				html += '<div class="box_title_left">Live - Real-Time View</div>';
+				html += '<div class="box_title_left">' + (online ? 'Live &mdash; Real-Time View' : 'Offline &mdash; Last Known State') + '</div>';
 				html += '<div class="box_title_left"><div class="button secondary"><i class="mdi mdi-calendar-cursor">&nbsp;</i>Change...</div></div>';
 				
-				html += '<div class="box_title_right"><div class="button primary"><i class="mdi mdi-monitor-screenshot">&nbsp;</i>Snapshot</div></div>';
-				html += '<div class="box_title_right"><div class="button secondary"><i class="mdi mdi-magnify-scan">&nbsp;</i>Watch...</div></div>';
+				if (online) {
+					html += '<div class="box_title_right"><div class="button primary" onClick="$P().createSnapshot()"><i class="mdi mdi-monitor-screenshot">&nbsp;</i>Snapshot</div></div>';
+					html += '<div class="box_title_right"><div class="button secondary"><i class="mdi mdi-eye-outline">&nbsp;</i>Watch...</div></div>';
+				}
+				
 				html += '<div class="box_title_right"><div class="button secondary"><i class="mdi mdi-file-edit-outline">&nbsp;</i>Edit Server...</div></div>';
 			html += '</div>';
 		html += '</div>';
@@ -745,6 +746,7 @@ Page.Servers = class Servers extends Page.ServerUtils {
 			html += '<div class="box_title">';
 				html += 'Server Summary';
 				
+				if (!online) html += '<div class="box_title_note">As of ' + this.getShortDateTimeText(snapshot.date) + '</div>';
 				// html += '<div class="button right danger" onMouseUp="$P().showDeleteSnapshotDialog()"><i class="mdi mdi-trash-can-outline">&nbsp;</i>Delete...</div>';
 				// html += '<div class="button secondary right" onMouseUp="$P().do_edit_from_view()"><i class="mdi mdi-file-edit-outline">&nbsp;</i>Edit Event...</div>';
 				// html += '<div class="button right" onMouseUp="$P().do_run_from_view()"><i class="mdi mdi-run-fast">&nbsp;</i>Run Now</div>';
@@ -772,7 +774,7 @@ Page.Servers = class Servers extends Page.ServerUtils {
 					
 					html += '<div>';
 						html += '<div class="info_label">Server Label</div>';
-						html += '<div class="info_value">' + (server.title || 'n/a') + '</div>';
+						html += '<div class="info_value" id="d_vs_stat_label">' + (server.title || 'n/a') + '</div>';
 					html += '</div>';
 					
 					// row 2
@@ -793,7 +795,7 @@ Page.Servers = class Servers extends Page.ServerUtils {
 					
 					html += '<div>';
 						html += '<div class="info_label">Server Uptime</div>';
-						html += '<div class="info_value">' + this.getNiceUptime(snapshot.data.uptime_sec) + '</div>';
+						html += '<div class="info_value" id="d_vs_stat_uptime">' + this.getNiceUptime(snapshot.data.uptime_sec) + '</div>';
 					html += '</div>';
 					
 					// row 3
@@ -856,6 +858,8 @@ Page.Servers = class Servers extends Page.ServerUtils {
 		html += '<div class="box" id="d_vs_jobs" style="">';
 			html += '<div class="box_title">';
 				html += 'Server Jobs';
+				html += '<div class="button right secondary" onMouseUp="$P().goJobHistory()"><i class="mdi mdi-magnify">&nbsp;</i>Job History...</div>';
+				html += '<div class="clear"></div>';
 			html += '</div>';
 			html += '<div class="box_content table">';
 				html += '<div class="loading_container"><div class="loading"></div></div>';
@@ -863,9 +867,9 @@ Page.Servers = class Servers extends Page.ServerUtils {
 		html += '</div>'; // box
 		
 		// quickmon charts
-		html += '<div class="box" id="d_vs_quickmon">';
+		html += '<div class="box" id="d_vs_quickmon" style="display:none">';
 			html += '<div class="box_title">';
-				html += 'Quick Monitors';
+				html += 'Quick Look &mdash; Last Minute';
 			html += '</div>';
 			html += '<div class="box_content table">';
 				html += '<div class="loading_container"><div class="loading"></div></div>';
@@ -897,7 +901,15 @@ Page.Servers = class Servers extends Page.ServerUtils {
 			html += '</div>'; // box_content
 		html += '</div>'; // box
 		
-		// TODO: pixl-chart monitors here?
+		// monitors
+		html += '<div class="box" id="d_vs_monitors">';
+			html += '<div class="box_title">';
+				html += 'Server Monitors &mdash; ' + (online ? 'Last Hour' : 'Last Known State');
+			html += '</div>';
+			html += '<div class="box_content table">';
+				html += '<div class="loading_container"><div class="loading"></div></div>';
+			html += '</div>'; // box_content
+		html += '</div>'; // box
 		
 		// processes
 		html += '<div class="box" id="d_vs_procs">';
@@ -943,31 +955,70 @@ Page.Servers = class Servers extends Page.ServerUtils {
 			html += '</div>'; // box_content
 		html += '</div>'; // box
 		
-		// TODO: maybe show job history, just for this server?
-		
 		this.div.html(html);
 		
 		this.updateServerStats();
-		this.getSnapshotAlerts();
-		this.renderActiveJobs();
 		this.renderMonitorGrid();
 		this.renderMemDetails();
 		this.renderCPUDetails();
-		this.setupQuickMonitors();
+		this.setupMonitors();
+		
+		if (online) {
+			// some components are online-only
+			this.getLiveAlerts();
+			this.renderActiveJobs();
+			this.setupQuickMonitors();
+		}
+		else {
+			// offline only
+			this.div.find('#d_vs_jobs').hide(); // hide jobs
+			this.getSnapshotAlerts();
+		}
 		
 		// SingleSelect.init( this.div.find('#fe_vs_mode, #fe_vs_year') );
 	}
 	
+	goJobHistory() {
+		// nav to job history for this server
+		Nav.go('Search?server=' + this.server.id);
+	}
+	
+	createSnapshot() {
+		// take snapshot of current server
+		app.clearError();
+		Dialog.showProgress( 1.0, "Creating snapshot..." );
+		
+		app.api.post( 'app/create_snapshot', { server: this.server.id }, function(resp) {
+			Dialog.hideProgress();
+			var loc = 'Snapshots?sub=view&id=' + resp.id;
+			app.showMessage('success', "Your snapshot was created successfully.  Click here to view it, or find it on the Snapshots page.", 8, loc);
+		} ); // api.post
+	}
+	
 	getSnapshotAlerts() {
-		// grab alerts associated with server
+		// get alerts from snapshot (offline only)
 		var self = this;
+		var snapshot = this.snapshot;
+		if (this.online) return;
+		
+		this.alerts = Object.values(snapshot.alerts || {}).filter( function(item) { return item.server == self.server.id; } );
+		this.renderSnapshotAlerts(); // in ServerUtils.class.js
+	}
+	
+	getLiveAlerts() {
+		// grab live alerts associated with server
+		var self = this;
+		if (!this.online) return;
+		
 		this.alerts = Object.values(app.activeAlerts).filter( function(item) { return item.server == self.server.id; } );
 		this.renderSnapshotAlerts(); // in ServerUtils.class.js
 	}
 	
 	renderActiveJobs() {
-		// show all active jobs
+		// show all active jobs for server
 		var self = this;
+		if (!this.online) return;
+		
 		var html = '';
 		var rows = Object.values(app.activeJobs).filter( function(item) { return item.server == self.server.id; } ).sort( function(a, b) {
 			return (a.started < b.started) ? 1 : -1;
@@ -1049,6 +1100,7 @@ Page.Servers = class Servers extends Page.ServerUtils {
 	setupQuickMonitors() {
 		// render empty quickmon charts, then request full data
 		var self = this;
+		var server = this.server;
 		var html = '';
 		html += '<div class="chart_grid_horiz">';
 		
@@ -1058,6 +1110,8 @@ Page.Servers = class Servers extends Page.ServerUtils {
 		} );
 		
 		html += '</div>';
+		
+		this.div.find('#d_vs_quickmon').show();
 		this.div.find('#d_vs_quickmon > div.box_content').html( html );
 		
 		var render_chart_overlay = function(key) {
@@ -1083,94 +1137,26 @@ Page.Servers = class Servers extends Page.ServerUtils {
 		});
 		
 		// request all data from server
-		app.api.get( 'app/get_quickmon_data', { server: this.server.id }, function(resp) {
+		app.api.post( 'app/get_quickmon_data', { server: this.server.id }, function(resp) {
 			if (!self.active) return; // sanity
 			
 			// now iterate over all quick monitors
 			config.quick_monitors.forEach( function(def, idx) {
 				var chart = self.charts[def.id];
+				var rows = resp.servers[server.id] || [];
 				
-				// add layer for each server
-				for (var server_id in resp.servers) {
-					var rows = resp.servers[server_id];
-					var server = app.servers[server_id];
-					
-					if (server) chart.addLayer({
-						id: server_id,
-						title: app.formatHostname(server.hostname),
-						data: self.getQuickMonChartData(rows, def.id)
-					});
-				} // foreach server
-				
-				if (chart.layers.length == 1) {
-					// if only 1 layer, color each chart separately (so they look nicer)
-					chart.layers[0].color = app.colors[ idx % app.colors.length ];
-				}
+				chart.addLayer({
+					id: server.id,
+					title: app.formatHostname(server.hostname),
+					data: self.getQuickMonChartData(rows, def.id),
+					color: app.colors[ idx % app.colors.length ]
+				});
 			}); // foreach mon
 		}); // api.get
 	}
 	
-	getQuickMonChartData(rows, id) {
-		// format data to be compat with pixl-chart
-		var data = [];
-		rows.forEach( function(row) {
-			data.push({ x: row.date, y: row[id] });
-		} );
-		return data;
-	}
-	
-	chartDownload(key) {
-		// download chart image with custom filename
-		// (this all happens client-side)
-		var chart = this.charts[key];
-		var filename = 'orchestra-server-' + this.server.id + '-' + get_unique_id(8) + '-' + key + '.png';
-		
-		chart.download({
-			filename: filename,
-			format: 'png', 
-			quality: 1.0, 
-			width: 1024, 
-			height: 512, 
-			density: 1
-		});
-	}
-	
-	chartCopyLink(key, elem) {
-		// upload image to server and copy link to it
-		var chart = this.charts[key];
-		var $elem = $(elem);
-		
-		// generate unique ID client-side and "predict" the URL
-		// so we can copy it to the clipboard in the click thread
-		var filename = 'server-' + this.server.id + '-' + get_unique_id(8) + '-' + key + '.png';
-		var clip_url = location.origin + '/files/' + app.username + '/' + filename;
-		copyToClipboard(clip_url);
-		
-		// show intermediate progress in icon
-		$elem.find('i').removeClass().addClass('mdi mdi-clipboard-arrow-up-outline');
-		
-		var opts = {
-			type: 'blob', 
-			format: 'png', 
-			quality: 1.0, 
-			width: 1024, 
-			height: 512, 
-			density: 1
-		};
-		chart.snapshot(opts, function(blob) {
-			// next, upload our blob
-			var form = new FormData();
-			form.append( 'file1', blob, filename );
-			
-			app.api.upload('app/upload_files', form, function(resp) {
-				// file uploaded successfully!  show check in icon
-				$elem.find('i').removeClass().addClass('mdi mdi-clipboard-check-outline success');
-			});
-		}); // snapshot
-	}
-	
-	appendSampleToChart(data) {
-		// append sample to chart (real-time from server)
+	appendSampleToQuickChart(data) {
+		// append sample to quickmon chart (real-time from server)
 		// { id, row }
 		var self = this;
 		
@@ -1182,6 +1168,94 @@ Page.Servers = class Servers extends Page.ServerUtils {
 				layer.data.push({ x: data.row.date, y: data.row[def.id] || 0 });
 				if (layer.data.length > 60) layer.data.shift();
 			}
+			
+			chart.dirty = true;
+		}); // foreach monitor
+	}
+	
+	setupMonitors() {
+		// setup custom monitors (updated every minute)
+		var self = this;
+		var server = this.server;
+		var monitors = this.monitors = [];
+		var html = '';
+		html += '<div class="chart_grid_horiz">';
+		
+		app.monitors.forEach( function(mon_def) {
+			if (!mon_def.display) return;
+			if (mon_def.groups.length && !app.includesAny(mon_def.groups, server.groups)) return;
+			monitors.push(mon_def);
+			
+			html += '<div><canvas id="c_vs_' + mon_def.id + '" class="chart"></canvas></div>';
+		} );
+		
+		html += '</div>';
+		this.div.find('#d_vs_monitors > div.box_content').html( html );
+		
+		if (!monitors.length) {
+			// odd situation, no monitors match this server
+			this.div.find('#d_vs_monitors').hide();
+			return;
+		}
+		
+		var render_chart_overlay = function(key) {
+			$('.pxc_tt_overlay').html(
+				'<div class="chart_toolbar ct_' + key + '">' + 
+					'<div class="chart_icon ci_di" title="Download Image" onClick="$P().chartDownload(\'' + key + '\')"><i class="mdi mdi-cloud-download-outline"></i></div>' + 
+					'<div class="chart_icon ci_cl" title="Copy Image Link" onClick="$P().chartCopyLink(\'' + key + '\',this)"><i class="mdi mdi-clipboard-pulse-outline"></i></div>' + 
+				'</div>' 
+			);
+		};
+		
+		monitors.forEach( function(def, idx) {
+			var chart = new Chart({
+				"canvas": '#c_vs_' + def.id,
+				"title": def.title,
+				"dataType": def.data_type,
+				"dataSuffix": def.suffix,
+				"showDataGaps": true,
+				"legend": false // single layer, no legend needed
+			});
+			chart.on('mouseover', function(event) { render_chart_overlay(def.id); });
+			self.charts[ def.id ] = chart;
+		});
+		
+		// request last hour from server
+		app.api.post( 'app/get_latest_monitor_data', { server: server.id, sys: 'hourly', limit: 60 }, function(resp) {
+			if (!self.active) return; // sanity
+			
+			// now iterate over all our monitors
+			monitors.forEach( function(def, idx) {
+				var chart = self.charts[def.id];
+				
+				chart.addLayer({
+					id: server.id,
+					title: app.formatHostname(server.hostname),
+					data: self.getMonitorChartData(resp.rows, def.id),
+					color: app.colors[ idx % app.colors.length ]
+				});
+			}); // foreach mon
+		}); // api.get
+	}
+	
+	appendSampleToChart() {
+		// append sample to chart (every minute)
+		// { id, row }
+		var self = this;
+		var snapshot = this.snapshot;
+		
+		this.monitors.forEach( function(def) {
+			var chart = self.charts[def.id];
+			var layer = chart.layers[0]; // single layer charts
+			
+			// normalize x to the minute
+			var x = Math.floor( snapshot.date / 60 ) * 60;
+			
+			// grab delta if applicable, or abs value for std monitors
+			var y = def.delta ? snapshot.data.deltas[def.id] : snapshot.data.monitors[def.id];
+			
+			layer.data.push({ x: x, y: y || 0 });
+			if (layer.data.length > 60) layer.data.shift();
 			
 			chart.dirty = true;
 		}); // foreach monitor
@@ -1209,6 +1283,9 @@ Page.Servers = class Servers extends Page.ServerUtils {
 		// new snapshot from server (every minute), update graphs and tables
 		this.snapshot = snapshot;
 		
+		// uptime
+		this.div.find('#d_vs_stat_uptime').html( this.getNiceUptime(snapshot.data.uptime_sec) );
+		
 		this.renderMonitorGrid();
 		this.renderMemDetails();
 		this.renderCPUDetails();
@@ -1218,7 +1295,8 @@ Page.Servers = class Servers extends Page.ServerUtils {
 		this.div.find('#d_vs_ifaces > div.box_content').html( this.getInterfaceTable(snapshot) );
 		this.div.find('#d_vs_fs > div.box_content').html( this.getMountTable(snapshot) );
 		
-		// TODO: update pixl-charts here
+		// update pixl-charts
+		this.appendSampleToChart();
 	}
 	
 	handleStatusUpdateView(data) {
@@ -1229,7 +1307,6 @@ Page.Servers = class Servers extends Page.ServerUtils {
 		
 		if (data.jobsChanged) {
 			this.renderActiveJobs();
-			// TODO: update job history table here, if expanded?
 		}
 		else {
 			// fast update without redrawing entire table
@@ -1260,12 +1337,29 @@ Page.Servers = class Servers extends Page.ServerUtils {
 		}
 	}
 	
+	checkUpdateServerState() {
+		// servers were updated (add or removed) -- check if OUR server was affected
+		var server = this.server;
+		var snapshot = this.snapshot;
+		
+		if (this.online && !app.servers[server.id]) {
+			// our server went offline!
+			this.onDeactivate();
+			this.receive_snapshot({ server: server, data: snapshot, online: false });
+		}
+		else if (!this.online && app.servers[server.id]) {
+			// our server came back online!
+			this.onDeactivate();
+			this.receive_snapshot({ server: app.servers[server.id], data: snapshot, online: true });
+		}
+	}
+	
 	onPageUpdate(pcmd, pdata) {
 		// receive data packet for this page specifically (i.e. live graph append)
 		switch (this.args.sub) {
 			case 'view':
 				switch (pcmd) {
-					case 'quickmon': this.appendSampleToChart(pdata); break;
+					case 'quickmon': this.appendSampleToQuickChart(pdata); break;
 					case 'snapshot': this.updateSnapshotData(pdata.snapshot); break;
 				}
 			break;
@@ -1288,8 +1382,9 @@ Page.Servers = class Servers extends Page.ServerUtils {
 			break;
 			
 			case 'view':
-				if (key == 'activeAlerts') this.getSnapshotAlerts();
+				if (key == 'activeAlerts') this.getLiveAlerts();
 				else if (key == 'stats') this.updateServerStats();
+				else if (key == 'servers') this.checkUpdateServerState();
 			break;
 		}
 	}
@@ -1297,6 +1392,10 @@ Page.Servers = class Servers extends Page.ServerUtils {
 	onDeactivate() {
 		// called when page is deactivated
 		delete this.servers;
+		delete this.monitors;
+		delete this.server;
+		delete this.snapshot;
+		delete this.online;
 		
 		// destroy charts if applicable (view page)
 		if (this.charts) {
