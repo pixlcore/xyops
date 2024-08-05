@@ -2100,6 +2100,12 @@ Page.Base = class Base extends Page {
 	
 	// Chart Utils
 	
+	createChart(opts) {
+		// merge opts with overrides and add user locale, return new chart
+		opts.locale = this.getUserLocale();
+		return new Chart( merge_objects(config.chart_defaults, opts) );
+	}
+	
 	chartDownload(key) {
 		// download chart image with custom filename
 		// (this all happens client-side)
