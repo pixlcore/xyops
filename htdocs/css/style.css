@@ -24,17 +24,26 @@ div.header > div.header_title > i {
 	color: var(--theme-color);
 } */
 
-div.header_clock {
+.header_widget.combo {
 	padding-left: 7px;
 	padding-right: 7px;
 	font-size: 12px;
 	line-height: 29px;
 }
-.header_clock i.mdi {
-	padding-right: 5px;
+
+.header_widget.combo > i.mdi {
+	padding-left: 2px;
+	padding-right: 2px;
 }
-.header_clock i.mdi:before {
+.header_widget.combo > i.mdi:before {
 	transform: scale(1.25);
+}
+.header_widget.combo > i.mdi.lg:before {
+	transform: scale(1.4);
+}
+
+.header_widget.combo > span {
+	padding-left: 3px;
 }
 
 div.box_title {

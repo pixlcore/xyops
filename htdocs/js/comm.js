@@ -178,9 +178,6 @@ app.comm = {
 			app[key] = data[key];
 		}
 		
-		// update clock widget
-		$('#d_header_clock').html( '<i class="mdi mdi-clock-time-four-outline"></i>' + app.formatDate(app.epoch, { hour: 'numeric', minute: '2-digit', second: '2-digit' }) );
-		
 		// delete jobsChanged flag from app
 		delete app.jobsChanged;
 		
@@ -193,6 +190,10 @@ app.comm = {
 			var page = app.page_manager.find(id);
 			if (page && page.onStatusUpdate) page.onStatusUpdate(data);
 		}
+		
+		// update header widgets
+		app.updateHeaderClock();
+		app.updateJobCounter();
 	},
 	
 	handleDataUpdate: function(data) {
@@ -207,6 +208,7 @@ app.comm = {
 		// maintain copy of servers in case they go offline
 		if (data.servers) merge_hash_into(app.serverCache, data.servers);
 		
+		// notify page if wanted
 		if (app.page_manager && app.page_manager.current_page_id) {
 			var id = app.page_manager.current_page_id;
 			var page = app.page_manager.find(id);
@@ -216,6 +218,9 @@ app.comm = {
 				}
 			}
 		}
+		
+		// header widgets
+		app.updateAlertCounter();
 	},
 	
 	handlePageUpdate: function(data) {

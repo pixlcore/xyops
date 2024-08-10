@@ -55,7 +55,9 @@ app.extend({
 		'^channel': { icon: 'bullhorn-outline', label: 'Channel' },
 		'^plugin': { icon: 'power-plug-outline', label: 'Plugin' },
 		'^job': { icon: 'timer-outline', label: 'Job' },
-		'^queue': { icon: 'tray-full', label: 'Queue' }
+		'^queue': { icon: 'tray-full', label: 'Queue' },
+		
+		'^state': { icon: 'database-outline', label: 'State' },
 	},
 	
 	receiveConfig: function(resp) {
@@ -195,38 +197,130 @@ app.extend({
 		// update top-right display
 		var html = '';
 		
-		html += '<div class="header_widget icon"><i class="mdi mdi-power-standby" onMouseUp="app.doUserLogout()" title="Logout"></i></div>';
-		html += '<div class="header_widget user" style="background-image:url(' + this.getUserAvatarURL( this.retina ? 64 : 32, bust ) + ')" onMouseUp="app.doMyAccount()" title="My Account (' + app.username + ')"></div>';
-		html += '<div class="header_widget icon"><i class="mdi mdi-tune-vertical-variant" onMouseUp="app.doMySettings()" title="Edit Settings"></i></div>';
-		html += '<div class="header_widget icon"><i class="mdi mdi-bell-ring-outline" onMouseUp=""></i></div>'; // TODO: this
-		html += '<div id="d_theme_ctrl" class="header_widget icon" onMouseUp="app.openThemeSelector()" title="Select Theme"></div>';
-		html += '<div id="d_header_clock" class="header_widget header_clock"></div>';
+		html += '<div class="header_widget icon"><i class="mdi mdi-power-standby" onClick="app.doUserLogout()" title="Logout"></i></div>';
+		html += '<div class="header_widget user" style="background-image:url(' + this.getUserAvatarURL( this.retina ? 64 : 32, bust ) + ')" onClick="app.doMyAccount()" title="My Account (' + app.username + ')"></div>';
+		html += '<div class="header_widget icon"><i class="mdi mdi-tune-vertical-variant" onClick="app.doMySettings()" title="Edit Settings"></i></div>';
+		html += '<div id="d_theme_ctrl" class="header_widget icon" onClick="app.openThemeSelector()" title="Select Theme"></div>';
+		html += '<div id="d_header_clock" class="header_widget combo" onClick="app.openScheduleSelector()" title="Toggle Scheduler">...</div>';
+		
+		html += '<div id="d_job_counter" class="header_widget combo" onClick="app.goJobs()" title="Active Jobs" style="display:none">...</div>';
+		html += '<div id="d_alert_counter" class="header_widget combo red" onClick="app.goAlerts()" title="Active Alerts" style="display:none">...</div>';
 		
 		// html += '<div class="header_search_widget"><i class="mdi mdi-magnify">&nbsp;</i><input type="text" size="15" id="fe_header_search" placeholder="Quick Search" onKeyDown="app.qsKeyDown(this,event)"/></div>';
 		$('#d_header_user_container').html( html );
+		
 		this.initTheme();
 		this.initSidebarTabs();
+		this.updateHeaderClock();
+		
+		this.updateJobCounter();
+		this.updateAlertCounter();
+	},
+	
+	updateAlertCounter: function() {
+		// update alert counter
+		var num_alerts = num_keys( this.activeAlerts || {} );
+		
+		if (num_alerts) {
+			$('#d_alert_counter').show().html( '<i class="mdi mdi-bell-ring-outline"></i><span><b>' + commify(num_alerts) + '</b></span>' );
+		}
+		else {
+			$('#d_alert_counter').hide();
+		}
+	},
+	
+	updateJobCounter: function() {
+		// update job counter
+		var num_jobs = num_keys( this.activeJobs || {} );
+		
+		if (num_jobs) {
+			$('#d_job_counter').show().html( '<i class="mdi mdi-timer-outline"></i><span><b>' + commify(num_jobs) + '</b></span>' );
+		}
+		else {
+			$('#d_job_counter').hide();
+		}
+	},
+	
+	updateHeaderClock: function() {
+		// redraw header clock (called every 1s by server status update)
+		var html = '';
+		
+		if (this.state.scheduler.enabled) {
+			html += '<i class="mdi mdi-clock-time-four-outline"></i><span>' + app.formatDate(app.epoch, { hour: 'numeric', minute: '2-digit', second: '2-digit' }) + '</span>';
+		}
+		else {
+			html += '<i class="mdi mdi-pause-circle"></i><span>Paused</span>';
+		}
+		
+		$('#d_header_clock').html( html );
+	},
+	
+	openScheduleSelector: function() {
+		// show scheduler toggler
+		var self = this;
+		
+		this.popupQuickMenu({
+			elem: '#d_header_clock',
+			title: 'Job Scheduler',
+			items: [
+				{ id: 'enabled', title: 'Active', icon: 'play-circle' },
+				{ id: 'disabled', title: 'Paused', icon: 'pause-circle' }
+			],
+			value: this.state.scheduler.enabled ? 'enabled' : 'disabled',
+			
+			callback: function(value) {
+				var enabled = (value == 'enabled');
+				
+				app.api.post( 'app/update_master_state', { 'scheduler.enabled': enabled }, function(resp) {
+					self.state.scheduler.enabled = enabled;
+					self.updateHeaderClock();
+					
+					// add temp local flare if disabled
+					if (!enabled) $('#d_header_clock').addClass('red');
+					else $('#d_header_clock').removeClass('red');
+				} ); // api.post
+			} // callback
+		}); // popupQuickMenu
 	},
 	
 	openThemeSelector: function() {
 		// show light/dark/auto theme selector
 		var self = this;
-		var $elem = $('#d_theme_ctrl');
-		var html = '';
-		var themes = [
-			{ id: 'light', title: 'Light', icon: 'weather-sunny' },
-			{ id: 'dark', title: 'Dark', icon: 'weather-night' },
-			{ id: 'auto', title: 'Auto', icon: 'circle-half-full' }
-		];
 		
-		html += '<div class="sel_dialog_label">Select Theme</div>';
+		this.popupQuickMenu({
+			elem: '#d_theme_ctrl',
+			title: 'Select Theme',
+			items: [
+				{ id: 'light', title: 'Light', icon: 'weather-sunny' },
+				{ id: 'dark', title: 'Dark', icon: 'weather-night' },
+				{ id: 'auto', title: 'Auto', icon: 'circle-half-full' }
+			],
+			value: this.getPref('theme'),
+			
+			callback: function(value) {
+				app.setTheme(value);
+			} // callback
+		}); // popupQuickMenu
+	},
+	
+	popupQuickMenu: function(opts) {
+		// show popup menu on custom element
+		// opts: { elem, title, items, value, callback }
+		// item: { id, title, icon }
+		var self = this;
+		var $elem = $(opts.elem);
+		var items = opts.items;
+		var callback = opts.callback;
+		var html = '';
+		
+		html += '<div class="sel_dialog_label">' + opts.title + '</div>';
 		html += '<div id="d_sel_dialog_scrollarea" class="sel_dialog_scrollarea">';
-		for (var idy = 0, ley = themes.length; idy < ley; idy++) {
-			var theme = themes[idy];
-			var sel = (this.getPref('theme') == theme.id);
-			html += '<div class="sel_dialog_item check ' + (sel ? 'selected' : '') + '" data-value="' + theme.id + '">';
-			if (theme.icon) html += '<i class="mdi mdi-' + theme.icon + '">&nbsp;</i>';
-			html += '<span>' + theme.title + '</span>';
+		for (var idy = 0, ley = items.length; idy < ley; idy++) {
+			var item = items[idy];
+			var sel = (item.id == opts.value);
+			html += '<div class="sel_dialog_item check ' + (sel ? 'selected' : '') + '" data-value="' + item.id + '">';
+			if (item.icon) html += '<i class="mdi mdi-' + item.icon + '">&nbsp;</i>';
+			html += '<span>' + item.title + '</span>';
 			html += '<div class="sel_dialog_item_check"><i class="mdi mdi-check"></i></div>';
 			html += '</div>';
 		}
@@ -235,14 +329,19 @@ app.extend({
 		Popover.attach( $elem, '<div style="padding:15px;">' + html + '</div>', true );
 		
 		$('#d_sel_dialog_scrollarea > div.sel_dialog_item').on('mouseup', function() {
-			// select item, close dialog and update theme
+			// select item, close dialog and update state
 			var $item = $(this);
 			var value = $item.data('value');
 			
 			Popover.detach();
-			
-			app.setTheme(value);
-		});
+			callback(value);
+		}); // mouseup
+		
+		Popover.onDetach = function() {
+			$elem.removeClass('popped');
+		};
+		
+		$elem.addClass('popped');
 	},
 	
 	qsKeyDown: function(elem, event) {
