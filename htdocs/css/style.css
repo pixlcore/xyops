@@ -23,6 +23,17 @@ div.header {
 div.header > div.header_title > i {
 	color: var(--theme-color);
 } */
+ 
+div.header_widget.marquee, div.box.marquee {
+	border: 1px solid transparent !important;
+	background: linear-gradient(var(--box-background-color), var(--box-background-color)) padding-box, linear-gradient(-45deg, rgba(128, 128, 128, 0.4) 25%, transparent 25%, transparent 50%, rgba(128, 128, 128, 0.4) 50%, rgba(128, 128, 128, 0.4) 75%, transparent 75%, transparent) 0 / 31px 31px;
+	animation: kfmarquee 2s linear infinite;
+}
+div.header_widget.marquee:hover {
+	border: 1px solid var(--theme-color-half) !important;
+}
+
+@keyframes kfmarquee { to { background-position: 30px 0; } }
 
 .header_widget.combo {
 	padding-left: 7px;
@@ -124,6 +135,10 @@ div.box_title_widget.btw_nav {
 div.box_title_widget.btw_admin {
 	font-size: 13px;
 	margin-bottom: 5px;
+}
+
+div.box_title_widget:focus-within i.mdi {
+	color: var(--theme-color);
 }
 
 div.box_title_right {
