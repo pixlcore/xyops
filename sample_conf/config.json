@@ -150,7 +150,24 @@
 					"minutes": [0]
 				}
 			],
-			"limits": [],
+			"limits": [
+				{
+					"type": "job",
+					"enabled": true,
+					"amount": 1
+				},
+				{
+					"type": "queue",
+					"enabled": true,
+					"amount": 0
+				},
+				{
+					"type": "retry",
+					"enabled": true,
+					"amount": 0,
+					"duration": 0
+				}
+			],
 			"actions": [],
 			"notes": ""
 		},
@@ -440,15 +457,15 @@
 						"master_labels": true
 					},
 					{
-						"id": "cpu_manufacturer",
-						"source": "/info/cpu/manufacturer",
+						"id": "cpu_virt",
+						"source": "/info/virt/vendor",
 						"filter": "alphanum",
 						"master_list": true,
 						"master_labels": true
 					},
 					{
 						"id": "cpu_brand",
-						"source": "/info/cpu/brand",
+						"source": "/info/cpu/combo",
 						"filter": "alphanum",
 						"master_list": true,
 						"master_labels": true
