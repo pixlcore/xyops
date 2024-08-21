@@ -63,6 +63,7 @@ Page.Dashboard = class Dashboard extends Page.Base {
 		// quickmon charts
 		html += '<div class="box" id="d_dash_monitors">';
 			html += '<div class="box_title">';
+				html += '<div class="box_title_widget" style="overflow:visible; margin-left:0;"><i class="mdi mdi-magnify" onMouseUp="$(this).next().focus()">&nbsp;</i><input type="text" placeholder="Filter" value="" onInput="$P().applyQuickMonitorFilter(this)"></div>';
 				html += 'Quick Look &mdash; All Servers';
 			html += '</div>';
 			html += '<div class="box_content table">';
@@ -286,7 +287,7 @@ Page.Dashboard = class Dashboard extends Page.Base {
 				'<div id="d_dash_jt_progress_' + job.id + '">' + self.getNiceJobProgressBar(job) + '</div>',
 				'<div id="d_dash_jt_remaining_' + job.id + '">' + self.getNiceJobRemainingTime(job, false) + '</div>',
 				
-				'<span class="link" onClick="$P().doAbortJob(\'' + job.id + '\')"><b>Abort Job</b></a>'
+				'<span class="link danger" onClick="$P().doAbortJob(\'' + job.id + '\')"><b>Abort Job</b></a>'
 			];
 		} );
 		
@@ -499,8 +500,8 @@ Page.Dashboard = class Dashboard extends Page.Base {
 				self.getNicePlugin(event.plugin, true),
 				nice_source,
 				self.getShortDateTime( job.epoch ),
-				'<i class="mdi mdi-clock-outline">&nbsp;</i>' + get_text_from_seconds( countdown, false, true ),
-				'<span class="link" onClick="$P().doSkipUpcomingJob(' + idx + ')"><b>Skip Job...</b></span>'
+				'<i class="mdi mdi-clock-outline">&nbsp;</i>' + get_text_from_seconds_round( countdown ),
+				'<span class="link danger" onClick="$P().doSkipUpcomingJob(' + idx + ')"><b>Skip Job...</b></span>'
 				// '<a href="#Job?id=' + job.id + '">Details</a>'
 			];
 		} );
@@ -596,7 +597,8 @@ Page.Dashboard = class Dashboard extends Page.Base {
 				"title": def.title,
 				"dataType": def.type,
 				"dataSuffix": def.suffix,
-				"minVertScale": def.minVertScale || 0
+				"minVertScale": def.minVertScale || 0,
+				"_quick": true
 			});
 			chart.on('mouseover', function(event) { render_chart_overlay(def.id); });
 			self.charts[ def.id ] = chart;
@@ -631,6 +633,13 @@ Page.Dashboard = class Dashboard extends Page.Base {
 			// hide if no servers
 			if (!num_keys(resp.servers)) self.div.find('#d_dash_monitors').hide();
 		}); // api.get
+		
+		// prepopulate filter if saved
+		if (this.quickMonitorFilter) {
+			var $elem = this.div.find('#d_dash_monitors .box_title_widget input[type="text"]');
+			$elem.val( this.quickMonitorFilter );
+			this.applyQuickMonitorFilter( $elem.get(0) );
+		}
 	}
 	
 	appendSampleToChart(data) {
@@ -667,6 +676,21 @@ Page.Dashboard = class Dashboard extends Page.Base {
 		}); // foreach monitor
 	}
 	
+	applyQuickMonitorFilter(elem) {
+		// hide or show specific quick monitors based on substring match on title
+		var filter = this.quickMonitorFilter = $(elem).val();
+		var re = new RegExp( escape_regexp(filter), 'i' );
+		
+		for (var key in this.charts) {
+			var chart = this.charts[key];
+			if (chart._quick) {
+				var $cont = $(chart.canvas).parent();
+				if (chart.title.match(re)) $cont.show();
+				else $cont.hide();
+			}
+		}
+	}
+	
 	onPageUpdate(pcmd, pdata) {
 		// receive data packet for this page specifically (i.e. live graph append)
 		switch (pcmd) {
@@ -684,6 +708,8 @@ Page.Dashboard = class Dashboard extends Page.Base {
 		switch (key) {
 			case 'stats': 
 				this.updateDashGrid(); 
+				this.autoExpireUpcomingJobs();
+				this.renderUpcomingJobs();
 			break;
 			
 			case 'activeAlerts': 
