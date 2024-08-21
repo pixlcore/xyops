@@ -717,7 +717,7 @@ Page.Job = class Job extends Page.Base {
 					
 					if (text.length) {
 						// render it progressively as to not hang the browser
-						self.logSpool = text.split(/\n/);
+						self.logSpool = text.trimEnd().split(/\n/);
 						self.spoolNextLogChunk();
 					}
 					else $cont.html('<div class="log_message">(Job log is empty.)</div>');
@@ -755,7 +755,7 @@ Page.Job = class Job extends Page.Base {
 			if (!self.active) return; // sanity
 			
 			var text = resp.text;
-			if (text.length) self.appendLiveJobLog(text);
+			if (text.match(/\S/)) self.appendLiveJobLog(text);
 			else self.div.find('#d_live_job_log').append( '<div class="loading_container"><div class="loading"></div></div>' );
 			
 			// set flag so live log updates can now come through
@@ -773,17 +773,23 @@ Page.Job = class Job extends Page.Base {
 		
 		if (this.emptyLogMessage) {
 			$cont.find('div.loading_container').remove();
-			$cont.addClass('active');
+			// $cont.addClass('active');
 			this.emptyLogMessage = false;
 		}
 		
 		var html = this.converter.ansi_to_html(text);
-		$cont.append( html.split(/\n/).map( function(line) { return '<p>' + (line || ' ') + '</p>'; } ).join("\n") );
+		$cont.append( html.replace(/\n$/, '').split(/\n/).map( function(line) { return '<p>' + (line || ' ') + '</p>'; } ).join("\n") );
 		
 		// only keep latest 1K chunks
 		var $children = $cont.children();
 		if ($children.length > 1000) {
 			$children.slice( 0, $children.length - 1000 ).remove();
+		}
+		
+		// auto-size
+		if (!$cont.hasClass('active')) {
+			var size = get_inner_window_size();
+			if ($cont.prop('scrollHeight') > size.height * 0.8) $cont.addClass('active');
 		}
 		
 		if (need_scroll) $cont.scrollTop( $cont.prop('scrollHeight') );
@@ -937,7 +943,7 @@ Page.Job = class Job extends Page.Base {
 		this.charts.cpu = this.createChart({
 			"canvas": '#c_live_cpu',
 			"title": "CPU Usage %",
-			"dataType": "integer",
+			"dataType": "float",
 			"dataSuffix": "%",
 			"fill": false,
 			"legend": !!app.getPref('job_chart_layers_cpu'),
@@ -1177,7 +1183,7 @@ Page.Job = class Job extends Page.Base {
 		
 		// include network conns just below procs
 		if (conns.length) {
-			cols = ['Protocol', 'State', 'Local Address', 'Peer Address', 'Process', 'Age', 'Transferred', 'Avg. Rate'];
+			cols = ['State', 'Protocol', 'Local Address', 'Peer Address', 'Process', 'Age', 'Transferred', 'Avg. Rate'];
 			cols.headerCenter = '&nbsp;';
 			cols.headerRight = '&nbsp;';
 			
@@ -1195,8 +1201,8 @@ Page.Job = class Job extends Page.Base {
 				var age = item.started ? Math.max(0, ref_time - item.started) : 0;
 				var proc = item.pid ? procs[item.pid] : null;
 				return [
+					'<i class="mdi mdi-network-outline">&nbsp;</i><b>' + nice_state + '</b>',
 					item.type.toUpperCase(),
-					nice_state,
 					item.local_addr,
 					item.remote_addr,
 					proc ? self.getNiceProcess(proc, true) : (item.pid || '(None)'),
@@ -1423,8 +1429,6 @@ Page.Job = class Job extends Page.Base {
 		var procs = updates.procs;
 		var conns = updates.conns;
 		
-		console.log( "Got here, in updateMinuteTimeline", updates ); // TODO: make sure this is really called -- need long running job
-		
 		var job = this.job;
 		var timelines = job.timelines;
 		
@@ -1608,7 +1612,7 @@ Page.Job = class Job extends Page.Base {
 		// copy job json to clipboard
 		var code = this.getJobJSON();
 		copyToClipboard(code);
-		app.showMessage('success', "Job data JSON copied to your clipboard.");
+		app.showMessage('info', "Job data JSON copied to your clipboard.");
 	}
 	
 	do_download_job_data() {
@@ -1667,6 +1671,8 @@ Page.Job = class Job extends Page.Base {
 		// and to detect job completion
 		if (!this.job || (this.job.state == 'complete')) return;
 		
+		var old_state = this.job.state;
+		
 		var updates = app.activeJobs[ this.job.id ];
 		if (updates) {
 			for (var key in updates) this.job[key] = updates[key];
@@ -1683,7 +1689,7 @@ Page.Job = class Job extends Page.Base {
 			return;
 		}
 		
-		if (!updates) {
+		if (!updates || ((old_state != 'complete') && (this.job.state == 'complete'))) {
 			// job has completed under our noses!  reload page!
 			Debug.trace('job', "Job has completed, refreshing page");
 			Nav.refresh();
