@@ -238,7 +238,7 @@ app.comm = {
 	
 	handleActivity: function(item) {
 		// something was logged to the activity log, show notification
-		Debug.trace('comm', "Activity log update: " + item.action + ": " + item.description);
+		Debug.trace('debug', "Activity log update: " + item.action + ": " + JSON.stringify(item));
 		
 		// determine activity type (icon, label)
 		var item_type = null;
