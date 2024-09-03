@@ -347,7 +347,7 @@ Page.Snapshots = class Snapshots extends Page.ServerUtils {
 		
 		html += '<div class="box">';
 			html += '<div class="box_title">';
-				html += 'Summary';
+				html += 'Snapshot Summary';
 				
 				html += '<div class="button right danger" onMouseUp="$P().showDeleteSnapshotDialog()"><i class="mdi mdi-trash-can-outline">&nbsp;</i>Delete...</div>';
 				// html += '<div class="button secondary right" onMouseUp="$P().do_edit_from_view()"><i class="mdi mdi-file-edit-outline">&nbsp;</i>Edit Event...</div>';
