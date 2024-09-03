@@ -49,6 +49,9 @@
 	"hostname_display_strip": "\\.[\\w\\-]+\\.\\w+$",
 	"tick_precision_ms": 50,
 	
+	"alert_email_to": "",
+	"alert_web_hook": "",
+	
 	"hooks": {
 		"job_complete": { "shell_exec": "date" }
 	},
@@ -56,7 +59,9 @@
 	"hook_text_templates": {
 		"job_start": "Orchestra Job started on [server/hostname]: [event/title]: [links/job_details]",
 		"job_success": "Orchestra Job completed successfully on [server/hostname]: [event/title]: [links/job_details]",
-		"job_error": "Orchestra Job failed on [server/hostname]: [event/title]: Error [job/code]: [job/description]: [links/job_details]"
+		"job_error": "Orchestra Job failed on [server/hostname]: [event/title]: Error [job/code]: [job/description]: [links/job_details]",
+		"alert_new": "Orchestra Alert: [nice_server]: [def.title]: [alert.message]: [alert_url]",
+		"alert_cleared": "Orchestra Alert Cleared: [nice_server]: [def.title]"
 	},
 	
 	"multi": {
