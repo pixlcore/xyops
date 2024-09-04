@@ -152,6 +152,7 @@
 		"items_per_page": 50,
 		"alt_items_per_page": 25,
 		"events_per_page": 500,
+		"alt_to_toggle": false,
 		
 		"new_event_template": { 
 			"id": "",
@@ -187,13 +188,6 @@
 			"actions": [],
 			"notes": ""
 		},
-		
-		"extra_server_info": {
-			"title": "Kernel Version",
-			"source": "[os/platform] [os/kernel]"
-		},
-		"first_year": 2020,
-		"max_legend_size": 16,
 		
 		"chart_defaults": {
 			"lineWidth": 2,
