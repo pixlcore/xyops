@@ -112,6 +112,12 @@ Page.Plugins = class Plugins extends Page.Base {
 		// toggle plugin checkbox, actually do the enable/disable here, update row
 		var self = this;
 		var item = this.plugins[idx];
+		
+		if (config.alt_to_toggle && !app.lastClick.altKey) {
+			$(elem).prop('checked', !$(elem).is(':checked'));
+			return app.showMessage('warning', "Accidental Click Protection: Please hold the Alt/Opt key to toggle this checkbox.", 8);
+		}
+		
 		item.enabled = !!$(elem).is(':checked');
 		
 		app.api.post( 'app/update_plugin', item, function(resp) {

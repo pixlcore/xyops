@@ -101,6 +101,12 @@ Page.WebHooks = class WebHooks extends Page.Base {
 		// toggle web hook checkbox, actually do the enable/disable here, update row
 		var self = this;
 		var item = this.web_hooks[idx];
+		
+		if (config.alt_to_toggle && !app.lastClick.altKey) {
+			$(elem).prop('checked', !$(elem).is(':checked'));
+			return app.showMessage('warning', "Accidental Click Protection: Please hold the Alt/Opt key to toggle this checkbox.", 8);
+		}
+		
 		item.enabled = !!$(elem).is(':checked');
 		
 		app.api.post( 'app/update_web_hook', item, function(resp) {
