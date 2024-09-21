@@ -448,7 +448,7 @@ Page.Search = class Search extends Page.Base {
 		
 		html += '<div class="box">';
 		
-		html += '<div class="box_title" style="' + (this.jobs.length ? 'padding-bottom:10px' : '') + '">';
+		html += '<div class="box_title">';
 			html += this.getSearchArgs() ? 'Search Results' : 'All Completed Jobs';
 			html += '<div class="clear"></div>';
 		html += '</div>';
@@ -468,10 +468,35 @@ Page.Search = class Search extends Page.Base {
 			];
 		} );
 		
+		if (this.jobs.length && app.hasPrivilege('delete_jobs')) {
+			html += '<div style="margin-top: 30px;">';
+			html += '<div class="button right danger" onMouseUp="$P().do_bulk_delete()"><i class="mdi mdi-trash-can-outline">&nbsp;</i>Delete Results...</div>';
+			html += '<div class="clear"></div>';
+			html += '</div>';
+		}
+		
 		html += '</div>'; // box_content
 		html += '</div>'; // box
 		
 		$results.html( html );
+	}
+	
+	do_bulk_delete() {
+		// start bulk delete job after danger confirmation
+		var total = this.lastSearchResp.list.length;
+		var args = this.args;
+		var query = this.getSearchQuery(args);
+		
+		Dialog.confirmDanger( 'Delete All Results', "Are you sure you want to <b>permanently delete</b> all " + commify(total) + " search results?", 'Delete All', function(result) {
+			if (!result) return;
+			app.clearError();
+			Dialog.showProgress( 1.0, "Starting Bulk Delete..." );
+			
+			app.api.post( 'app/bulk_search_delete_jobs', { query: query }, function(resp) {
+				Dialog.hideProgress();
+				app.showMessage('success', "Your bulk delete job was started in the background.  You can monitor its progress on the Dashboard.", 8, '#Dashboard');
+			} ); // api.post
+		} ); // confirm
 	}
 	
 	searchPaginate(offset) {
