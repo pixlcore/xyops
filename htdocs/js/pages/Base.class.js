@@ -37,7 +37,7 @@ Page.Base = class Base extends Page {
 		if (typeof(item) == 'string') item = { id: item };
 		
 		var html = '<span class="nowrap">';
-		var icon = '<i class="mdi mdi-database">&nbsp;</i>';
+		var icon = '<i class="mdi mdi-database"></i>';
 		html += icon + item.id;
 		html += '</span>';
 		
