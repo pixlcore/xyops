@@ -113,7 +113,8 @@ app.extend({
 			{ ID: 'Servers' },
 			{ ID: 'ServerHist' },
 			{ ID: 'Snapshots' },
-			{ ID: 'Alerts' }
+			{ ID: 'Alerts' },
+			{ ID: 'System' }
 		];
 		this.config.DefaultPage = 'Dashboard';
 		
