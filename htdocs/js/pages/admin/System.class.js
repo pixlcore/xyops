@@ -259,7 +259,7 @@ Page.System = class System extends Page.Base {
 				self.getNiceUser(job.username),
 				
 				'<div id="d_sys_job_progress_' + job.id + '">' + self.getNiceJobProgressBar(job) + '</div>',
-				'<div id="d_sys_job_elapsed_' + job.id + '">' + self.getNiceJobElapsedTime(job, false) + '</div>',
+				'<div id="d_sys_job_elapsed_' + job.id + '">' + self.getNiceJobElapsedTime(job, false, true) + '</div>',
 				'<div id="d_sys_job_remaining_' + job.id + '">' + self.getNiceJobRemainingTime(job, false) + '</div>'
 			];
 		} );
@@ -275,7 +275,7 @@ Page.System = class System extends Page.Base {
 		var jobs = Object.values(app.internalJobs);
 		
 		jobs.forEach( function(job) {
-			div.find('#d_sys_job_elapsed_' + job.id).html( self.getNiceJobElapsedTime(job, false) );
+			div.find('#d_sys_job_elapsed_' + job.id).html( self.getNiceJobElapsedTime(job, false, true) );
 			div.find('#d_sys_job_remaining_' + job.id).html( self.getNiceJobRemainingTime(job, false) );
 			
 			// update progress bar without redrawing it (so animation doesn't jitter)
@@ -572,12 +572,13 @@ Page.System = class System extends Page.Base {
 	do_run_maint() {
 		// run daily maintenance manually
 		var self = this;
-		var html = "This runs the nightly database maintenance process manually.  The maintenance job deletes old data that has expired, and optionally backs up the database if configured.";
+		var html = "This runs the nightly database maintenance process manually.  The maintenance job deletes old data that has expired, and optionally backs up the database if configured.  This will run multiple internal jobs in sequence.";
 		
 		Dialog.confirm( 'Run Maintenance', html, 'Run Now', function(result) {
 			if (!result) return;
+			Dialog.hide();
 			
-			app.api.post( 'app/admin_run_maintenance', { items }, function(resp) {
+			app.api.post( 'app/admin_run_maintenance', {}, function(resp) {
 				app.showMessage('success', "Your maintenance job has started in the background.");
 			}); // api.post
 		} ); // confirm
@@ -590,8 +591,9 @@ Page.System = class System extends Page.Base {
 		
 		Dialog.confirm( 'Optimize Database', html, 'Optimize Now', function(result) {
 			if (!result) return;
+			Dialog.hide();
 			
-			app.api.post( 'app/admin_run_optimization', { items }, function(resp) {
+			app.api.post( 'app/admin_run_optimization', {}, function(resp) {
 				app.showMessage('success', "Your optimization job has started in the background.");
 			}); // api.post
 		} ); // confirm
@@ -604,8 +606,9 @@ Page.System = class System extends Page.Base {
 		
 		Dialog.confirm( 'Reset Daily Stats', html, 'Reset Now', function(result) {
 			if (!result) return;
+			Dialog.hide();
 			
-			app.api.post( 'app/admin_reset_daily_stats', { items }, function(resp) {
+			app.api.post( 'app/admin_reset_daily_stats', {}, function(resp) {
 				app.showMessage('success', "The daily statistics have been reset.");
 			}); // api.post
 		} ); // confirm
