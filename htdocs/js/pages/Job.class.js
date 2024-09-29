@@ -1204,10 +1204,13 @@ Page.Job = class Job extends Page.Base {
 		var tline = (job.final && (job.elapsed > 300)) ? 'minute' : 'second';
 		this.charts = {};
 		
-		if (!timelines.second || !timelines.second.length) {
-			this.div.find('#d_job_graphs').hide();
-			return;
-		}
+		// if (!timelines.second || !timelines.second.length) {
+		// 	this.div.find('#d_job_graphs').hide();
+		// 	return;
+		// }
+		
+		if (!timelines.minute) timelines.minute = [];
+		if (!timelines.second) timelines.second = [];
 		
 		this.charts.cpu = this.createChart({
 			"canvas": '#c_live_cpu',
@@ -1296,6 +1299,7 @@ Page.Job = class Job extends Page.Base {
 		
 		['cpu', 'mem', 'disk', 'net'].forEach( function(key) {
 			var chart = self.charts[key];
+			
 			chart.layers = [];
 			chart.addLayers( self.getChartLayers(timelines[ chart._timeline ], chart._procKey, chart) );
 		} );
