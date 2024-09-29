@@ -143,10 +143,10 @@ Page.System = class System extends Page.Base {
 		var html = '';
 		
 		// orch version
-		html += '<div class="dash_unit_box">';
-			html += '<div class="dash_unit_value">' + data.version + '</div>';
-			html += '<div class="dash_unit_label">Orchestra Version</div>';
-		html += '</div>';
+		// html += '<div class="dash_unit_box">';
+		// 	html += '<div class="dash_unit_value">' + data.version + '</div>';
+		// 	html += '<div class="dash_unit_label">Orchestra Version</div>';
+		// html += '</div>';
 		
 		// node version
 		// html += '<div class="dash_unit_box">';
@@ -154,16 +154,22 @@ Page.System = class System extends Page.Base {
 		// 	html += '<div class="dash_unit_label">Node.js Version</div>';
 		// html += '</div>';
 		
-		// process mem
-		html += '<div class="dash_unit_box">';
-			html += '<div class="dash_unit_value">' + get_text_from_bytes(stats.mem, 1) + '</div>';
-			html += '<div class="dash_unit_label">Process Mem</div>';
-		html += '</div>';
-		
 		// process cpu (or load?)
 		html += '<div class="dash_unit_box">';
 			html += '<div class="dash_unit_value">' + Math.round(stats.cpu) + '%</div>';
 			html += '<div class="dash_unit_label">Process CPU</div>';
+		html += '</div>';
+		
+		// process mem
+		html += '<div class="dash_unit_box">';
+			html += '<div class="dash_unit_value">' + get_text_from_bytes(stats.mem, 1) + '</div>';
+			html += '<div class="dash_unit_label">Process Memory</div>';
+		html += '</div>';
+		
+		// sqlite mem (external)
+		html += '<div class="dash_unit_box">';
+			html += '<div class="dash_unit_value">' + get_text_from_bytes(stats.memoryUsage.external || 0, 1) + '</div>';
+			html += '<div class="dash_unit_label">DB Memory</div>';
 		html += '</div>';
 		
 		// process uptime
@@ -173,16 +179,16 @@ Page.System = class System extends Page.Base {
 		// 	html += '<div class="dash_unit_label">Uptime</div>';
 		// html += '</div>';
 		
-		// storage cache objects
-		html += '<div class="dash_unit_box">';
-			html += '<div class="dash_unit_value">' + (data.cache ? commify(data.cache.count) : 'n/a') + '</div>';
-			html += '<div class="dash_unit_label">Cache Objects</div>';
-		html += '</div>';
-		
 		// storage cache mem
 		html += '<div class="dash_unit_box">';
 			html += '<div class="dash_unit_value">' + (data.cache ? get_text_from_bytes(data.cache.bytes, 1) : 'n/a') + '</div>';
 			html += '<div class="dash_unit_label">Cache Memory</div>';
+		html += '</div>';
+		
+		// storage cache objects
+		html += '<div class="dash_unit_box">';
+			html += '<div class="dash_unit_value">' + (data.cache ? this.getNiceDashNumber(data.cache.count) : 'n/a') + '</div>';
+			html += '<div class="dash_unit_label">Cache Objects</div>';
 		html += '</div>';
 		
 		// cache full
@@ -194,36 +200,36 @@ Page.System = class System extends Page.Base {
 		// sqlite db file size
 		html += '<div class="dash_unit_box">';
 			html += '<div class="dash_unit_value">' + (data.db.sqlite ? get_text_from_bytes(data.db.sqlite, 1) : 'n/a') + '</div>';
-			html += '<div class="dash_unit_label">DB Index Disk Size</div>';
+			html += '<div class="dash_unit_label">DB Disk Size</div>';
 		html += '</div>';
 		
 		// jobs table row count
 		html += '<div class="dash_unit_box">';
-			html += '<div class="dash_unit_value">' + commify(data.db.records.jobs || 0) + '</div>';
+			html += '<div class="dash_unit_value">' + this.getNiceDashNumber(data.db.records.jobs || 0) + '</div>';
 			html += '<div class="dash_unit_label">Job DB Rows</div>';
 		html += '</div>';
 		
 		// servers table row count
 		html += '<div class="dash_unit_box">';
-			html += '<div class="dash_unit_value">' + commify(data.db.records.servers || 0) + '</div>';
+			html += '<div class="dash_unit_value">' + this.getNiceDashNumber(data.db.records.servers || 0) + '</div>';
 			html += '<div class="dash_unit_label">Server DB Rows</div>';
 		html += '</div>';
 		
 		// snapshots table row count
 		html += '<div class="dash_unit_box">';
-			html += '<div class="dash_unit_value">' + commify(data.db.records.snapshots || 0) + '</div>';
+			html += '<div class="dash_unit_value">' + this.getNiceDashNumber(data.db.records.snapshots || 0) + '</div>';
 			html += '<div class="dash_unit_label">Snapshot DB Rows</div>';
 		html += '</div>';
 		
 		// alerts table row count
 		html += '<div class="dash_unit_box">';
-			html += '<div class="dash_unit_value">' + commify(data.db.records.alerts || 0) + '</div>';
+			html += '<div class="dash_unit_value">' + this.getNiceDashNumber(data.db.records.alerts || 0) + '</div>';
 			html += '<div class="dash_unit_label">Alert DB Rows</div>';
 		html += '</div>';
 		
 		// activity table row count
 		html += '<div class="dash_unit_box">';
-			html += '<div class="dash_unit_value">' + commify(data.db.records.activity || 0) + '</div>';
+			html += '<div class="dash_unit_value">' + this.getNiceDashNumber(data.db.records.activity || 0) + '</div>';
 			html += '<div class="dash_unit_label">Activity DB Rows</div>';
 		html += '</div>';
 		
