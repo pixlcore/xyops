@@ -61,10 +61,10 @@ Page.MySecurity = class MySecurity extends Page.Base {
 			if (!item.action) item.action = 'unknown';
 			
 			var item_type = '';
-			for (var key in app.activity_types) {
+			for (var key in config.activity_types) {
 				var regexp = new RegExp(key);
 				if (item.action.match(regexp)) {
-					item_type = app.activity_types[key];
+					item_type = config.activity_types[key];
 					break;
 				}
 			}
