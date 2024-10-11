@@ -63,7 +63,6 @@ app.extend({
 			{ ID: 'MySettings' },
 			{ ID: 'APIKeys' },
 			{ ID: 'Groups' },
-			{ ID: 'Commands' },
 			{ ID: 'Monitors' },
 			{ ID: 'AlertSetup' },
 			{ ID: 'Categories' },
@@ -146,7 +145,7 @@ app.extend({
 	
 	presortTables: function() {
 		// pre-sort tables by sort order, or by title
-		['groups', 'plugins', 'categories', 'events', 'channels', 'monitors', 'alerts', 'commands'].forEach( function(key) {
+		['groups', 'plugins', 'categories', 'events', 'channels', 'monitors', 'alerts'].forEach( function(key) {
 			if (app[key].length && ('sort_order' in app[key][0])) {
 				app[key].sort( function(a, b) {
 					return (a.sort_order < b.sort_order) ? -1 : 1;
@@ -698,7 +697,7 @@ app.extend({
 	
 	requirePrivilege: function(priv_id) {
 		// check if user has priv, show error toast if not
-		var priv = find_object( config.privilege_list, { id: priv_id } ) || { title: priv_id };
+		var priv = find_object( config.ui.privilege_list, { id: priv_id } ) || { title: priv_id };
 		if (!this.hasPrivilege(priv_id)) return this.doError("Your account requires the &ldquo;" + priv.title + "&rdquo; privilege to perform this action.");
 		return true;
 	},

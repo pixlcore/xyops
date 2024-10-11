@@ -315,7 +315,7 @@ Page.APIKeys = class APIKeys extends Page.Base {
 				id: 'fe_ak_privs',
 				title: 'Select Privileges',
 				placeholder: 'Click to assign privileges...',
-				options: config.privilege_list,
+				options: config.ui.privilege_list,
 				values: hash_keys_to_array( api_key.privileges ),
 				default_icon: 'card-bulleted-outline',
 				onChange: '$P().onPrivChange(this)',

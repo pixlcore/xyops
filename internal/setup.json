@@ -41,6 +41,7 @@
 			"enabled": 1,
 			"command": "[test-plugin]",
 			"username": "admin",
+			"type": "event",
 			"modified": 1434125333,
 			"created": 1434125333,
 			"params": [
@@ -60,6 +61,7 @@
 			"enabled": 1,
 			"command": "[shell-plugin]",
 			"username": "admin",
+			"type": "event",
 			"modified": 1434125333,
 			"created": 1434125333,
 			"params": [
@@ -74,6 +76,7 @@
 			"enabled": 1,
 			"command": "[http-plugin]",
 			"username": "admin",
+			"type": "event",
 			"modified": 1434125333,
 			"created": 1434125333,
 			"params": [
@@ -89,6 +92,21 @@
 				{ "type":"checkbox", "id":"ssl_cert_bypass", "title":"SSL Cert Bypass", "value":false }
 			]
 		} ],
+		[ "listPush", "global/plugins", {
+			"id": "open_files",
+			"title": "Count Open Files",
+			"command": "/bin/sh",
+			"script": "cat /proc/sys/fs/file-nr",
+			"groups": [],
+			"enabled": true,
+			"format": "text",
+			"notes": "This is for Linux only.",
+			"username": "admin",
+			"type": "monitor",
+			"modified": 1434125333,
+			"created": 1434125333
+		} ],
+		
 		[ "listCreate", "global/categories", {} ],
 		[ "listPush", "global/categories", {
 			"id": "general",
@@ -439,22 +457,6 @@
 			"limit_jobs": true,
 			"abort_jobs": false,
 			"notes": "",
-			"username": "admin",
-			"modified": 1434125333,
-			"created": 1434125333
-		} ],
-		
-		[ "listCreate", "global/commands", { "page_size": 100 } ],
-		[ "listPush", "global/commands", {
-			"id": "open_files",
-			"title": "Count Open Files",
-			"exec": "/bin/sh",
-			"script": "cat /proc/sys/fs/file-nr",
-			"groups": [],
-			"enabled": true,
-			"format": "text",
-			"timeout": 5,
-			"notes": "This is for Linux only.",
 			"username": "admin",
 			"modified": 1434125333,
 			"created": 1434125333

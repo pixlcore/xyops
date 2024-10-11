@@ -29,7 +29,7 @@ Page.ActivityLog = class ActivityLog extends Page.Base {
 		if (!args.offset) args.offset = 0;
 		if (!args.limit) args.limit = 25;
 		
-		var action_items = [].concat( config.list_list ).concat([
+		var action_items = [].concat( config.ui.list_list ).concat([
 			{ "id": "jobs", "title": "Jobs", "icon": "timer-outline" },
 			{ "id": "servers", "title": "Servers", "icon": "router-network" },
 			{ "id": "peers", "title": "Conductors", "icon": "database" },
@@ -209,9 +209,9 @@ Page.ActivityLog = class ActivityLog extends Page.Base {
 		
 		if (args.action) {
 			// each action is an alias -- lookup the individual actions for the query
-			var re = new RegExp( config.activity_search_map[args.action] || '.+' );
+			var re = new RegExp( config.ui.activity_search_map[args.action] || '.+' );
 			var keys = [];
-			for (var key in config.activity_descriptions) {
+			for (var key in config.ui.activity_descriptions) {
 				if (key.match(re)) keys.push( key );
 			}
 			if (keys.length) query += ' action:' + keys.join('|');
@@ -292,18 +292,18 @@ Page.ActivityLog = class ActivityLog extends Page.Base {
 			if (!item.action) item.action = 'unknown';
 			
 			var item_type = '';
-			for (var key in config.activity_types) {
+			for (var key in config.ui.activity_types) {
 				var regexp = new RegExp(key);
 				if (item.action.match(regexp)) {
-					item_type = config.activity_types[key];
+					item_type = config.ui.activity_types[key];
 					break;
 				}
 			}
 			item._type = item_type;
 			
 			var search_key = '';
-			for (var key in config.activity_search_map) {
-				var regexp = new RegExp( config.activity_search_map[key] );
+			for (var key in config.ui.activity_search_map) {
+				var regexp = new RegExp( config.ui.activity_search_map[key] );
 				if (item.action.match(regexp)) {
 					search_key = key;
 					break;
@@ -317,7 +317,7 @@ Page.ActivityLog = class ActivityLog extends Page.Base {
 			var click = '';
 			
 			// description template
-			var template = config.activity_descriptions[item.action];
+			var template = config.ui.activity_descriptions[item.action];
 			if (template) desc = substitute(template, item, false);
 			else if (!desc) desc = '(No description provided)';
 			item._desc = desc;
@@ -351,13 +351,6 @@ Page.ActivityLog = class ActivityLog extends Page.Base {
 				case 'channels':
 					if (item.channel) {
 						click = `$P().showActionReport(${idx},'channel')`;
-						actions.push(`<span class="link" onClick="${click}"><b>Details...</b></span>`);
-					}
-				break;
-				
-				case 'commands':
-					if (item.command) {
-						click = `$P().showActionReport(${idx},'command')`;
 						actions.push(`<span class="link" onClick="${click}"><b>Details...</b></span>`);
 					}
 				break;
@@ -487,7 +480,7 @@ Page.ActivityLog = class ActivityLog extends Page.Base {
 	showActionReport(idx, obj_key) {
 		// pop dialog for any action
 		var item = this.items[idx];
-		var template = config.activity_descriptions[item.action];
+		var template = config.ui.activity_descriptions[item.action];
 		
 		// massage a title out of description template (ugh)
 		var title = template.replace(/\:\s+.+$/, '').replace(/\s+\(.+$/, '');

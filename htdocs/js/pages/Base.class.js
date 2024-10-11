@@ -212,25 +212,6 @@ Page.Base = class Base extends Page {
 		return html;
 	}
 	
-	getNiceCommand(item, link) {
-		// get formatted command with icon, plus optional link
-		if (typeof(item) == 'string') item = find_object(app.commands, { id: item });
-		if (!item) return '(None)';
-		
-		var html = '<span class="nowrap">';
-		var icon = '<i class="mdi mdi-' + (item.icon || 'pound-box-outline') + '"></i>';
-		if (link) {
-			html += '<a href="#Commands?sub=edit&id=' + item.id + '">';
-			html += icon + '<span>' + item.title + '</span></a>';
-		}
-		else {
-			html += icon + item.title;
-		}
-		
-		html += '</span>';
-		return html;
-	}
-	
 	getNiceChannel(item, link) {
 		// get formatted channel with icon, plus optional link
 		if (typeof(item) == 'string') item = find_object(app.channels, { id: item });
@@ -284,6 +265,24 @@ Page.Base = class Base extends Page {
 			html += icon + item.title;
 		}
 		
+		html += '</span>';
+		return html;
+	}
+	
+	getNicePluginType(type) {
+		// get formatted plugin type
+		var icon = '';
+		var title = '';
+		
+		switch (type) {
+			case 'event': icon = 'calendar-clock'; title = 'Event'; break;
+			case 'monitor': icon = 'console'; title = 'Monitor'; break;
+			case 'action': icon = 'eye-outline'; title = 'Action'; break;
+			case 'scheduler': icon = 'clock-time-four-outline'; title = 'Scheduler'; break;
+		}
+		
+		var html = '<span class="nowrap">';
+		html += '<i class="mdi mdi-' + icon + '"></i><span>' + title + ' Plugin</span>';
 		html += '</span>';
 		return html;
 	}
@@ -2430,18 +2429,7 @@ Page.Base = class Base extends Page {
 		html += '<div class="code_viewer">';
 		html += '<div class="markdown-body">';
 		
-		html += marked(text, {
-			gfm: true,
-			tables: true,
-			breaks: false,
-			pedantic: false,
-			sanitize: false,
-			smartLists: true,
-			smartypants: false,
-			silent: true,
-			headerIds: false,
-			mangle: false
-		});
+		html += marked(text, config.ui.marked_config);
 		
 		html += '</div>'; // markdown-body
 		html += '</div>'; // code_viewer

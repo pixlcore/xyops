@@ -532,7 +532,7 @@ Page.Users = class Users extends Page.Base {
 				id: 'fe_eu_privs',
 				title: 'Select Privileges',
 				placeholder: 'Click to assign privileges...',
-				options: config.privilege_list,
+				options: config.ui.privilege_list,
 				values: hash_keys_to_array( user.privileges ),
 				default_icon: 'card-bulleted-outline',
 				onChange: '$P().onPrivChange(this)',

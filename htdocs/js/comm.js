@@ -260,10 +260,10 @@ app.comm = {
 		
 		// determine activity type (icon, label)
 		var item_type = null;
-		for (var key in config.activity_types) {
+		for (var key in config.ui.activity_types) {
 			var regexp = new RegExp(key);
 			if (item.action.match(regexp)) {
-				item_type = config.activity_types[key];
+				item_type = config.ui.activity_types[key];
 				break;
 			}
 		}
@@ -283,7 +283,7 @@ app.comm = {
 		
 		// compose proper description
 		var desc = item.description;
-		var template = config.activity_descriptions[item.action];
+		var template = config.ui.activity_descriptions[item.action];
 		if (template) desc = substitute(template, item, false);
 		else if (!desc) desc = '(No description provided)';
 		

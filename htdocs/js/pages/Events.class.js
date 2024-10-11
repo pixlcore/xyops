@@ -1355,10 +1355,10 @@ Page.Events = class Events extends Page.Base {
 			if (!item.action) item.action = 'unknown';
 			
 			var item_type = '';
-			for (var key in config.activity_types) {
+			for (var key in config.ui.activity_types) {
 				var regexp = new RegExp(key);
 				if (item.action.match(regexp)) {
-					item_type = config.activity_types[key];
+					item_type = config.ui.activity_types[key];
 					break;
 				}
 			}
@@ -1371,7 +1371,7 @@ Page.Events = class Events extends Page.Base {
 			var nice_rev = 'n/a';
 			
 			// description template
-			var template = config.activity_descriptions[item.action];
+			var template = config.ui.activity_descriptions[item.action];
 			if (template) desc = substitute(template, item, false);
 			else if (!desc) desc = '(No description provided)';
 			item._desc = desc;
@@ -1410,7 +1410,7 @@ Page.Events = class Events extends Page.Base {
 	showActionReport(idx) {
 		// pop dialog for any action
 		var item = this.revisions[idx];
-		var template = config.activity_descriptions[item.action];
+		var template = config.ui.activity_descriptions[item.action];
 		var is_cur_rev = (item.event.revision === this.event.revision);
 		
 		// massage a title out of description template (ugh)

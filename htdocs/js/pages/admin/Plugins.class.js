@@ -62,7 +62,7 @@ Page.Plugins = class Plugins extends Page.Base {
 		this.plugins = resp.rows;
 		
 		// NOTE: Don't change these columns without also changing the responsive css column collapse rules in style.css
-		var cols = ['<i class="mdi mdi-checkbox-marked-outline"></i>', 'Plugin Title', 'Plugin ID', 'Events', 'Author', 'Created', 'Actions'];
+		var cols = ['<i class="mdi mdi-checkbox-marked-outline"></i>', 'Plugin Title', 'Plugin ID', 'Type', 'Author', 'Created', 'Actions'];
 		
 		html += '<div class="box">';
 		html += '<div class="box_title">';
@@ -86,7 +86,8 @@ Page.Plugins = class Plugins extends Page.Base {
 				}) + '</div>',
 				'<b>' + self.getNicePlugin(item, true) + '</b>',
 				'<span class="mono">' + item.id + '</span>',
-				commify( num_events ),
+				self.getNicePluginType(item.type),
+				// commify( num_events ),
 				self.getNiceUser(item.username, app.isAdmin()),
 				'<span title="'+self.getNiceDateTimeText(item.created)+'">'+self.getNiceDate(item.created)+'</span>',
 				actions.join(' | ')
@@ -163,6 +164,11 @@ Page.Plugins = class Plugins extends Page.Base {
 			"id": "",
 			"title": "",
 			"enabled": true,
+			"type": "event",
+			"command": "",
+			"script": "",
+			"groups": [],
+			"format": "text",
 			"params": [],
 			"notes": ""
 		};
@@ -182,10 +188,11 @@ Page.Plugins = class Plugins extends Page.Base {
 		
 		this.div.html( html );
 		
-		// MultiSelect.init( this.div.find('select[multiple]') );
-		SingleSelect.init( this.div.find('#fe_ep_icon') );
+		SingleSelect.init( this.div.find('#fe_ep_icon, #fe_ep_type') );
+		MultiSelect.init( this.div.find('select[multiple]') );
 		// this.updateAddRemoveMe('#fe_ep_email');
 		$('#fe_ep_title').focus();
+		this.setPluginType();
 		this.setupBoxButtonFloater();
 		
 		this.setupDraggableTable({
@@ -270,8 +277,10 @@ Page.Plugins = class Plugins extends Page.Base {
 		
 		// lock ID for editing
 		$('#fe_ep_id').attr('disabled', true);
-		SingleSelect.init( this.div.find('#fe_ep_icon') );
+		SingleSelect.init( this.div.find('#fe_ep_icon, #fe_ep_type') );
+		MultiSelect.init( this.div.find('select[multiple]') );
 		// this.updateAddRemoveMe('#fe_ep_email');
+		this.setPluginType();
 		this.setupBoxButtonFloater();
 		
 		this.setupDraggableTable({
@@ -310,11 +319,11 @@ Page.Plugins = class Plugins extends Page.Base {
 		var self = this;
 		
 		// check for events first
-		var plugin_events = find_objects( app.events, { plugin: this.plugin.id } );
-		var num_events = plugin_events.length;
-		if (num_events) return app.doError("Sorry, you cannot delete a plugin that has events assigned to it.");
+		// var plugin_events = find_objects( app.events, { plugin: this.plugin.id } );
+		// var num_events = plugin_events.length;
+		// if (num_events) return app.doError("Sorry, you cannot delete a plugin that has events assigned to it.");
 		
-		Dialog.confirmDanger( 'Delete Plugin', "Are you sure you want to <b>permanently delete</b> the plugin &ldquo;" + this.plugin.title + "&rdquo;?  There is no way to undo this action.", 'Delete', function(result) {
+		Dialog.confirmDanger( 'Delete Plugin', "Are you sure you want to <b>permanently delete</b> the " + this.plugin.type + " plugin &ldquo;" + this.plugin.title + "&rdquo;?  There is no way to undo this action.", 'Delete', function(result) {
 			if (result) {
 				Dialog.showProgress( 1.0, "Deleting Plugin..." );
 				app.api.post( 'app/delete_plugin', self.plugin, self.delete_plugin_finish.bind(self) );
@@ -329,7 +338,7 @@ Page.Plugins = class Plugins extends Page.Base {
 		if (!this.active) return; // sanity
 		
 		Nav.go('Plugins?sub=list', 'force');
-		app.showMessage('success', "The plugin &ldquo;" + this.plugin.title + "&rdquo; was deleted successfully.");
+		app.showMessage('success', "The " + this.plugin.type + " plugin &ldquo;" + this.plugin.title + "&rdquo; was deleted successfully.");
 	}
 	
 	get_plugin_edit_html() {
@@ -371,7 +380,27 @@ Page.Plugins = class Plugins extends Page.Base {
 				label: 'Plugin Enabled',
 				checked: plugin.enabled
 			}),
-			caption: 'Check this box to enable all jobs for the plugin.'
+			caption: 'Check this box to enable the plugin for use.'
+		});
+		
+		// type
+		html += this.getFormRow({
+			label: 'Plugin Type:',
+			content: this.getFormMenuSingle({
+				id: 'fe_ep_type',
+				title: 'Select Plugin Type',
+				placeholder: 'Select type for plugin...',
+				options: [
+					{ id: 'action', title: 'Action Plugin', icon: 'eye-outline' },
+					{ id: 'event', title: 'Event Plugin', icon: 'calendar-clock' },
+					{ id: 'monitor', title: 'Monitor Plugin', icon: 'console' },
+					{ id: 'scheduler', title: 'Scheduler Plugin', icon: 'clock-time-four-outline' }
+				],
+				onChange: '$P().setPluginType()',
+				value: plugin.type || '',
+				// 'data-shrinkwrap': 1
+			}),
+			caption: '<span id="s_ep_plugin_type_desc"></span>'
 		});
 		
 		// icon
@@ -397,14 +426,56 @@ Page.Plugins = class Plugins extends Page.Base {
 				spellcheck: 'false',
 				value: plugin.command || ''
 			}),
-			caption: 'Enter the filesystem path to your executable, including any command-line arguments. Do not include any pipes or redirects. For those, please use the <b>Shell Plugin</b>.'
+			caption: 'Enter the filesystem path to your executable, including any command-line arguments you requre.  This can be an interpreter like <code>/bin/sh</code> or <code>/usr/bin/python</code>, or your own custom binary.  Do not include any pipes or redirects here.'
 		});
 		
-		// params
+		// script
 		html += this.getFormRow({
+			label: 'Script:',
+			content: this.getFormTextarea({
+				id: 'fe_ep_script',
+				class: 'monospace',
+				rows: 5,
+				value: plugin.script || ''
+			}),
+			caption: 'Optionally enter your Plugin source code here, which will be written to a temporary file and passed as an argument to your executable.  Leave this blank if your Plugin executable should run standalone.'
+		});
+		
+		// params (non-monitor only)
+		html += this.getFormRow({
+			id: 'd_ep_params',
 			label: 'Parameters:',
 			content: '<div id="d_ep_params_table">' + this.getParamsTable() + '</div>',
 			caption: 'Parameters are passed to your Plugin via JSON, and as environment variables. For example, you can use this to customize the PATH variable, if your Plugin requires it.'
+		});
+		
+		// groups (monitor type only)
+		html += this.getFormRow({
+			id: 'd_ep_groups',
+			label: 'Server Groups:',
+			content: this.getFormMenuMulti({
+				id: 'fe_ep_groups',
+				title: 'Select Groups',
+				placeholder: '(All Groups)',
+				options: app.groups,
+				values: plugin.groups || [],
+				default_icon: 'server-network',
+				'data-hold': 1
+				// 'data-shrinkwrap': 1
+			}),
+			caption: 'Select which server group(s) should run the monitoring Plugin.'
+		});
+		
+		// format (monitor type only)
+		html += this.getFormRow({
+			id: 'd_ep_format',
+			label: 'Format:',
+			content: this.getFormMenu({
+				id: 'fe_ep_format',
+				options: [['text','Text'], ['json','JSON'], ['xml', 'XML']],
+				value: plugin.format || ''
+			}),
+			caption: 'Select the output format that the script generates, so it can be parsed correctly.'
 		});
 		
 		// CWD
@@ -455,6 +526,29 @@ Page.Plugins = class Plugins extends Page.Base {
 		});
 		
 		return html;
+	}
+	
+	setPluginType() {
+		// swap out the plugin type dynamic caption
+		var plugin_type = $('#fe_ep_type').val();
+		var md = config.ui.plugin_type_descriptions[ plugin_type ];
+		var html = marked(md, config.ui.marked_config).trim().replace(/^<p>(.+)<\/p>$/, '$1');
+		this.div.find('#s_ep_plugin_type_desc').html( html );
+		
+		// hide/show sections based on new type
+		switch (plugin_type) {
+			case 'monitor':
+				this.div.find('#d_ep_params').hide();
+				this.div.find('#d_ep_groups').show();
+				this.div.find('#d_ep_format').show();
+			break;
+			
+			default:
+				this.div.find('#d_ep_params').show();
+				this.div.find('#d_ep_groups').hide();
+				this.div.find('#d_ep_format').hide();
+			break;
+		} // switch plugin_type
 	}
 	
 	renderParamEditor() {
@@ -728,8 +822,10 @@ Page.Plugins = class Plugins extends Page.Base {
 		plugin.id = $('#fe_ep_id').val().replace(/\W+/g, '').toLowerCase();
 		plugin.title = $('#fe_ep_title').val().trim();
 		plugin.enabled = $('#fe_ep_enabled').is(':checked') ? true : false;
+		plugin.type = $('#fe_ep_type').val();
 		plugin.icon = $('#fe_ep_icon').val();
-		plugin.command = $('#fe_ep_command').val();
+		plugin.command = $('#fe_ep_command').val().trim();
+		plugin.script = $('#fe_ep_script').val().trim();
 		plugin.cwd = $('#fe_ep_cwd').val();
 		plugin.uid = $('#fe_ep_uid').val();
 		plugin.gid = $('#fe_ep_gid').val();
@@ -744,6 +840,19 @@ Page.Plugins = class Plugins extends Page.Base {
 		if (!plugin.command.length) {
 			return app.badField('#fe_ep_command', "Please enter the executable path for the plugin.");
 		}
+		
+		switch (plugin.type) {
+			case 'monitor':
+				plugin.params = [];
+				plugin.groups = $('#fe_ep_groups').val();
+				plugin.format = $('#fe_ep_format').val();
+			break;
+			
+			default:
+				plugin.groups = [];
+				plugin.format = '';
+			break;
+		} // switch plugin_type
 		
 		return plugin;
 	}

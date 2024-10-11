@@ -366,8 +366,6 @@ An internal object used to track CPU/Mem thresholds.
 
 # Alert Def
 
-# Command
-
 # Tag
 
 # User
