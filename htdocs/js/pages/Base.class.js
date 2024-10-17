@@ -1083,9 +1083,11 @@ Page.Base = class Base extends Page {
 	}
 	
 	getNiceJobSource(job) {
+		// get nice job source
 		if (job.source.match(/scheduler/i)) {
-			return job.single ? '<i class="mdi mdi-alarm-check">&nbsp;</i>Single Shot' : '<i class="mdi mdi-update">&nbsp;</i>Scheduler';
-			// return '<i class="mdi mdi-calendar-multiple">&nbsp;</i>Scheduler';
+			if (job.single) return '<i class="mdi mdi-alarm-check">&nbsp;</i>Single Shot';
+			else if (job.splugin) return this.getNicePlugin(job.splugin, true);
+			else return '<i class="mdi mdi-update">&nbsp;</i>Scheduler';
 		}
 		else if (job.source.match(/(user|manual)/i)) {
 			return '' + this.getNiceUser(job.username, true) + '';
@@ -1785,6 +1787,7 @@ Page.Base = class Base extends Page {
 			caption: 'Select which channel to notify for the action.'
 		});
 		
+		// plugin
 		html += this.getFormRow({
 			id: 'd_eja_plugin',
 			label: 'Action Plugin:',
@@ -1795,7 +1798,7 @@ Page.Base = class Base extends Page {
 				value: action.plugin_id,
 				default_icon: 'power-plug-outline'
 			}),
-			caption: 'Select which Plugin to use for the action.'
+			caption: 'Select Plugin to use as the action.'
 		});
 		
 		// plugin params
