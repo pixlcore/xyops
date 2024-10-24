@@ -1089,6 +1089,9 @@ Page.Base = class Base extends Page {
 			else if (job.splugin) return this.getNicePlugin(job.splugin, true);
 			else return '<i class="mdi mdi-update">&nbsp;</i>Scheduler';
 		}
+		else if (job.source.match(/(plugin)/i)) {
+			return '' + this.getNicePlugin(job.splugin, true) + '';
+		}
 		else if (job.source.match(/(user|manual)/i)) {
 			return '' + this.getNiceUser(job.username, true) + '';
 		}
@@ -2084,6 +2087,22 @@ Page.Base = class Base extends Page {
 			{ id: 'z_retried', title: "Retried", icon: 'refresh', group: "System Tags:" },
 			{ id: 'z_last', title: "Last in Set", icon: 'page-last' } 
 		);
+	}
+	
+	buildServerOptGroup(title, default_icon) {
+		// build menu group specifically for servers
+		// sorted properly, with labels and icons
+		var servers = Object.values(app.servers).sort( 
+			function(a, b) {
+				return ( a.label || a.hostname ).localeCompare( b.label || b.hostname );
+			} 
+		).map( 
+			function(server) {
+				return merge_objects( { title: server.label || server.hostname }, server );
+			}
+		);
+		
+		return this.buildOptGroup( servers, title || "Servers:", default_icon || 'router-network' );
 	}
 	
 	// Page State/Draft System
