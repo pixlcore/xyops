@@ -224,7 +224,7 @@ Page.ActivityLog = class ActivityLog extends Page.Base {
 		}
 		
 		if (args.username) {
-			query += ' keywords:' + args.username;
+			query += ' keywords:' + args.username.replace(/\W/g, '_');
 		}
 		
 		if (args.date) {
@@ -490,6 +490,7 @@ Page.ActivityLog = class ActivityLog extends Page.Base {
 		// pop dialog for any action
 		var item = this.items[idx];
 		var template = config.ui.activity_descriptions[item.action];
+		if (!item.ips) item.ips = [];
 		
 		// massage a title out of description template (ugh)
 		var title = template.replace(/\:\s+.+$/, '').replace(/\s+\(.+$/, '');
@@ -504,7 +505,7 @@ Page.ActivityLog = class ActivityLog extends Page.Base {
 		// user info
 		md += "\n### Client Info\n\n";
 		md += '- **User:** ' + this.getNiceUser(item.username, true) + "\n";
-		md += '- **IP Addresses:** ' + item.ips.join(', ') + "\n";
+		md += '- **IP Addresses:** ' + (item.ips.join(', ') || 'n/a') + "\n";
 		md += '- **User Agent:** ' + (item.useragent || 'Unknown') + "\n";
 		
 		// headers

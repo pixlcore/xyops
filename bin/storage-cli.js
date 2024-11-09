@@ -122,6 +122,7 @@ var storage = new StandaloneStorage(config.Storage, function(err) {
 		case 'install':
 			// setup new master server
 			var setup = require('../internal/setup.json');
+			var unbase_config = require('../internal/unbase.json');
 			
 			// make sure this is only run once
 			storage.get( 'global/users', function(err) {
@@ -130,12 +131,57 @@ var storage = new StandaloneStorage(config.Storage, function(err) {
 					process.exit(1);
 				}
 				
+				// append activity setup steps
+				setup.storage.forEach( function(params) {
+					if ((params[0] != 'listPush') || !setup.activity_map[params[1]] || (typeof(params[2]) != 'object')) return;
+					var info = setup.activity_map[params[1]];
+					var item = params[2];
+					var activity = {
+						id: Tools.generateShortID('a'),
+						epoch: Tools.timeNow(true),
+						action: info.action,
+						description: item.title,
+						headers: { 'user-agent': "Orchestra Setup Script" },
+						keywords: [ item.id, 'admin' ],
+						username: 'admin'
+					};
+					item.revision = 1;
+					activity[ info.key ] = Tools.copyHash( item, true );
+					setup.storage.push([ 'insertActivity', activity ]);
+				} );
+				
+				// utility function for inserting activity
+				var insertActivity = function(activity, callback) {
+					// bootstrap activity into unbase manually
+					var record_id = activity.id;
+					var record_data = activity;
+					var base_path = unbase_config.base_path || 'unbase';
+					var index = unbase_config.indexes.activity;
+					index.base_path = base_path + '/index/activity';
+					var data_path = base_path + '/records/activity/' + record_id;
+					
+					// store data itself
+					storage.put( data_path, record_data, function(err) {
+						if (err) return callback(err);
+						
+						// now index it
+						storage.indexRecord( record_id, record_data, index, function(err, state) {
+							if (err) return callback(err);
+							callback();
+						}); // indexRecord
+					}); // put
+				}; // insertActivity
+				
+				// run setup actions
 				async.eachSeries( setup.storage,
 					function(params, callback) {
 						verbose( "Executing: " + JSON.stringify(params) + "\n" );
 						// [ "listCreate", "global/users", { "page_size": 100 } ]
 						var func = params.shift();
 						params.push( callback );
+						
+						// special functions
+						if (func == 'insertActivity') return insertActivity.apply( null, params );
 						
 						// massage a few params
 						if (typeof(params[1]) == 'object') {

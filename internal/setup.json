@@ -1,4 +1,4 @@
-{
+{	
 	"storage": [
 		[ "put", "users/admin", {
 			"username": "admin",
@@ -469,6 +469,41 @@
 			"scheduler": { "enabled": true }
 		} ]
 	],
+	
+	"activity_map": {
+		"global/groups": {
+			"action": "group_create",
+			"key": "group"
+		},
+		"global/plugins": {
+			"action": "plugin_create",
+			"key": "plugin"
+		},
+		"global/categories": {
+			"action": "category_create",
+			"key": "category"
+		},
+		"global/channels": {
+			"action": "channel_create",
+			"key": "channel"
+		},
+		"global/web_hooks": {
+			"action": "web_hook_create",
+			"key": "web_hook"
+		},
+		"global/tags": {
+			"action": "tag_create",
+			"key": "tag"
+		},
+		"global/monitors": {
+			"action": "monitor_create",
+			"key": "monitor"
+		},
+		"global/alerts": {
+			"action": "alert_create",
+			"key": "alert"
+		}
+	},
 	
 	"build": {
 		"common": [
