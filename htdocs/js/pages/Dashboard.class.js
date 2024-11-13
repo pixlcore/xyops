@@ -814,6 +814,10 @@ Page.Dashboard = class Dashboard extends Page.Base {
 				this.renderActiveAlerts(); 
 				this.updateDashGrid();
 			break;
+			
+			case 'events':
+				this.getUpcomingJobs();
+			break;
 		}
 	}
 	
