@@ -1849,7 +1849,7 @@ Page.Job = class Job extends Page.Base {
 		
 		app.api.post( 'app/run_event', new_job, function(resp) {
 			Dialog.hideProgress();
-			app.showMessage('success', "The job was started successfully.");
+			// app.showMessage('success', "The job was started successfully.");
 			
 			if (!self.active) return; // sanity
 			

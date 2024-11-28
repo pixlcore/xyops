@@ -180,8 +180,9 @@ Page.Channels = class Channels extends Page.PageUtils {
 			"title": "",
 			"enabled": true,
 			"email": "",
-			"web_hook": "",
+			"users": [],
 			"run_event": "",
+			"sound": "",
 			"shell_exec": "",
 			"notes": ""
 		};
@@ -201,8 +202,8 @@ Page.Channels = class Channels extends Page.PageUtils {
 		
 		this.div.html( html );
 		
-		// MultiSelect.init( this.div.find('select[multiple]') );
-		SingleSelect.init( this.div.find('#fe_ech_run_event, #fe_ech_icon, #fe_ech_web_hook') );
+		MultiSelect.init( this.div.find('select[multiple]') );
+		SingleSelect.init( this.div.find('#fe_ech_run_event, #fe_ech_icon, #fe_ech_web_hook, #fe_ech_sound') );
 		this.updateAddRemoveMe('#fe_ech_email');
 		$('#fe_ech_title').focus();
 		this.setupBoxButtonFloater();
@@ -286,7 +287,8 @@ Page.Channels = class Channels extends Page.PageUtils {
 		
 		// lock ID for editing
 		$('#fe_ech_id').attr('disabled', true);
-		SingleSelect.init( this.div.find('#fe_ech_run_event, #fe_ech_icon, #fe_ech_web_hook') );
+		MultiSelect.init( this.div.find('select[multiple]') );
+		SingleSelect.init( this.div.find('#fe_ech_run_event, #fe_ech_icon, #fe_ech_web_hook, #fe_ech_sound') );
 		this.updateAddRemoveMe('#fe_ech_email');
 		this.setupBoxButtonFloater();
 	}
@@ -352,6 +354,19 @@ Page.Channels = class Channels extends Page.PageUtils {
 		app.showMessage('success', "The channel &ldquo;" + this.channel.title + "&rdquo; was deleted successfully.");
 	}
 	
+	getNiceSounds() {
+		// get nice list of sounds suitable for menu
+		return app.sounds.map( function(filename) {
+			return { id: filename, title: toTitleCase( filename.replace(/\.\w+$/, '').replace(/-/g, ' ') ) };
+		} );
+	}
+	
+	playCurrentSound(elem) {
+		// play current sound if one is selected
+		var sound = elem.value;
+		if (sound) app.playSound(sound);
+	}
+	
 	get_channel_edit_html() {
 		// get html for editing an channel (or creating a new one)
 		var html = '';
@@ -408,9 +423,27 @@ Page.Channels = class Channels extends Page.PageUtils {
 			caption: 'Optionally choose an icon for the channel.'
 		});
 		
+		// users
+		html += this.getFormRow({
+			label: 'Notify Users:',
+			content: this.getFormMenuMulti({
+				id: 'fe_ech_users',
+				title: 'Select Users',
+				placeholder: 'None',
+				options: app.users.map( function(user) {
+					return { id: user.username, title: user.full_name, icon: user.icon || '' };
+				} ),
+				values: channel.users || [],
+				default_icon: 'account',
+				'data-hold': 1
+				// 'data-shrinkwrap': 1
+			}),
+			caption: 'Select which users should be notified for this channel.'
+		});
+		
 		// email
 		html += this.getFormRow({
-			label: 'Email:',
+			label: 'Send Email:',
 			content: this.getFormText({
 				id: 'fe_ech_email',
 				// type: 'email',
@@ -420,7 +453,7 @@ Page.Channels = class Channels extends Page.PageUtils {
 				onChange: '$P().updateAddRemoveMe(this)'
 			}),
 			suffix: '<div class="form_suffix_icon mdi" title="" onClick="$P().addRemoveMe(this)"></div>',
-			caption: 'Optionally add e-mail recipients to be notified for this channel.'
+			caption: 'Optionally add custom e-mail recipients to be notified for this channel.'
 		});
 		
 		// web hook
@@ -447,6 +480,20 @@ Page.Channels = class Channels extends Page.PageUtils {
 				default_icon: 'calendar-clock'
 			}),
 			caption: 'Optionally select an event to run for this action.'
+		});
+		
+		// play sound
+		html += this.getFormRow({
+			label: 'Play Sound:',
+			content: this.getFormMenuSingle({
+				id: 'fe_ech_sound',
+				title: 'Select Sound',
+				options: [ ['', "(None)"] ].concat( this.getNiceSounds() ),
+				value: channel.sound || '',
+				default_icon: 'volume-high',
+				onChange: '$P().playCurrentSound(this)'
+			}),
+			caption: 'Optionally select a sound effect to play for all channel users.'
 		});
 		
 		// shell exec
@@ -483,9 +530,11 @@ Page.Channels = class Channels extends Page.PageUtils {
 		channel.title = $('#fe_ech_title').val().trim();
 		channel.enabled = $('#fe_ech_enabled').is(':checked') ? true : false;
 		channel.icon = $('#fe_ech_icon').val();
+		channel.users = $('#fe_ech_users').val();
 		channel.email = $('#fe_ech_email').val();
 		channel.web_hook = $('#fe_ech_web_hook').val();
 		channel.run_event = $('#fe_ech_run_event').val();
+		channel.sound = $('#fe_ech_sound').val();
 		channel.shell_exec = $('#fe_ech_shell_exec').val();
 		channel.notes = $('#fe_ech_notes').val();
 		

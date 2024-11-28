@@ -180,7 +180,8 @@ app.comm = {
 			
 			case 'notify':
 				// custom notification for user
-				app.showMessage( data.type, data.message, data.lifetime || 0, data.loc || '' );
+				if (data.type == 'channel') app.showChannelMessage(data);
+				else app.showMessage( data.type, data.message, data.lifetime || 0, data.loc || '' );
 			break;
 			
 			case 'cachebust':

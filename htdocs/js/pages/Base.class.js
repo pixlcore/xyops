@@ -1587,8 +1587,10 @@ Page.Base = class Base extends Page {
 		switch (action.type) {
 			case 'email':
 				disp.type = "Send Email";
-				disp.text = action.email;
-				disp.desc = '<div style="word-break:break-word;">' + disp.text + '</div>';
+				var parts = [];
+				if (action.users) parts.push( '' + commify(action.users.length) + ' ' + pluralize('user', action.users.length) );
+				if (action.email) parts.push( action.email );
+				disp.text = disp.desc = parts.join(', ');
 				disp.icon = 'email-send-outline';
 			break;
 			
@@ -1762,8 +1764,26 @@ Page.Base = class Base extends Page {
 		});
 		
 		html += this.getFormRow({
+			id: 'd_eja_users',
+			label: 'Email Users:',
+			content: this.getFormMenuMulti({
+				id: 'fe_eja_users',
+				title: 'Select Users',
+				placeholder: 'None',
+				options: app.users.map( function(user) {
+					return { id: user.username, title: user.full_name, icon: user.icon || '' };
+				} ),
+				values: action.users || [],
+				default_icon: 'account',
+				'data-hold': 1
+				// 'data-shrinkwrap': 1
+			}),
+			caption: 'Select which users should be emailed for the action.'
+		});
+		
+		html += this.getFormRow({
 			id: 'd_eja_email',
-			label: 'Email Addresses:',
+			label: 'Addresses:',
 			content: this.getFormText({
 				id: 'fe_eja_email',
 				// type: 'email',
@@ -1793,7 +1813,7 @@ Page.Base = class Base extends Page {
 		
 		html += this.getFormRow({
 			id: 'd_eja_run_job',
-			label: 'Run Job:',
+			label: 'Event:',
 			content: this.getFormMenuSingle({
 				id: 'fe_eja_event',
 				title: 'Select Event',
@@ -1807,7 +1827,7 @@ Page.Base = class Base extends Page {
 		// notification channel
 		html += this.getFormRow({
 			id: 'd_eja_channel',
-			label: 'Notify Channel:',
+			label: 'Channel:',
 			content: this.getFormMenuSingle({
 				id: 'fe_eja_channel',
 				title: 'Select Channel',
@@ -1851,8 +1871,12 @@ Page.Base = class Base extends Page {
 			};
 			switch (action.type) {
 				case 'email':
+					action.users = $('#fe_eja_users').val();
 					action.email = $('#fe_eja_email').val();
-					if (!action.email) return app.badField('#fe_eja_email', "Please enter one or more email addresses for the action.");
+					// if (!action.email) return app.badField('#fe_eja_email', "Please enter one or more email addresses for the action.");
+					if (!action.users.length && !action.email) {
+						return app.doError("Please select one or more users, or enter one or more custom email addresses.");
+					}
 				break;
 				
 				case 'web_hook':
@@ -1892,11 +1916,12 @@ Page.Base = class Base extends Page {
 		} ); // Dialog.confirm
 		
 		var change_action_type = function(new_type) {
-			$('#d_eja_email, #d_eja_web_hook, #d_eja_run_job, #d_eja_channel, #d_eja_plugin, #d_eja_plugin_params').hide();
+			$('#d_eja_email, #d_eja_users, #d_eja_web_hook, #d_eja_run_job, #d_eja_channel, #d_eja_plugin, #d_eja_plugin_params').hide();
 			
 			switch (new_type) {
 				case 'email':
 					$('#d_eja_email').show();
+					$('#d_eja_users').show();
 				break;
 				
 				case 'web_hook':
@@ -1941,6 +1966,7 @@ Page.Base = class Base extends Page {
 			$('#d_eja_param_editor').html( self.getPluginParamEditor( $(this).val(), action.params || {} ) );
 		}); // type change
 		
+		MultiSelect.init( $('#fe_eja_users') );
 		SingleSelect.init( $('#fe_eja_trigger, #fe_eja_type, #fe_eja_event, #fe_eja_channel, #fe_eja_web_hook, #fe_eja_plugin') );
 		this.updateAddRemoveMe('#fe_eja_email');
 		

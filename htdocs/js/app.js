@@ -14,6 +14,7 @@ app.extend({
 	pageSnapshots: {},
 	pageDrafts: {},
 	serverCache: {},
+	tracks: {},
 	default_prefs: {
 		
 	},
@@ -871,6 +872,48 @@ app.extend({
 		}
 		
 		return results.value;
+	},
+	
+	showChannelMessage(args) {
+		// show special message for channel
+		// { channel, message, lifetime, loc, sound }
+		var channel = find_object( app.channels, { id: args.channel } ) || { icon: 'bullhorn-outline', title: '(Unknown Channel)' };
+		var html = '<b>' + channel.title + '</b><br>' + args.message;
+		
+		this.toast({
+			type: 'channel', 
+			icon: channel.icon || 'bullhorn-outline', 
+			msg: html,
+			lifetime: 0, 
+			loc: args.loc || '' 
+		});
+		
+		if (args.sound) this.playSound(args.sound);
+	},
+	
+	playSound(name) {
+		// play sound, load if needed
+		if (this.getPref('mute') || app.user.mute) return;
+		var track = this.tracks[name];
+		
+		if (track) {
+			// track already loaded, replay
+			if (!track.paused) track.currentTime = 0;
+			else track.play();
+		}
+		else {
+			// new track, load and play
+			track = new Audio();
+			
+			track.autoplay = true;
+			track.loop = false;
+			track.preload = 'auto';
+			track.volume = 1.0;
+			track.muted = false;
+			track.src = 'sounds/' + name;
+			
+			this.tracks[name] = track;
+		}
 	}
 	
 }); // app

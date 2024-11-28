@@ -639,7 +639,7 @@ Page.Events = class Events extends Page.PageUtils {
 		
 		app.api.post( 'app/run_event', this.event, function(resp) {
 			Dialog.hideProgress();
-			app.showMessage('success', "The job was started successfully.");
+			// app.showMessage('success', "The job was started successfully.");
 			
 			if (!self.active) return; // sanity
 			
@@ -907,7 +907,7 @@ Page.Events = class Events extends Page.PageUtils {
 		
 		app.api.post( 'app/run_event', this.event, function(resp) {
 			Dialog.hideProgress();
-			app.showMessage('success', "The job was started successfully.");
+			// app.showMessage('success', "The job was started successfully.");
 			
 			if (!self.active) return; // sanity
 			
@@ -1986,7 +1986,7 @@ Page.Events = class Events extends Page.PageUtils {
 			
 			app.api.post( 'app/run_event', job, function(resp) {
 				Dialog.hideProgress();
-				app.showMessage('success', "The job was started successfully.");
+				// app.showMessage('success', "The job was started successfully.");
 				
 				if (!self.active) return; // sanity
 				

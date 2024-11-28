@@ -132,9 +132,12 @@
 			"modified": 1434125333,
 			"created": 1434125333,
 			"notes": "For major events that require everyone's attention right away.",
+			"users": ["admin"],
 			"email": "",
 			"web_hook": "",
 			"run_event": "",
+			"sound": "",
+			"icon": "",
 			"shell_exec": ""
 		} ],
 		

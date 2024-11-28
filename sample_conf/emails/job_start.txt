@@ -1,4 +1,4 @@
-To: [action/email]
+To: [email_to]
 From: [config/email_from]
 Subject: Orchestra Job Started Successfully: [event/title]
 

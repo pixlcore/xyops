@@ -1,4 +1,4 @@
-To: [action/email]
+To: [email_to]
 From: [config/email_from]
 Subject: ✅ Orchestra Job Completed Successfully: [event/title]
 
@@ -15,9 +15,6 @@ Elapsed Time: [display/elapsed]
 Performance Metrics: [display/perf]
 Avg. Memory Usage: [display/mem]
 Avg. CPU Usage: [display/cpu]
-
-Description:
-[job/description]
 
 Job Details:
 [links/job_details]
