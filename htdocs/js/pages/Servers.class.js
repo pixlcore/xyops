@@ -740,7 +740,7 @@ Page.Servers = class Servers extends Page.ServerUtils {
 		var label = 'Watch...';
 		var extra_classes = '';
 		
-		if (app.state && app.state.watches && app.state.watches[server.id] && (app.state.watches[server.id] > app.epoch)) {
+		if (app.state && app.state.watches && app.state.watches.servers && app.state.watches.servers[server.id] && (app.state.watches.servers[server.id] > app.epoch)) {
 			// currently watching this server
 			icon = 'bullseye-arrow';
 			label = 'Watching...';
@@ -789,8 +789,12 @@ Page.Servers = class Servers extends Page.ServerUtils {
 		html += '<div class="box">';
 			html += '<div class="box_title">';
 				html += 'Server Summary';
+				if (!online) html += ' &mdash; As of ' + this.getShortDateTimeText(snapshot.date);
 				
-				if (!online) html += '<div class="box_title_note">As of ' + this.getShortDateTimeText(snapshot.date) + '</div>';
+				html += '<div class="button icon right secondary" title="Server Job History..." onClick="$P().goJobHistory()"><i class="mdi mdi-cloud-search-outline"></i></div>';
+				html += '<div class="button icon right secondary" title="Server Alert History..." onClick="$P().goAlertHistory()"><i class="mdi mdi-restore-alert"></i></div>';
+				
+				// if (!online) html += '<div class="box_title_note">As of ' + this.getShortDateTimeText(snapshot.date) + '</div>';
 				// html += '<div class="button right danger" onMouseUp="$P().showDeleteSnapshotDialog()"><i class="mdi mdi-trash-can-outline">&nbsp;</i>Delete...</div>';
 				// html += '<div class="button secondary right" onMouseUp="$P().do_edit_from_view()"><i class="mdi mdi-file-edit-outline">&nbsp;</i>Edit Event...</div>';
 				// html += '<div class="button right" onMouseUp="$P().do_run_from_view()"><i class="mdi mdi-run-fast">&nbsp;</i>Run Now</div>';
@@ -892,7 +896,7 @@ Page.Servers = class Servers extends Page.ServerUtils {
 		html += '<div class="box" id="d_vs_alerts" style="display:none">';
 			html += '<div class="box_title">';
 				html += 'Server Alerts';
-				html += '<div class="button right secondary" onMouseUp="$P().goAlertHistory()"><i class="mdi mdi-magnify">&nbsp;</i>Alert History...</div>';
+				// html += '<div class="button right secondary" onMouseUp="$P().goAlertHistory()"><i class="mdi mdi-magnify">&nbsp;</i>Alert History...</div>';
 				html += '<div class="clear"></div>';
 			html += '</div>';
 			html += '<div class="box_content table">';
@@ -904,7 +908,7 @@ Page.Servers = class Servers extends Page.ServerUtils {
 		html += '<div class="box" id="d_vs_jobs" style="">';
 			html += '<div class="box_title">';
 				html += 'Server Jobs';
-				html += '<div class="button right secondary" onMouseUp="$P().goJobHistory()"><i class="mdi mdi-magnify">&nbsp;</i>Job History...</div>';
+				// html += '<div class="button right secondary" onMouseUp="$P().goJobHistory()"><i class="mdi mdi-magnify">&nbsp;</i>Job History...</div>';
 				html += '<div class="clear"></div>';
 			html += '</div>';
 			html += '<div class="box_content table">';
@@ -1034,8 +1038,8 @@ Page.Servers = class Servers extends Page.ServerUtils {
 		var btn = ['check-circle', "Save Changes"];
 		var cur_value = 300;
 		
-		if (app.state && app.state.watches && app.state.watches[server.id] && (app.state.watches[server.id] > app.epoch)) {
-			cur_value = Math.floor( app.state.watches[server.id] - app.epoch );
+		if (app.state && app.state.watches && app.state.watches.servers && app.state.watches.servers[server.id] && (app.state.watches.servers[server.id] > app.epoch)) {
+			cur_value = Math.floor( app.state.watches.servers[server.id] - app.epoch );
 			if (cur_value >= 86400) cur_value -= (cur_value % 86400);
 			else if (cur_value >= 3600) cur_value -= (cur_value % 3600);
 			else if (cur_value >= 60) cur_value -= (cur_value % 60);
@@ -1045,11 +1049,6 @@ Page.Servers = class Servers extends Page.ServerUtils {
 		var html = '';
 		html += `<div class="dialog_intro">This allows you to set a "watch" on a server, which means that Orchestra will take snapshots of it every minute until the watch duration elapses.</div>`;
 		html += '<div class="dialog_box_content">';
-		
-		// html += this.getFormRow({
-		// 	label: 'Description:',
-		// 	content: `This allows you to set a "watch" on a server, which means that Orchestra will take snapshots of it every minute until the watch duration elapses.`
-		// });
 		
 		html += this.getFormRow({
 			label: 'Watch Duration:',
@@ -1067,20 +1066,15 @@ Page.Servers = class Servers extends Page.ServerUtils {
 			
 			var duration = parseInt( $('#fe_vsw_duration').val() );
 			
-			Dialog.showProgress( 1.0, "Updating Watch..." );
+			Dialog.showProgress( 1.0, duration ? "Setting Watch..." : "Removing Watch..." );
 			app.api.post( 'app/watch_server', { id: server.id, duration }, function(resp) {
 				// update complete
 				Dialog.hideProgress();
-				if (!self.active) return; // sanity
-				
 				app.showMessage('success', "The server watch was " + (duration ? 'set' : 'removed') + " successfully.");
-				// self.updateWatchButton();
 			}); // api.post
 		}); // Dialog.confirm
 		
-		// SingleSelect.init( $('#fe_es_icon') );
-		// MultiSelect.init( $('#fe_es_groups') );
-		// Dialog.autoResize();
+		RelativeTime.init( $('#fe_vsw_duration') );
 		$('#fe_vsw_duration_val').focus();
 	}
 	
