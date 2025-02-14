@@ -791,8 +791,9 @@ Page.Servers = class Servers extends Page.ServerUtils {
 				html += 'Server Summary';
 				if (!online) html += ' &mdash; As of ' + this.getShortDateTimeText(snapshot.date);
 				
-				html += '<div class="button icon right secondary" title="Server Job History..." onClick="$P().goJobHistory()"><i class="mdi mdi-cloud-search-outline"></i></div>';
-				html += '<div class="button icon right secondary" title="Server Alert History..." onClick="$P().goAlertHistory()"><i class="mdi mdi-restore-alert"></i></div>';
+				html += '<div class="button icon right secondary" title="Job History..." onClick="$P().goJobHistory()"><i class="mdi mdi-cloud-search-outline"></i></div>';
+				html += '<div class="button icon right secondary" title="Alert History..." onClick="$P().goAlertHistory()"><i class="mdi mdi-restore-alert"></i></div>';
+				html += '<div class="button icon right secondary" title="Server History..." onClick="$P().goServerHistory()"><i class="mdi mdi-script-text-outline"></i></div>';
 				
 				// if (!online) html += '<div class="box_title_note">As of ' + this.getShortDateTimeText(snapshot.date) + '</div>';
 				// html += '<div class="button right danger" onMouseUp="$P().showDeleteSnapshotDialog()"><i class="mdi mdi-trash-can-outline">&nbsp;</i>Delete...</div>';
@@ -1176,6 +1177,11 @@ Page.Servers = class Servers extends Page.ServerUtils {
 		SingleSelect.init( $('#fe_es_icon') );
 		MultiSelect.init( $('#fe_es_groups') );
 		Dialog.autoResize();
+	}
+	
+	goServerHistory() {
+		// nav to activity search
+		Nav.go('#ActivityLog?action=servers&query=' + this.server.id);
 	}
 	
 	goAlertHistory() {
