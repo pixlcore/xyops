@@ -397,6 +397,9 @@ Page.ServerHist = class ServerHist extends Page.ServerUtils {
 				"dataType": def.data_type,
 				"dataSuffix": def.suffix,
 				"showDataGaps": true,
+				"delta": def.delta || false,
+				"divideByDelta": def.divide_by_delta || false,
+				"minVertScale": def.min_vert_scale || 0,
 				"legend": false // single layer, no legend needed
 			});
 			chart.on('mouseover', function(event) { render_chart_overlay(def.id); });
