@@ -7,6 +7,7 @@
 		"host": "localhost",
 		"port": 25
 	},
+	"max_emails_per_day": 0,
 	
 	"log_dir": "logs",
 	"log_filename": "[component].log",
