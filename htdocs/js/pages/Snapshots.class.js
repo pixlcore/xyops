@@ -436,6 +436,7 @@ Page.Snapshots = class Snapshots extends Page.ServerUtils {
 		// quickmon charts
 		html += '<div class="box" id="d_vs_quickmon">';
 			html += '<div class="box_title">';
+			html += this.getChartSizeSelector();
 				html += 'Quick Look &mdash; Last Minute';
 			html += '</div>';
 			html += '<div class="box_content table">';
@@ -514,6 +515,8 @@ Page.Snapshots = class Snapshots extends Page.ServerUtils {
 		
 		this.div.html(html);
 		
+		SingleSelect.init( this.div.find('select.sel_chart_size') );
+		
 		this.getSnapshotAlerts();
 		this.getSnapshotJobs();
 		this.setupQuickMonitors();
@@ -558,7 +561,7 @@ Page.Snapshots = class Snapshots extends Page.ServerUtils {
 		var server = app.servers[ snapshot.server ] || null;
 		
 		var html = '';
-		html += '<div class="chart_grid_horiz">';
+		html += '<div class="chart_grid_horiz ' + (app.getPref('chart_size') || 'medium') + '">';
 		
 		config.quick_monitors.forEach( function(def) {
 			// { "id": "cpu_load", "title": "CPU Load Average", "source": "cpu.avgLoad", "type": "float", "suffix": "" },
@@ -567,15 +570,6 @@ Page.Snapshots = class Snapshots extends Page.ServerUtils {
 		
 		html += '</div>';
 		this.div.find('#d_vs_quickmon > div.box_content').html( html );
-		
-		var render_chart_overlay = function(key) {
-			$('.pxc_tt_overlay').html(
-				'<div class="chart_toolbar ct_' + key + '">' + 
-					'<div class="chart_icon ci_di" title="Download Image" onClick="$P().chartDownload(\'' + key + '\')"><i class="mdi mdi-cloud-download-outline"></i></div>' + 
-					'<div class="chart_icon ci_cl" title="Copy Image Link" onClick="$P().chartCopyLink(\'' + key + '\',this)"><i class="mdi mdi-clipboard-pulse-outline"></i></div>' + 
-				'</div>' 
-			);
-		};
 		
 		config.quick_monitors.forEach( function(def, idx) {
 			var chart = self.createChart({
@@ -589,8 +583,8 @@ Page.Snapshots = class Snapshots extends Page.ServerUtils {
 				"divideByDelta": def.divide_by_delta || false,
 				"legend": false // single layer, no legend needed
 			});
-			chart.on('mouseover', function(event) { render_chart_overlay(def.id); });
 			self.charts[ def.id ] = chart;
+			self.setupChartHover(def.id);
 			
 			chart.addLayer({
 				id: snapshot.server,
