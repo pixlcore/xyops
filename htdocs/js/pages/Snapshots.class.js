@@ -449,7 +449,7 @@ Page.Snapshots = class Snapshots extends Page.ServerUtils {
 		html += '<div class="box" id="d_vs_quickmon">';
 			html += '<div class="box_title">';
 			html += '<div class="box_title_widget" style="overflow:visible; margin-left:0;"><i class="mdi mdi-magnify" onMouseUp="$(this).next().focus()">&nbsp;</i><input type="text" placeholder="Filter" value="" onInput="$P().applyQuickMonitorFilter(this)"></div>';
-			html += this.getChartSizeSelector();
+			html += this.getChartSizeSelector('chart_size_quick');
 				html += 'Quick Look &mdash; Snapshot Minute';
 			html += '</div>';
 			html += '<div class="box_content table">';
@@ -587,7 +587,7 @@ Page.Snapshots = class Snapshots extends Page.ServerUtils {
 		var server = app.servers[ snapshot.server ] || null;
 		
 		var html = '';
-		html += '<div class="chart_grid_horiz ' + (app.getPref('chart_size') || 'medium') + '">';
+		html += '<div class="chart_grid_horiz ' + (app.getPref('chart_size_quick') || 'medium') + '">';
 		
 		config.quick_monitors.forEach( function(def) {
 			// { "id": "cpu_load", "title": "CPU Load Average", "source": "cpu.avgLoad", "type": "float", "suffix": "" },
@@ -826,7 +826,7 @@ Page.Snapshots = class Snapshots extends Page.ServerUtils {
 					html += '</div>';
 					
 					html += '<div>';
-						html += '<div class="info_label">Active Servers</div>';
+						html += '<div class="info_label">Servers</div>';
 						html += '<div class="info_value" id="d_vg_stat_servers">' + commify(this.servers.length) + '</div>';
 					html += '</div>';
 					
@@ -892,7 +892,7 @@ Page.Snapshots = class Snapshots extends Page.ServerUtils {
 		html += '<div class="box" id="d_vg_quickmon" style="display:none">';
 			html += '<div class="box_title">';
 				html += '<div class="box_title_widget" style="overflow:visible; margin-left:0;"><i class="mdi mdi-magnify" onMouseUp="$(this).next().focus()">&nbsp;</i><input type="text" placeholder="Filter" value="" onInput="$P().applyQuickMonitorFilter(this)"></div>';
-				html += this.getChartSizeSelector();
+				html += this.getChartSizeSelector('chart_size_quick');
 				html += 'Quick Look &mdash; Snapshot Minute <span class="s_grp_filtered"></span>';
 			html += '</div>';
 			html += '<div class="box_content table">';
@@ -995,7 +995,7 @@ Page.Snapshots = class Snapshots extends Page.ServerUtils {
 		var self = this;
 		var group = this.group;
 		var html = '';
-		html += '<div class="chart_grid_horiz ' + (app.getPref('chart_size') || 'medium') + '">';
+		html += '<div class="chart_grid_horiz ' + (app.getPref('chart_size_quick') || 'medium') + '">';
 		
 		config.quick_monitors.forEach( function(def) {
 			// { "id": "cpu_load", "title": "CPU Load Average", "source": "cpu.avgLoad", "type": "float", "suffix": "" },
