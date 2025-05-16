@@ -116,6 +116,9 @@ Page.GroupHist = class GroupHist extends Page.ServerUtils {
 		var nice_email = 'n/a';
 		if (group.alert_email) nice_email = '<i class="mdi mdi-email-outline">&nbsp;</i>' + group.alert_email;
 		
+		// give hint for behavior in components (like the server table)
+		this.groupMode = 'history';
+		
 		html += '<div class="box" style="border:none;">';
 			html += '<div class="box_title">';
 				html += '<div class="box_title_left" style="color:var(--green)">' + ucfirst(args.mode) + ' &mdash; ' + this.histTitle + '</div>';
