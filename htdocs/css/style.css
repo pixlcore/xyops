@@ -187,6 +187,9 @@ div.box_title_left {
 	/* display: flex;
 	align-items: center; */
 }
+div.box_title_left > i.mdi:before {
+	transform: scale(1.20);
+}
 
 div.box_title_note {
 	float: right;
