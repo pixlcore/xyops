@@ -145,7 +145,7 @@ Page.MySettings = class MySettings extends Page.Base {
 				value: user.volume || 0
 			}),
 			suffix: '<div class="form_suffix_icon mdi mdi-play-circle-outline" title="Preview Volume..." onClick="$P().playPreviewSound()" onMouseDown="event.preventDefault();"></div>',
-			caption: 'Select your desired audio volume level for notifications.'
+			caption: 'Select your desired audio volume level for app notifications.'
 		});
 		
 		// motion preference
@@ -201,6 +201,18 @@ Page.MySettings = class MySettings extends Page.Base {
 				checked: !!user.page_info
 			}),
 			caption: 'Enable or disable page descriptions, which introduce each page in the app.  This can be helpful for new users.'
+		});
+		
+		// notifications
+		html += this.getFormRow({
+			label: 'Notifications:',
+			content: this.getFormCheckbox({
+				id: 'fe_ms_notify',
+				label: 'Use System Notifications',
+				checked: user.notifications,
+				disabled: !app.secure
+			}),
+			caption: 'Enable or disable system notifications, for custom channel messages' + (app.secure ? '' : ' (requires SSL)') + '.'
 		});
 		
 		// whimsy (effects)
@@ -273,6 +285,7 @@ Page.MySettings = class MySettings extends Page.Base {
 			contrast: this.div.find('#fe_ms_contrast').val(),
 			color_blind: this.div.find('#fe_ms_colorblind').is(':checked'),
 			page_info: this.div.find('#fe_ms_pageinfo').is(':checked'),
+			notifications: this.div.find('#fe_ms_notify').is(':checked'),
 			effects: this.div.find('#fe_ms_effects').is(':checked')
 		};
 	}
@@ -294,6 +307,7 @@ Page.MySettings = class MySettings extends Page.Base {
 		if (json.contrast != user.contrast) return true;
 		if (json.color_blind != user.color_blind) return true;
 		if (json.page_info != user.page_info) return true;
+		if (json.notifications != user.notifications) return true;
 		if (json.effects != user.effects) return true;
 		
 		return false;
@@ -318,6 +332,7 @@ Page.MySettings = class MySettings extends Page.Base {
 			app.initSidebarTabs();
 			app.updateHeaderInfo();
 			app.updateAccessibility();
+			app.setupNotifications();
 		} );
 	}
 	

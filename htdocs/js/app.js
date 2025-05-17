@@ -952,6 +952,28 @@ app.extend({
 		return results.value;
 	},
 	
+	setupNotifications() {
+		// setup system-level notifications, if the user has requested it
+		if (!this.user.notifications) return; // nope
+		if (!("Notification" in window)) return; // nope
+		if (!this.secure) return; // nope
+		
+		if (Notification.permission === "granted") {
+			Debug.trace("Notification permissions already granted");
+		}
+		else if (Notification.permission !== "denied") {
+			Debug.trace("Asking user for notification permissions...");
+			
+			Notification.requestPermission().then(permission => {
+				if (permission === "granted") Debug.trace("User granted notification permissions.");
+				else app.showMessage('warning', "Notification permissions have been denied.");
+			});
+		}
+		else {
+			app.showMessage('warning', "Notification permissions have been denied.");
+		}
+	},
+	
 	showChannelMessage(args) {
 		// show special message for channel
 		// { channel, message, lifetime, loc, sound }
@@ -964,11 +986,26 @@ app.extend({
 			type: 'channel', 
 			icon: channel.icon || 'bullhorn-outline', 
 			msg: html,
-			lifetime: 0, 
+			lifetime: 10, 
 			loc: args.loc || '' 
 		});
 		
 		if (args.sound) this.playSound(args.sound);
+		
+		// optional system-level notification
+		if (this.user.notifications && (Notification.permission === "granted")) {
+			var note = new Notification( "Orchestra: " + channel.title, {
+				body: args.message.replace(/<.+?>/g, ''),
+				icon: '/images/logo-256.png',
+				tag: 'orchestra-channel',
+				renotify: true,
+				requireInteraction: true
+			} );
+			
+			if (args.loc) note.onclick = function(event) {
+				Nav.go( args.loc );
+			};
+		}
 	},
 	
 	initAudio() {
