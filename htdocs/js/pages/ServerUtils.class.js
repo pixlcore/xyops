@@ -1243,8 +1243,9 @@ Page.ServerUtils = class ServerUtils extends Page.PageUtils {
 		// select platform
 		html += this.getFormRow({
 			label: 'Platform:',
-			content: this.getFormMenu({
+			content: this.getFormMenuSingle({
 				id: 'fe_as_platform',
+				title: 'Select Platform',
 				options: [ ['standard','Linux / macOS'], ['windows','Windows'] ],
 				value: 'standard',
 				onChange: '$P().updateServerInstallCode()',
@@ -1281,7 +1282,7 @@ Page.ServerUtils = class ServerUtils extends Page.PageUtils {
 			if (result) Dialog.hide(); 
 		};
 		
-		SingleSelect.init( $('#fe_as_icon') );
+		SingleSelect.init( $('#fe_as_icon, #fe_as_platform') );
 		MultiSelect.init( $('#fe_as_groups') );
 		Dialog.autoResize();
 		
@@ -1642,11 +1643,11 @@ Page.ServerUtils = class ServerUtils extends Page.PageUtils {
 				
 				case 'snapshot':
 					nice_jobs = 'None';
-					var num_jobs = find_objects( self.jobs, { server: item.id } ).length;
+					var num_jobs = find_objects( self.jobs || [], { server: item.id } ).length;
 					if (num_jobs > 0) nice_jobs = '<b>' + num_jobs + '</b>';
 					
 					nice_alerts = 'None';
-					var num_alerts = find_objects( self.alerts, { server: item.id } ).length;
+					var num_alerts = find_objects( self.alerts || [], { server: item.id } ).length;
 					if (num_alerts > 0) nice_alerts = '<i class="mdi mdi-bell-outline">&nbsp;</i><b>' + num_alerts + '</b>';
 				break;
 				
