@@ -137,3 +137,52 @@ body.dark.lowcon {
 	--icon-color: rgb(86, 86, 98);
 	--icon-color-half: rgba(90, 90, 102, 0.5);
 }
+
+/* Color Accessibility Mode */
+
+body.coloracc a, body.coloracc span.link {
+	text-decoration: dashed underline;
+}
+body.coloracc a:hover, body.coloracc span.link:hover {
+	text-decoration: underline !important;
+}
+
+body.coloracc .checkbox_container > input:hover ~ label {
+	text-decoration: underline !important;
+}
+
+body.coloracc .danger {
+	text-transform: upper-case;
+}
+
+body.coloracc .button:hover {
+	text-decoration: underline !important;
+	border-style: dashed !important;
+}
+
+body.coloracc .diff_removed {
+	text-decoration: line-through;
+}
+
+body.coloracc .diff_added {
+	text-decoration: dotted underline;
+}
+
+body.coloracc .header_widget:hover {
+	text-decoration: underline !important;
+	border-style: dashed !important;
+}
+
+body.coloracc input:focus, body.coloracc textarea:focus {
+	border-color: var(--theme-color) !important;
+	border-style: dashed !important;
+}
+
+body.coloracc .multiselect:hover {
+	border-color: var(--theme-color) !important;
+	border-style: dashed !important;
+}
+
+body.coloracc .sel_dialog_item:hover {
+	text-decoration: underline !important;
+}
