@@ -2200,7 +2200,7 @@ Page.Events = class Events extends Page.PageUtils {
 				id: 'fe_ee_plugin',
 				title: 'Select Plugin for event',
 				placeholder: 'Select Plugin for event...',
-				options: app.plugins,
+				options: app.plugins.filter( function(plugin) { return plugin.type == 'event'; } ),
 				value: event.plugin || '',
 				default_icon: 'power-plug-outline',
 				// 'data-shrinkwrap': 1
