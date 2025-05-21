@@ -889,7 +889,7 @@ Page.Events = class Events extends Page.PageUtils {
 		// confirm user wants to run job
 		var self = this;
 		
-		Dialog.confirm( 'Run Event', "Are you sure you want to manually run the current event?", ['run-fast', 'Run Now'], function(result) {
+		Dialog.confirm( 'Run Event', "Are you sure you want to manually run the event &ldquo;" + this.event.title + "&rdquo;?", ['run-fast', 'Run Now'], function(result) {
 			if (!result) return;
 			self.do_run_from_view();
 		} ); // confirm
@@ -957,6 +957,8 @@ Page.Events = class Events extends Page.PageUtils {
 		if (!this.active) return;
 		
 		if (!resp.rows) resp.rows = [];
+		this.queuedJobs = resp.rows;
+		
 		if (!resp.rows.length) {
 			this.div.find('#d_ve_queued').hide().find('> .box_content').html('');
 			return;
@@ -979,7 +981,7 @@ Page.Events = class Events extends Page.PageUtils {
 				self.getNiceJobSource(job),
 				self.getNiceTargetList(job.targets),
 				self.getShortDateTime( job.started ),
-				self.getNiceJobElapsedTime(job, true),
+				'<div id="d_ve_jt_elapsed_' + job.id + '">' + self.getNiceJobElapsedTime(job, true) + '</div>',
 				'<span class="link danger" onClick="$P().doAbortJob(\'' + job.id + '\')"><b>Abort Job</b></a>'
 			];
 		} );
@@ -1097,6 +1099,11 @@ Page.Events = class Events extends Page.PageUtils {
 				$cont.find('> div.progress_bar_inner').css( 'width', '' + cx + 'px' );
 				$cont.find('div.progress_bar_label').html( label );
 			} ); // foreach job
+			
+			// update queued job elapsed times too
+			(this.queuedJobs || []).forEach( function(job) {
+				div.find('#d_ve_jt_elapsed_' + job.id).html( self.getNiceJobElapsedTime(job, true) );
+			} );
 		}
 	}
 	
@@ -3371,6 +3378,7 @@ Page.Events = class Events extends Page.PageUtils {
 		delete this.queueOffset;
 		delete this.revisionOffset;
 		delete this.revisions;
+		delete this.queuedJobs;
 		
 		// destroy charts if applicable (view page)
 		if (this.charts) {
