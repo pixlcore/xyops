@@ -210,6 +210,9 @@ div.inline_page_message {
 	font-size: 13px;
 	color: var(--label-color);
 }
+.inline_page_message i.mdi:before {
+	transform: scale(1.20);
+}
 
 .verifier {
 	position: relative;
@@ -852,13 +855,14 @@ body.dark .box_buttons.floater {
 }
 
 .plugin_param_editor_cont .info_label {
-	font-size: 12px;
+	font-size: 13px;
 	margin-bottom: 4px;
 }
 
 .plugin_param_editor_cont .info_value {
 	margin-top: 2px;
 	margin-bottom: 15px;
+	font-size: 13px;
 }
 
 .plugin_param_editor_cont textarea {
