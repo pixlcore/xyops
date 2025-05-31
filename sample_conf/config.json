@@ -72,7 +72,7 @@
 	"multi": {
 		"protocol": "ws:",
 		"connect_timeout_sec": 3,
-		"master_timeout_sec": 60,
+		"master_timeout_sec": 10,
 		"socket_opts": {
 			"rejectUnauthorized": false
 		}
