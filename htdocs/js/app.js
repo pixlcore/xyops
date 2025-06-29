@@ -15,6 +15,7 @@ app.extend({
 	pageDrafts: {},
 	serverCache: {},
 	tracks: {},
+	cssVarCache: {},
 	default_prefs: {
 		
 	},
@@ -86,6 +87,7 @@ app.extend({
 			{ ID: 'Document' },
 			{ ID: 'Login' },
 			{ ID: 'Events' },
+			{ ID: 'Workflows' },
 			{ ID: 'Job' },
 			{ ID: 'Search' },
 			{ ID: 'MyAccount' },
@@ -152,15 +154,13 @@ app.extend({
 		var ua = navigator.userAgent;
 		if (ua.match(/Safari/) && !ua.match(/(Chrome|Opera|Edge)/)) {
 			$('body').addClass('safari');
+			this.safari = true;
 		}
 		else if (ua.match(/Chrome/)) {
 			$('body').addClass('chrome');
 		}
 		else if (ua.match(/Firefox/)) {
 			$('body').addClass('firefox');
-		}
-		else if (ua.match(/(MSIE|Trident)/)) {
-			$('body').addClass('ie');
 		}
 		
 		// hook up mobile sidebar pullover
@@ -233,6 +233,9 @@ app.extend({
 			case 'light': $head.append('<link rel="stylesheet" href="css/atom-one-light.css" hljs>'); break;
 			case 'dark': $head.append('<link rel="stylesheet" href="css/atom-one-dark.css" hljs>'); break;
 		}
+		
+		// clear css variable cache on theme change
+		this.cssVarCache = {};
 	},
 	
 	updateHeaderInfo: function(bust) {
@@ -1149,6 +1152,20 @@ app.extend({
 		else if (this.user.contrast == 'normal') return 'normal';
 		else if (this.user.contrast == 'low') return 'low';
 		else return this.sysContrast;
+	},
+	
+	getCSSVar(key) {
+		// get and cache CSS variable value (cleared on theme change)
+		if (key in this.cssVarCache) return this.cssVarCache[key];
+		var value = this.cssVarCache[key] = getComputedStyle(document.body).getPropertyValue(key).trim();
+		return value;
+	},
+	
+	scrollToBottom() {
+		// scroll to bottom of page, but only if we aren't already there
+		if (window.innerHeight + window.scrollY < document.documentElement.scrollHeight - 1) {
+			window.scrollTo(0, document.documentElement.scrollHeight);
+		}
 	}
 	
 }); // app
