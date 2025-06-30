@@ -688,7 +688,12 @@ Page.Events = class Events extends Page.PageUtils {
 		var html = '';
 		var event = this.event = find_object( app.events, { id: args.id } );
 		if (!event) return this.doFullPageError("Event not found: " + args.id);
-		var icon = event.icon || 'file-clock-outline';
+		
+		var is_workflow = (event.type == 'workflow');
+		var default_icon = is_workflow ? 'clipboard-flow-outline' : 'file-clock-outline';
+		var icon = event.icon || default_icon;
+		var edit_btn_text = is_workflow ? 'Edit Workflow...' : 'Edit Event...';
+		var thing = is_workflow ? 'Workflow' : 'Event';
 		
 		app.setHeaderNav([
 			{ icon: 'calendar-multiple', loc: '#Events?sub=list', title: 'Events' },
@@ -696,16 +701,16 @@ Page.Events = class Events extends Page.PageUtils {
 		]);
 		
 		// app.setHeaderTitle( '<i class="mdi mdi-calendar-search">&nbsp;</i>Event Details' );
-		app.setWindowTitle( "Viewing Event \"" + event.title + "\"" );
+		app.setWindowTitle( `Viewing ${thing} "${event.title}"` );
 		
 		html += '<div class="box">';
 			html += '<div class="box_title">';
 				// html += '<i class="mdi mdi-' + icon + '">&nbsp;</i>' + event.title;
-				if (!event.enabled) html += '<span style="color:var(--red);">Event Disabled</span>';
-				else html += 'Event Summary';
+				if (!event.enabled) html += `<span style="color:var(--red);">${thing} Disabled</span>`;
+				else html += `${thing} Summary`;
 				
 				// html += '<div class="button right danger" onClick="$P().show_delete_event_dialog()"><i class="mdi mdi-trash-can-outline">&nbsp;</i>Delete...</div>';
-				html += '<div class="button default right" onClick="$P().do_edit_from_view()"><i class="mdi mdi-file-edit-outline">&nbsp;</i>Edit Event...</div>';
+				html += '<div class="button default right" onClick="$P().do_edit_from_view()"><i class="mdi mdi-file-edit-outline">&nbsp;</i>' + edit_btn_text + '</div>';
 				if (event.enabled) html += '<div class="button right" onClick="$P().do_run_current_event()"><i class="mdi mdi-run-fast">&nbsp;</i>Run Now</div>';
 				html += '<div class="clear"></div>';
 			html += '</div>'; // title
@@ -715,12 +720,12 @@ Page.Events = class Events extends Page.PageUtils {
 					
 					// row 1
 					html += '<div>';
-						html += '<div class="info_label">Event ID</div>';
+						html += `<div class="info_label">${thing} ID</div>`;
 						html += '<div class="info_value monospace">' + this.getNiceCopyableID(event.id) + '</div>';
 					html += '</div>';
 					
 					html += '<div>';
-						html += '<div class="info_label">Event Title</div>';
+						html += `<div class="info_label">${thing} Title</div>`;
 						html += '<div class="info_value">' + this.getNiceEvent(event) + '</div>';
 					html += '</div>';
 				
@@ -801,7 +806,7 @@ Page.Events = class Events extends Page.PageUtils {
 				
 				if (event.notes) {
 					html += '<div class="summary_grid" style="grid-template-columns: 1fr; margin-top:30px;"><div>';
-					html += '<div class="info_label">Event Notes</div>';
+					html += `<div class="info_label">${thing} Notes</div>`;
 					html += '<div class="info_value overflow" style="font-weight:normal; line-height:16px;">' + event.notes.replace(/\n/g, '<br>') + '</div>';
 					html += '</div></div>';
 				}
