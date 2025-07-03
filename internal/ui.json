@@ -377,7 +377,7 @@
 	
 	"workflow_new_node_menu": [
 		{ "id": "event", "title": "New Event...", "icon": "calendar-clock" },
-		{ "id": "job", "title": "New Job...", "icon": "timer-outline" },
+		{ "id": "job", "title": "New Plugin...", "icon": "power-plug" },
 		{ "id": "limit", "title": "New Limiter...", "icon": "gauge" },
 		{ "id": "trigger", "title": "New Trigger...", "icon": "rocket-launch-outline" },
 		{ "id": "action", "title": "New Action...", "icon": "gesture-tap" },
