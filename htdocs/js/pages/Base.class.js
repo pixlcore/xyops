@@ -392,10 +392,9 @@ Page.Base = class Base extends Page {
 	getNiceWorkflowNodeType(node) {
 		// get formatted workflow node type with suitable icon
 		if (!node) return 'n/a';
-		var title = ucfirst(node.type);
-		var info = find_object( config.ui.workflow_new_node_menu, { id: node.type } );
-		if (!info) return title;
-		return '<i class="mdi mdi-' + info.icon +'">&nbsp;</i>' + title;
+		var info = find_object( config.ui.workflow_node_types, { id: node.type } );
+		if (!info) return '(' + node.type + ')';
+		return '<i class="mdi mdi-' + info.icon +'">&nbsp;</i>' + info.title;
 	}
 	
 	getNiceJobEvent(job, link) {
