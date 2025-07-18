@@ -331,7 +331,8 @@
 		{ "id": "catchup", "title": "Catch-Up", "icon": "calendar-refresh-outline", "group": "Options" },
 		{ "id": "range", "title": "Range", "icon": "calendar-range-outline" },
 		{ "id": "blackout", "title": "Blackout", "icon": "circle" },
-		{ "id": "delay", "title": "Delay", "icon": "chat-sleep-outline" }
+		{ "id": "delay", "title": "Delay", "icon": "chat-sleep-outline" },
+		{ "id": "precision", "title": "Precision", "icon": "progress-clock" }
 	],
 	
 	"event_target_algo_menu": [

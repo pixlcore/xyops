@@ -2158,6 +2158,15 @@ Page.PageUtils = class PageUtils extends Page.Base {
 				nice_desc = '<i class="mdi mdi-chat-sleep-outline">&nbsp;</i><b>Delay:</b> ' + short_desc;
 			break;
 			
+			case 'precision':
+				nice_icon = '<i class="mdi mdi-cog-outline"></i>';
+				nice_type = 'Precision';
+				alt_type = 'Precision';
+				short_desc = 'On the minute';
+				if (item.seconds && item.seconds.length) short_desc = item.seconds.map( sec => ':' + zeroPad(sec, 2) ).join(', ');
+				nice_desc = '<i class="mdi mdi-progress-clock">&nbsp;</i><b>Seconds:</b> ' + short_desc;
+			break;
+			
 			case 'plugin':
 				nice_icon = '<i class="mdi mdi-power-plug"></i>';
 				nice_type = 'Plugin';
