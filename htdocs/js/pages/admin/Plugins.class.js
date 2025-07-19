@@ -516,18 +516,6 @@ Page.Plugins = class Plugins extends Page.PageUtils {
 			caption: 'Select the output format that the script generates, so it can be parsed correctly.'
 		});
 		
-		// CWD
-		html += this.getFormRow({
-			label: 'Working Directory:',
-			content: this.getFormText({
-				id: 'fe_ep_cwd',
-				class: 'monospace',
-				spellcheck: 'false',
-				value: plugin.cwd || ''
-			}),
-			caption: 'Optionally enter a custom working directory (CWD) for the Plugin to run from.  This defaults to the OS temp directory.'
-		});
-		
 		// UID
 		html += this.getFormRow({
 			label: 'Run as User:',
@@ -598,7 +586,6 @@ Page.Plugins = class Plugins extends Page.PageUtils {
 		plugin.icon = $('#fe_ep_icon').val();
 		plugin.command = $('#fe_ep_command').val().trim();
 		plugin.script = this.editor.getValue().trim();
-		plugin.cwd = $('#fe_ep_cwd').val();
 		plugin.uid = $('#fe_ep_uid').val();
 		plugin.gid = $('#fe_ep_gid').val();
 		plugin.notes = $('#fe_ep_notes').val();
