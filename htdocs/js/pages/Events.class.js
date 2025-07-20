@@ -1034,7 +1034,7 @@ Page.Events = class Events extends Page.PageUtils {
 	}
 	
 	getLimitDetails() {
-		// get resource limit details in comact table (read-only)
+		// get resource limit details in compact table (read-only)
 		var self = this;
 		var html = '';
 		var rows = this.event.limits.filter( function(limit) { return limit.enabled; } );
