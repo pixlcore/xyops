@@ -228,6 +228,12 @@
 			"indentUnit": 4,
 			"lineWrapping": true,
 			"dragDrop": false
+		},
+		
+		"bucket_upload_settings": {
+			"max_files_per_bucket": 100,
+			"max_file_size": 1073741824,
+			"accepted_file_types": []
 		}
 	},
 	
