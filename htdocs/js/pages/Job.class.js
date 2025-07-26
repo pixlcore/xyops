@@ -535,7 +535,7 @@ Page.Job = class Job extends Page.PageUtils {
 		// format json with syntax highlighting
 		var html = '';
 		
-		if (json) {
+		if (json && first_key(json)) {
 			html += '<div class="box_code_viewer">';
 			html += '<pre><code class="hljs">' + app.highlightAuto( JSON.stringify(json, null, "\t") ) + '</code></pre>';
 			html += '</div>';
@@ -759,16 +759,8 @@ Page.Job = class Job extends Page.PageUtils {
 			self.updateJobProgressBar(job, '#d_wf_jt_progress_' + job.id + ' > div.progress_bar_container');
 		} ); // foreach job
 		
-		// some node states can change without job actions, so update those here
-		workflow.nodes.filter( function(node) { return !!node.type.match(/^(trigger|controller|action)$/); } ).forEach( function(node) {
-			var state = workflow.state[node.id] || {};
-			var $elem = $cont.find(`#d_wfn_${node.id}`);
-			
-			// these node types have simple state props we can key off of
-			$elem.toggleClass('wf_active', !!state.active);
-			$elem.toggleClass('wf_completed', !!state.completed);
-			$elem.toggleClass('disabled', !state.active && !state.completed);
-		});
+		// we need to decorate every tick, because sub-job state changes can alter things!
+		this.decorateWorkflowNodes();
 	}
 	
 	renderJobTags() {
@@ -2254,6 +2246,9 @@ Page.Job = class Job extends Page.PageUtils {
 		for (var key in new_job) {
 			if (!key.match(/^(type|event|category|plugin|targets|algo|workflow|input|params|parent|actions|limits|icon|label|test)$/)) delete new_job[key];
 		}
+		
+		// run_event API expects event ID in "id" prop
+		new_job.id = job.event;
 		
 		// TODO: copy tags from event?  maybe?  NO, we're doing away with tags in events!  Set to empty array on each job launch
 		
