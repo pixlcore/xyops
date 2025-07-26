@@ -1404,6 +1404,22 @@ Page.PageUtils = class PageUtils extends Page.Base {
 				icon = 'monitor-screenshot';
 			break;
 			
+			case 'store':
+				var bucket = find_object( app.buckets, { id: action.bucket_id } );
+				if (!bucket) classes.push('error');
+				title = "Store Bucket";
+				label = bucket ? bucket.title : "(Not found)";
+				icon = bucket ? (bucket.icon || 'pail-outline') : 'alert-decagram-outline';
+			break;
+			
+			case 'fetch':
+				var bucket = find_object( app.buckets, { id: action.bucket_id } );
+				if (!bucket) classes.push('error');
+				title = "Fetch Bucket";
+				label = bucket ? bucket.title : "(Not found)";
+				icon = bucket ? (bucket.icon || 'pail-outline') : 'alert-decagram-outline';
+			break;
+			
 			case 'disable':
 				title = "Disable Event";
 				label = "(Current event)";
@@ -1422,6 +1438,12 @@ Page.PageUtils = class PageUtils extends Page.Base {
 				title = "Plugin";
 				label = plugin ? plugin.title : "(Not found)";
 				icon = plugin ? (plugin.icon || 'power-plug') : 'alert-decagram-outline';
+			break;
+			
+			default:
+				title = "Unknown Action";
+				label = "";
+				icon = 'help';
 			break;
 		} // switch action.type
 		
