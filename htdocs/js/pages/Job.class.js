@@ -65,10 +65,13 @@ Page.Job = class Job extends Page.PageUtils {
 			// complete
 			this.live = false;
 			
-			if (is_workflow) icon = 'clipboard';
-			else icon = 'timer';
+			if (job.icon) icon = job.icon;
+			else {
+				if (is_workflow) icon = 'clipboard';
+				else icon = 'timer';
 			
-			icon += '-' + (job.code ? 'alert' : 'check') + '-outline';
+				icon += '-' + (job.code ? 'alert' : 'check') + '-outline';
+			}
 			// app.setHeaderTitle( '<i class="mdi mdi-timer-' + (job.code ? 'alert' : 'check') + '-outline">&nbsp;</i>Completed Job' );
 			app.setWindowTitle( "Completed Job: #" + job.id );
 			
@@ -88,7 +91,9 @@ Page.Job = class Job extends Page.PageUtils {
 		// construct nav bar
 		var nav_items = [];
 		if (is_sub_job) nav_items.push({ icon: 'clipboard-play-outline', title: "Workflow #" + job.workflow.job, loc: '#Job?id=' + job.workflow.job });
-		if (is_workflow) nav_items.push({ icon: icon, title: "Workflow #" + job.id });
+		
+		if (job.test) nav_items.push({ icon: icon, title: "Test #" + job.id });
+		else if (is_workflow) nav_items.push({ icon: icon, title: "Workflow #" + job.id });
 		else nav_items.push({ icon: icon, title: "Job #" + job.id });
 		
 		if (job.final) {
@@ -170,7 +175,8 @@ Page.Job = class Job extends Page.PageUtils {
 				
 				if (job.final) {
 					// job is complete
-					html += '<span>Job Summary</span>';
+					if (job.test) html += '<span>Test Summary</span>';
+					else html += '<span>Job Summary</span>';
 					
 					// html += '<div class="button right" onClick="$P().do_confirm_run_again()"><i class="mdi mdi-run-fast">&nbsp;</i>Run Again</div>';
 					// html += '<div class="button right secondary" onClick="$P().do_view_job_data()"><i class="mdi mdi-code-json">&nbsp;</i>View JSON...</div>';

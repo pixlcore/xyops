@@ -135,7 +135,8 @@ Page.Search = class Search extends Page.Base {
 							title: 'Select Tag',
 							options: [['', 'Any Tag']].concat( app.tags, [ 
 								{ id: '_retried', title: "Retried", icon: 'refresh', group: "System Tags:" },
-								{ id: '_last', title: "Last in Set", icon: 'page-last' } 
+								{ id: '_last', title: "Last in Set", icon: 'page-last' },
+								{ id: '_test', title: "Test Job", icon: 'test-tube' }
 							]),
 							value: args.tag || '',
 							default_icon: 'tag-outline',

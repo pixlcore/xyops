@@ -1134,7 +1134,8 @@ Page.Base = class Base extends Page {
 		if (job.label && (job.type != 'adhoc')) nice_id = strip_html(job.label) + ' (' + job.id + ')';
 		
 		var icon = '<i class="mdi mdi-timer-outline"></i>';
-		if (job.type == 'workflow') icon = '<i class="mdi mdi-clipboard-play-outline"></i>';
+		if (job.icon) icon = '<i class="mdi mdi-' + job.icon + '"></i>';
+		else if (job.type == 'workflow') icon = '<i class="mdi mdi-clipboard-play-outline"></i>';
 		else if (job.workflow) icon = '<i class="mdi mdi-clipboard-clock-outline"></i>';
 		
 		var html = '<span class="nowrap">';
@@ -2534,7 +2535,8 @@ Page.Base = class Base extends Page {
 			this.buildOptGroup( app.tags, "Tags:", 'tag-outline', 't_' )
 		).concat(
 			{ id: 'z_retried', title: "Retried", icon: 'refresh', group: "System Tags:" },
-			{ id: 'z_last', title: "Last in Set", icon: 'page-last' } 
+			{ id: 'z_last', title: "Last in Set", icon: 'page-last' },
+			{ id: 'z_test', title: "Test Job", icon: 'test-tube' }
 		);
 	}
 	

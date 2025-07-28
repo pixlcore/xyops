@@ -1278,6 +1278,7 @@ Page.Events = class Events extends Page.PageUtils {
 				
 				case 'z_retried': args.query += ' tags:_retried'; break;
 				case 'z_last': args.query += ' tags:_last'; break;
+				case 'z_test': args.query += ' tags:_test'; break;
 				
 				default:
 					if (args.filter.match(/^t_(.+)$/)) args.query += ' tags:' + RegExp.$1;
