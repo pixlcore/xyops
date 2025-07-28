@@ -952,9 +952,10 @@ Page.Workflows = class Workflows extends Page.Events {
 		});
 		
 		// user files
+		var limit = find_object( event.limits || [], { type: 'file', enabled: true } );
 		html += this.getFormRow({
 			label: 'File Input:',
-			content: this.getDialogFileUploader(),
+			content: this.getDialogFileUploader(limit),
 			caption: 'Optionally upload and attach files to the job as inputs.'
 		});
 		

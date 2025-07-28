@@ -1557,6 +1557,22 @@ Page.Base = class Base extends Page {
 				}
 				icon = 'tray-full';
 			break;
+			
+			case 'file':
+				nice_title = "Max Files";
+				if (!item.amount) {
+					nice_desc = "No files allowed";
+					short_desc = "None";
+				}
+				else {
+					nice_desc = "Up to " + commify(item.amount) + " " + pluralize("file", item.amount);
+					if (item.size) nice_desc += " (" + get_text_from_bytes(item.size) + " total)";
+					
+					short_desc = commify(item.amount) + ' ' + pluralize("file", item.amount);
+					if (item.size) short_desc += ", " + get_text_from_bytes(item.size);
+				}
+				icon = 'file-multiple-outline';
+			break;
 		} // switch item.type
 		
 		return { nice_title, nice_desc, short_desc, icon };
@@ -1634,6 +1650,7 @@ Page.Base = class Base extends Page {
 			else if (!find_object(this.limits, { type: 'cpu' })) limit = { type: 'cpu' };
 			else if (!find_object(this.limits, { type: 'retry' })) limit = { type: 'retry' };
 			else if (!find_object(this.limits, { type: 'queue' })) limit = { type: 'queue' };
+			else if (!find_object(this.limits, { type: 'file' })) limit = { type: 'file' };
 			limit.enabled = true;
 		}
 		
@@ -1718,16 +1735,42 @@ Page.Base = class Base extends Page {
 			caption: '<span id="s_erl_duration_cap"></span>'
 		});
 		
+		html += this.getFormRow({
+			id: 'd_erl_file_size',
+			label: 'Max File Size:',
+			content: this.getFormRelativeBytes({
+				id: 'fe_erl_file_size',
+				value: limit.size || 0
+			}),
+			caption: 'Select the maximum allowed file size (total), or 0 for unlimited.'
+		});
+		
+		html += this.getFormRow({
+			id: 'd_erl_file_types',
+			label: 'File Types:',
+			content: this.getFormText({
+				id: 'fe_erl_file_types',
+				placeholder: '*',
+				spellcheck: 'false',
+				maxlength: 256,
+				value: limit.accept || ''
+			}),
+			caption: 'Optionally limit the accepted file types to the specified list.  You can specify file extensions or content types here, separated by commas.  See <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Attributes/accept#unique_file_type_specifiers" target="_blank">file type specifiers</a> for details.'
+		});
+		
 		html += '</div>';
 		Dialog.confirm( title, html, btn, function(result) {
 			if (!result) return;
 			
 			limit.enabled = $('#fe_erl_enabled').is(':checked');
 			limit.type = $('#fe_erl_type').val();
+			delete limit.amount;
+			delete limit.duration;
+			delete limit.accept;
+			
 			switch (limit.type) {
 				case 'time':
 					limit.duration = parseInt( $('#fe_erl_duration').val() );
-					delete limit.amount;
 				break;
 				
 				case 'mem':
@@ -1742,12 +1785,10 @@ Page.Base = class Base extends Page {
 				
 				case 'log':
 					limit.amount = parseInt( $('#fe_erl_byte_amount').val() );
-					delete limit.duration;
 				break;
 				
 				case 'job':
 					limit.amount = parseInt( $('#fe_erl_raw_amount').val() );
-					delete limit.duration;
 				break;
 				
 				case 'retry':
@@ -1757,7 +1798,12 @@ Page.Base = class Base extends Page {
 				
 				case 'queue':
 					limit.amount = parseInt( $('#fe_erl_raw_amount').val() );
-					delete limit.duration;
+				break;
+				
+				case 'file':
+					limit.amount = parseInt( $('#fe_erl_raw_amount').val() );
+					limit.size = parseInt( $('#fe_erl_file_size').val() );
+					limit.accept = $('#fe_erl_file_types').val().replace(/[^\w\s\-\.\,\/\*]+/g, '');
 				break;
 			} // switch limit.type
 			
@@ -1766,23 +1812,21 @@ Page.Base = class Base extends Page {
 		} ); // Dialog.confirm
 		
 		var change_limit_type = function(new_type) {
+			$('#d_erl_byte_amount, #d_erl_raw_amount, #d_erl_duration, #d_erl_file_size, #d_erl_file_types').hide();
+			
 			switch (new_type) {
 				case 'time':
-					$('#d_erl_byte_amount').hide();
-					$('#d_erl_raw_amount').hide();
 					$('#d_erl_duration').show();
 					$('#s_erl_duration_cap').html('Enter the maximum duration for the time limit.');
 				break;
 				
 				case 'mem':
 					$('#d_erl_byte_amount').show();
-					$('#d_erl_raw_amount').hide();
 					$('#d_erl_duration').show();
 					$('#s_erl_duration_cap').html('Specify the amount of time the memory must stay over the limit before the job is aborted.');
 				break;
 				
 				case 'cpu':
-					$('#d_erl_byte_amount').hide();
 					$('#d_erl_raw_amount').show();
 					$('#s_erl_raw_amount_cap').html('Enter the maximum CPU precentage for the limit (100 = 1 core maxed).');
 					$('#d_erl_duration').show();
@@ -1791,19 +1835,14 @@ Page.Base = class Base extends Page {
 				
 				case 'log':
 					$('#d_erl_byte_amount').show();
-					$('#d_erl_raw_amount').hide();
-					$('#d_erl_duration').hide();
 				break;
 				
 				case 'job':
-					$('#d_erl_byte_amount').hide();
 					$('#d_erl_raw_amount').show();
 					$('#s_erl_raw_amount_cap').html('Enter the maximum number to concurrent jobs to allow.');
-					$('#d_erl_duration').hide();
 				break;
 				
 				case 'retry':
-					$('#d_erl_byte_amount').hide();
 					$('#d_erl_raw_amount').show();
 					$('#s_erl_raw_amount_cap').html('Enter the maximum number of retries to attempt before failing the job.');
 					$('#d_erl_duration').show();
@@ -1811,10 +1850,15 @@ Page.Base = class Base extends Page {
 				break;
 				
 				case 'queue':
-					$('#d_erl_byte_amount').hide();
 					$('#d_erl_raw_amount').show();
 					$('#s_erl_raw_amount_cap').html('Enter the maximum number of queued jobs to allow.');
-					$('#d_erl_duration').hide();
+				break;
+				
+				case 'file':
+					$('#d_erl_raw_amount').show();
+					$('#s_erl_raw_amount_cap').html('Enter the maximum number of input files to allow.');
+					$('#d_erl_file_size').show();
+					$('#d_erl_file_types').show();
 				break;
 			} // switch new_type
 		}; // change_limit_type
@@ -1832,7 +1876,7 @@ Page.Base = class Base extends Page {
 		
 		SingleSelect.init( $('#fe_erl_type') );
 		RelativeTime.init( $('#fe_erl_duration') );
-		RelativeBytes.init( $('#fe_erl_byte_amount') );
+		RelativeBytes.init( $('#fe_erl_byte_amount, #fe_erl_file_size') );
 		
 		Dialog.autoResize();
 	}

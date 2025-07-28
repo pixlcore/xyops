@@ -390,7 +390,8 @@
 		{ "id": "mem", "title": "Memory Limit", "icon": "memory" },
 		{ "id": "cpu", "title": "CPU % Limit", "icon": "chip" },
 		{ "id": "retry", "title": "Max Retry Limit", "icon": "redo-variant" },
-		{ "id": "queue", "title": "Max Queue Limit", "icon": "tray-full" }
+		{ "id": "queue", "title": "Max Queue Limit", "icon": "tray-full" },
+		{ "id": "file", "title": "Max File Limit", "icon": "file-multiple-outline" }
 	],
 	
 	"workflow_node_types": [
