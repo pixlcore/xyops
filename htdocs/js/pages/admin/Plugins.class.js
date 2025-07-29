@@ -433,7 +433,7 @@ Page.Plugins = class Plugins extends Page.PageUtils {
 					{ id: 'action', title: 'Action Plugin', icon: 'gesture-tap' },
 					{ id: 'event', title: 'Event Plugin', icon: 'calendar-clock' },
 					{ id: 'monitor', title: 'Monitor Plugin', icon: 'console' },
-					{ id: 'scheduler', title: 'Scheduler Plugin', icon: 'clock-time-four-outline' }
+					{ id: 'scheduler', title: 'Trigger Plugin', icon: 'rocket-launch-outline' }
 				],
 				onChange: '$P().setPluginType()',
 				value: plugin.type || '',
