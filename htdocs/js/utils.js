@@ -379,11 +379,6 @@ function gen_workflow_id(prefix) {
 	return get_short_id(prefix, 7);
 };
 
-function inline_marked(md) {
-	// render text to markdown, trimming and stripping outer <p> tag
-	return marked(md, config.ui.marked_config).trim().replace(/^<p>(.+)<\/p>$/, '$1')
-};
-
 function interval_hits_per_minute(trigger, epoch) {
 	// calculate when an interval should hit in the current minute (epoch)
 	// return an array of second offsets, similar to precision.seconds
