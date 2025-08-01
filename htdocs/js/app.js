@@ -39,8 +39,8 @@ app.extend({
 		"xml": "text/xml"
 	},
 	cmThemeMap: {
-		"light": "default",
-		"dark": "shadowfox"
+		"light": "one-light",
+		"dark": "one-dark"
 	},
 	
 	receiveConfig: function(resp) {
