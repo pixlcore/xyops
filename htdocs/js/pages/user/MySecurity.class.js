@@ -46,7 +46,7 @@ Page.MySecurity = class MySecurity extends Page.Base {
 		html += '<div class="box">';
 		html += '<div class="box_title">';
 			html += 'Recent User Activity';
-			html += '<div class="box_subtitle" style="font-style:italic; color:var(--label-color);">This shows all your user account related activity, including each time you logged in.  If you see any IP addresses or other events that you do not recognize, it is recommended that you logout all sessions using the button below, and reset your password right afterward.</div>';
+			// html += '<div class="box_subtitle" style="font-style:italic; color:var(--label-color);">This shows all your user account related activity, including each time you logged in.  If you see any IP addresses or other events that you do not recognize, it is recommended that you logout all sessions using the button below, and reset your password right afterward.</div>';
 		html += '</div>';
 		html += '<div class="box_content table">';
 		
