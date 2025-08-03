@@ -940,7 +940,7 @@ Page.PageUtils = class PageUtils extends Page.Base {
 			rows: rows,
 			cols: cols,
 			data_type: 'limit',
-			class: 'data_grid',
+			class: 'data_grid c_limit_grid',
 			empty_msg: add_link,
 			grid_template_columns: '40px auto auto auto'
 		};
@@ -1356,7 +1356,7 @@ Page.PageUtils = class PageUtils extends Page.Base {
 			rows: rows,
 			cols: cols,
 			data_type: 'action',
-			class: 'data_grid',
+			class: 'data_grid c_action_grid',
 			empty_msg: add_link,
 			always_append_empty_msg: true,
 			grid_template_columns: '40px auto auto auto auto'
@@ -2018,15 +2018,16 @@ Page.PageUtils = class PageUtils extends Page.Base {
 		this.wfZoomAuto();
 		
 		// scroll handler
-		$cont.find('#d_wf_editor').on('mousedown', function(event) {
-			if (event.which !== 1) return; // only capture left-clicks
+		$cont.find('#d_wf_editor').css('touchAction', 'none').on('pointerdown', function(event) {
+			var native = event.originalEvent;
+			if (native.button !== 0) return; // only capture left-clicks
 			var $this = $(this);
 			
 			event.stopPropagation();
 			event.preventDefault();
 			
 			// if we're soldering, pause it and pop menu to create node in place
-			if (self.wfSoldering) return self.solderNewNode();
+			if (self.wfSoldering) return self.solderNewNode(event);
 			
 			// if we're in edit mode, deselect all
 			if (self.wfEdit) self.deselectAll();
@@ -2036,23 +2037,23 @@ Page.PageUtils = class PageUtils extends Page.Base {
 			var start_scroll = Object.assign( {}, self.wfScroll );
 			
 			$cont.addClass('dragging');
+			this.setPointerCapture(native.pointerId);
 			
-			$(document).on('mousemove.scroll', function(event) {
+			$this.on('pointermove.scroll', function(event) {
 				self.wfScroll.x = start_scroll.x - ((event.clientX - start_pt.x) / self.wfZoom);
 				self.wfScroll.y = start_scroll.y - ((event.clientY - start_pt.y) / self.wfZoom);
 				self.drawWorkflow();
 			});
 			
-			$(document).on('mouseup.scroll', function(event) {
+			$this.on('pointerup.scroll', function(event) {
 				delete self.wfScroll.dragging;
 				$this.css('cursor', 'grab');
-				$(document).off('.scroll');
+				$this.off('.scroll');
 				$cont.removeClass('dragging');
 				if (self.wfEdit) self.updateState();
 			});
 			
 			$this.css('cursor', 'grabbing');
-			return false; // legacy
 		});
 	}
 	
@@ -2951,7 +2952,7 @@ Page.PageUtils = class PageUtils extends Page.Base {
 			rows: rows,
 			cols: cols,
 			data_type: 'param',
-			class: 'data_grid',
+			class: 'data_grid c_param_grid',
 			empty_msg: add_link,
 			always_append_empty_msg: true,
 			grid_template_columns: '40px auto auto auto auto'
