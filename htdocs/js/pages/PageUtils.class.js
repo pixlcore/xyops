@@ -2014,6 +2014,7 @@ Page.PageUtils = class PageUtils extends Page.Base {
 	
 	collapseSearchOpts() {
 		// collapse toggle box
+		var self = this;
 		var $btn = this.div.find('#btn_search_opts');
 		var $content = $btn.closest('.box').find('div.form_grid');
 		var $icon = $btn.find('i').first();
@@ -2029,8 +2030,9 @@ Page.PageUtils = class PageUtils extends Page.Base {
 				height: 0,
 				marginBottom: 0
 			}, {
-				duration: 500,
-				easing: 'easeOutQuart'
+				duration: app.reducedMotion() ? 1 : 400,
+				easing: 'easeOutQuart',
+				complete: function() { self.updateBoxButtonFloaterState(); }
 			});
 			
 			// $title.html('Show Options');
@@ -2041,6 +2043,7 @@ Page.PageUtils = class PageUtils extends Page.Base {
 	
 	expandSearchOpts() {
 		// expand toggle box
+		var self = this;
 		var $btn = this.div.find('#btn_search_opts');
 		var $content = $btn.closest('.box').find('div.form_grid');
 		var $icon = $btn.find('i').first();
@@ -2056,8 +2059,9 @@ Page.PageUtils = class PageUtils extends Page.Base {
 				height: $content[0].scrollHeight,
 				marginBottom: '25px'
 			}, {
-				duration: 500,
-				easing: 'easeOutQuart'
+				duration: app.reducedMotion() ? 1 : 400,
+				easing: 'easeOutQuart',
+				complete: function() { self.updateBoxButtonFloaterState(); }
 			});
 			
 			// $title.html('Hide Options');
