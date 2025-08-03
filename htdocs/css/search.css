@@ -213,11 +213,11 @@ div.load_more {
 
 @media only screen and (min-width: 240px) and (max-width: 767px) {
 	.form_grid {
-		grid-template-columns: 1fr;
+		grid-template-columns: 1fr 1fr;
 		grid-row-gap: 20px;
 	}
 	.form_grid.four {
-		grid-template-columns: 1fr;
+		grid-template-columns: 1fr 1fr;
 	}
 	
 	.form_grid .multiselect > .single {
