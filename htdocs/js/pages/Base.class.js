@@ -377,7 +377,6 @@ Page.Base = class Base extends Page {
 		
 		if (item.type == 'workflow') {
 			default_icon = 'clipboard-flow-outline';
-			loc = '#Workflows';
 		}
 		
 		var html = '<span class="nowrap">';
