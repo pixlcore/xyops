@@ -53,6 +53,20 @@ app.extend({
 		// apply menu item max
 		SingleSelect.maxMenuItems = config.max_menu_items || 1000;
 		
+		// extend marked with our customizations
+		marked.use({ renderer: {
+			link(href, title, text) {
+				// Check if it's an anchor link (starts with "#")
+				if (href.startsWith('#')) {
+					const titleAttr = title ? ` title="${title}"` : '';
+					return `<a href="${href}" target="_blank"${titleAttr}>${text}<i style="padding-left:3px" class="mdi mdi-open-in-new"></i></a>`;
+				}
+				
+				// Use default behavior for other links
+				return `<a href="${href}"${title ? ` title="${title}"` : ''}>${text}</a>`;
+			}
+		} });
+		
 		// setup audio subsystem
 		this.initAudio();
 		
