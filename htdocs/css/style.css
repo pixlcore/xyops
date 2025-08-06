@@ -1039,10 +1039,6 @@ div.ex_tree_inner pre code.hljs {
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
-	
-	user-select: none;
-	-moz-user-select: none;
-	-webkit-user-select: none;
 }
 .tree_row .mdi:before {
 	transform: scale(1.4);
@@ -1062,7 +1058,7 @@ div.ex_tree_inner pre code.hljs {
 
 .tree_folder {
 	padding-right: 5px;
-	color: var(--blue);
+	color: var(--cyan);
 }
 
 .tree_key {
@@ -1088,25 +1084,16 @@ div.ex_tree_inner pre code.hljs {
 .tree_value {
 	font-weight: normal;
 }
-/* .tree_value.tv_string {
-	color: var(--green);
-}
-.tree_value.tv_number {
-	font-weight: bold;
-	color: var(--orange);
-}
-.tree_value.tv_boolean {
-	font-weight: bold;
-	color: var(--purple);
-}
-.tree_value.tv_null {
-	font-weight: bold;
-	color: var(--pink);
-} */
 .tree_value:before {
 	content: ':';
 	padding-right: 5px;
 	color: var(--label-color);
+}
+
+.tree_ctrl, .tree_folder, .tree_file, .tree_key {
+	user-select: none;
+	-moz-user-select: none;
+	-webkit-user-select: none;
 }
 
 /* Box Button Floater */
