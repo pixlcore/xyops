@@ -632,7 +632,7 @@ Page.WebHooks = class WebHooks extends Page.PageUtils {
 		var self = this;
 		var header = (idx > -1) ? this.headers[idx] : { name: '', value: '' };
 		var title = (idx > -1) ? "Editing Header" : "New Header";
-		var btn = (idx > -1) ? ['check-circle', "Apply"] : ['plus-circle', "Add Header"];
+		var btn = (idx > -1) ? ['check-circle', "Accept"] : ['plus-circle', "Add Header"];
 		
 		var html = '<div class="dialog_box_content scroll">';
 		

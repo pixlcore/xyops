@@ -890,7 +890,7 @@ Page.ServerUtils = class ServerUtils extends Page.PageUtils {
 		var self = this;
 		var args = this.args;
 		var title = "View Historical " + (group_mode ? 'Group' : 'Server') + " Data";
-		var btn = ['check-circle', "Apply"];
+		var btn = ['check-circle', "Accept"];
 		
 		var html = '<div class="dialog_box_content scroll">';
 		

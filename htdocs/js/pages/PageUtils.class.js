@@ -988,7 +988,7 @@ Page.PageUtils = class PageUtils extends Page.Base {
 		var self = this;
 		var limit = (idx > -1) ? this.limits[idx] : null;
 		var title = (idx > -1) ? "Editing Resource Limit" : "New Resource Limit";
-		var btn = (idx > -1) ? ['check-circle', "Apply"] : ['plus-circle', "Add Limit"];
+		var btn = (idx > -1) ? ['check-circle', "Accept"] : ['plus-circle', "Add Limit"];
 		
 		if (!limit) {
 			if (!find_object(this.limits, { type: 'time' })) limit = { type: 'time' };
@@ -1402,7 +1402,7 @@ Page.PageUtils = class PageUtils extends Page.Base {
 		var self = this;
 		var action = (idx > -1) ? this.actions[idx] : { condition: 'error', type: 'email', email: '', enabled: true };
 		var title = (idx > -1) ? "Editing Job Action" : "New Job Action";
-		var btn = (idx > -1) ? ['check-circle', "Apply"] : ['plus-circle', "Add Action"];
+		var btn = (idx > -1) ? ['check-circle', "Accept"] : ['plus-circle', "Add Action"];
 		
 		this.showEditJobActionDialog({
 			action: action,
@@ -3255,7 +3255,7 @@ Page.PageUtils = class PageUtils extends Page.Base {
 		var self = this;
 		var param = (idx > -1) ? this.params[idx] : { type: 'text', value: '' };
 		var title = (idx > -1) ? "Editing Parameter" : "New Parameter";
-		var btn = (idx > -1) ? ['check-circle', "Apply"] : ['plus-circle', "Add Param"];
+		var btn = (idx > -1) ? ['check-circle', "Accept"] : ['plus-circle', "Add Param"];
 		
 		// prepare control type menu
 		var ctypes = (this.controlTypes || Object.keys(config.ui.control_type_labels)).map (function(key) { 

@@ -943,7 +943,7 @@ Page.Base = class Base extends Page {
 		var self = this;
 		var args = this.args;
 		var title = "Select Date Range";
-		var btn = ['check-circle', "Apply"];
+		var btn = ['check-circle', "Accept"];
 		
 		var html = '<div class="dialog_box_content scroll">';
 		

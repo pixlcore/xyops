@@ -1069,7 +1069,7 @@ Page.Servers = class Servers extends Page.ServerUtils {
 		var self = this;
 		var server = this.server;
 		var title = "Set Server Watch";
-		var btn = ['check-circle', "Apply"];
+		var btn = ['check-circle', "Accept"];
 		var cur_value = 300;
 		
 		if (app.state && app.state.watches && app.state.watches.servers && app.state.watches.servers[server.id] && (app.state.watches.servers[server.id] > app.epoch)) {

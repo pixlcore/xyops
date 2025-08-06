@@ -2596,7 +2596,7 @@ Page.Events = class Events extends Page.PageUtils {
 		var new_item = { type: 'schedule', enabled: true, minutes: [0] };
 		var trigger = (idx > -1) ? this.event.triggers[idx] : new_item;
 		var title = (idx > -1) ? "Editing Trigger" : "New Trigger";
-		var btn = (idx > -1) ? ['check-circle', "Apply"] : ['plus-circle', "Add Trigger"];
+		var btn = (idx > -1) ? ['check-circle', "Accept"] : ['plus-circle', "Add Trigger"];
 		
 		// grab external ID if applicable (workflow node)
 		var ext_id = trigger.id || '';

@@ -1549,7 +1549,7 @@ Page.Groups = class Groups extends Page.ServerUtils {
 		var self = this;
 		var group = this.group;
 		var title = "Set Group Watch";
-		var btn = ['check-circle', "Apply"];
+		var btn = ['check-circle', "Accept"];
 		var cur_value = 300;
 		
 		if (app.state && app.state.watches && app.state.watches.groups && app.state.watches.groups[group.id] && (app.state.watches.groups[group.id] > app.epoch)) {
