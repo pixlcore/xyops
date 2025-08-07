@@ -1089,16 +1089,16 @@ app.extend({
 	
 	initAudio() {
 		// initialize audio and unlock ability to play background sounds
-		const AudioContext = window.AudioContext || window.webkitAudioContext;
-		const context = new AudioContext();
-		let allowed = false;
+		var AudioContext = window.AudioContext || window.webkitAudioContext;
+		var context = new AudioContext();
+		var allowed = false;
 		
-		const unlockAudioContext = () => {
+		var unlockAudioContext = function() {
 			if (allowed) return;
 			
 			// create a short silent sound
-			const buffer = context.createBuffer(1, 1, 22050);
-			const source = context.createBufferSource();
+			var buffer = context.createBuffer(1, 1, 22050);
+			var source = context.createBufferSource();
 			source.buffer = buffer;
 			source.connect(context.destination);
 			source.start(0);
@@ -1114,8 +1114,8 @@ app.extend({
 			}
 		};
 		
-		['mousedown', 'keydown', 'keyup', 'touchstart'].forEach(eventType => {
-			document.addEventListener(eventType, unlockAudioContext, { once: true });
+		['pointerdown', 'keydown'].forEach(eventType => {
+			document.addEventListener(eventType, unlockAudioContext, { once: true, capture: true });
 		});
 	},
 	
@@ -1147,6 +1147,23 @@ app.extend({
 			
 			this.tracks[name] = track;
 		}
+	},
+	
+	confetti(args) {
+		// augment confetti with origin element (optional)
+		if (!this.user.effects) return;
+		if (!args) args = {};
+		
+		if (args.origin && args.origin.jquery) args.origin = args.origin.get(0);
+		if (args.origin && args.origin.getBoundingClientRect) {
+			// center confetti emitter on selected DOM element
+			var rect = args.origin.getBoundingClientRect();
+			var x = (rect.left + (rect.width / 2)) / window.innerWidth;
+			var y = (rect.top + (rect.height / 2)) / window.innerHeight;
+			args.origin = { x, y };
+		}
+		
+		confetti(args);
 	},
 	
 	getApproxServerTime() {
