@@ -56,14 +56,8 @@ app.extend({
 		// extend marked with our customizations
 		marked.use({ renderer: {
 			link(href, title, text) {
-				// Check if it's an anchor link (starts with "#")
-				if (href.startsWith('#')) {
-					const titleAttr = title ? ` title="${title}"` : '';
-					return `<a href="${href}" target="_blank"${titleAttr}>${text}<i style="padding-left:3px" class="mdi mdi-open-in-new"></i></a>`;
-				}
-				
-				// Use default behavior for other links
-				return `<a href="${href}"${title ? ` title="${title}"` : ''}>${text}</a>`;
+				const titleAttr = title ? ` title="${title}"` : '';
+				return `<a href="${href}" target="_blank"${titleAttr}>${text}<i style="padding-left:3px" class="mdi mdi-open-in-new"></i></a>`;
 			}
 		} });
 		
@@ -116,6 +110,7 @@ app.extend({
 			{ ID: 'Channels' },
 			{ ID: 'WebHooks' },
 			{ ID: 'Buckets' },
+			{ ID: 'Secrets' },
 			{ ID: 'Plugins' },
 			{ ID: 'Tags' },
 			{ ID: 'Roles' },
@@ -432,6 +427,7 @@ app.extend({
 			$('#tab_ActivityLog').removeClass('enabled').hide();
 			$('#tab_APIKeys').removeClass('enabled').hide();
 			$('#tab_Masters').removeClass('enabled').hide();
+			$('#tab_Secrets').removeClass('enabled').hide();
 			$('#tab_System').removeClass('enabled').hide();
 			$('#tab_Users').removeClass('enabled').hide();
 			$('#tab_Roles').removeClass('enabled').hide();

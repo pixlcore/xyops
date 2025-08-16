@@ -333,6 +333,25 @@ Page.Base = class Base extends Page {
 		return html;
 	}
 	
+	getNiceSecret(item, link) {
+		// get formatted secret with icon, plus optional link
+		if (typeof(item) == 'string') item = find_object(app.secrets, { id: item });
+		if (!item) return '(None)';
+		
+		var html = '<span class="nowrap">';
+		var icon = '<i class="mdi mdi-' + (item.icon || 'shield-lock-outline') + '"></i>';
+		if (link) {
+			html += '<a href="#Secrets?sub=edit&id=' + item.id + '">';
+			html += icon + '<span>' + item.title + '</span></a>';
+		}
+		else {
+			html += icon + item.title;
+		}
+		
+		html += '</span>';
+		return html;
+	}
+	
 	getNicePlugin(item, link) {
 		// get formatted plugin with icon, plus optional link
 		if (typeof(item) == 'string') item = find_object(app.plugins, { id: item });

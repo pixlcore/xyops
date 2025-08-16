@@ -51,7 +51,7 @@
 		{ "id": "create_snapshots", "title": "Create Snapshots", "icon": "monitor-eye" }
 	],
 	
-	"globalMemoryLists": ["groups", "plugins", "categories", "events", "channels", "web_hooks", "buckets", "monitors", "alerts", "tags", "roles"],
+	"globalMemoryLists": ["groups", "plugins", "categories", "events", "channels", "web_hooks", "buckets", "secrets", "monitors", "alerts", "tags", "roles"],
 	
 	"list_list": [
 		{ "id": "alerts", "title": "Alerts", "icon": "bell-outline" },
@@ -63,6 +63,7 @@
 		{ "id": "groups", "title": "Groups", "icon": "server-network" },
 		{ "id": "monitors", "title": "Monitors", "icon": "chart-areaspline" },
 		{ "id": "plugins", "title": "Plugins", "icon": "power-plug-outline" },
+		{ "id": "secrets", "title": "Secrets", "icon": "shield-lock-outline" },
 		{ "id": "tags", "title": "Tags", "icon": "tag-outline" },
 		{ "id": "users", "title": "Users", "icon": "account" },
 		{ "id": "roles", "title": "Roles", "icon": "account-group" },
@@ -135,6 +136,11 @@
 		"bucket_update": "Bucket updated: [description] ([bucket.id])",
 		"bucket_delete": "Bucket deleted: [description] ([bucket.id])",
 		
+		"secret_create": "Secret created: [description] ([secret.id])",
+		"secret_update": "Secret updated: [description] ([secret.id])",
+		"secret_delete": "Secret deleted: [description] ([secret.id])",
+		"secret_access": "Secret was accessed: [description] ([secret.id])",
+		
 		"user_create": "User created: [user.full_name] ([user.username])",
 		"user_update": "User updated: [user.full_name] ([user.username])",
 		"user_delete": "User deleted: [user.full_name] ([user.username])",
@@ -173,6 +179,7 @@
 		"tags": "^(tag_.+)$",
 		"web_hooks": "^(web_hook_.+)$",
 		"buckets": "^(bucket_.+)$",
+		"secrets": "^(secret_.+)$",
 		"users": "^(user_.+)$",
 		"roles": "^(role_.+)$",
 		"servers": "^(server_.+)$",
@@ -210,6 +217,7 @@
 		"^channel": { "icon": "bullhorn-outline", "label": "Channel" },
 		"^web_hook": { "icon": "webhook", "label": "Web Hook" },
 		"^bucket": { "icon": "pail-outline", "label": "Bucket" },
+		"^secret": { "icon": "shield-lock-outline", "label": "Secret" },
 		"^plugin": { "icon": "power-plug-outline", "label": "Plugin" },
 		"^job": { "icon": "timer-outline", "label": "Job" },
 		"^queue": { "icon": "tray-full", "label": "Queue" },
@@ -230,6 +238,7 @@
 		"tag": { "name": "tag", "list": "tags", "icon": "tag-outline", "page": "Tags" },
 		"web_hook": { "name": "web hook", "list": "web_hooks", "icon": "webhook", "page": "WebHooks" },
 		"bucket": { "name": "bucket", "list": "buckets", "icon": "pail-outline", "page": "Buckets" },
+		"secret": { "name": "secret", "list": "secrets", "icon": "shield-lock-outline", "page": "Secrets" },
 		"user": { "name": "user", "list": "users", "icon": "account", "page": "Users" },
 		"role": { "name": "role", "list": "roles", "icon": "account-group", "page": "Roles" }
 	},
@@ -610,7 +619,8 @@
 		"rollback_draft": "Revision [event.revision] has been loaded as a draft edit.  Click 'Save Changes' to complete the rollback.  Note that a new revision number will be assigned.",
 		"draft_restored": "Your previous unsaved edits were restored.  Click the 'Cancel' button to discard them.",
 		"wf_new_save": "The new workflow was created successfully.",
-		"wf_edit_save": "The workflow was saved successfully."
+		"wf_edit_save": "The workflow was saved successfully.",
+		"secret_decrypted": "The secret was successfully decrypted for editing."
 	},
 	
 	"menu_bits": {

@@ -518,7 +518,7 @@
 		} ],
 		
 		[ "listCreate", "global/buckets", {} ],
-		
+		[ "listCreate", "global/secrets", {} ],
 		[ "listCreate", "global/stats", {} ],
 		
 		[ "put", "global/state", {
