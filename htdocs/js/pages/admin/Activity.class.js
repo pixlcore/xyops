@@ -407,6 +407,20 @@ Page.ActivityLog = class ActivityLog extends Page.PageUtils {
 					}
 				break;
 				
+				case 'buckets':
+					if (item.bucket) {
+						click = `$P().showActionReport(${idx},'bucket')`;
+						actions.push(`<span class="link" onClick="${click}"><b>Details...</b></span>`);
+					}
+				break;
+				
+				case 'secrets':
+					if (item.secret) {
+						click = `$P().showActionReport(${idx},'secret')`;
+						actions.push(`<span class="link" onClick="${click}"><b>Details...</b></span>`);
+					}
+				break;
+				
 				case 'users':
 					if (item.user) {
 						click = `$P().showActionReport(${idx},'user')`;
@@ -573,6 +587,20 @@ Page.ActivityLog = class ActivityLog extends Page.PageUtils {
 		else {
 			md += "\n### Details\n\n";
 			md += "No details provided.\n";
+		}
+		
+		if (job.params) {
+			md += "\n### Job Parameters\n\n";
+			md += '```json' + "\n";
+			md += JSON.stringify( job.params, null, "\t" ) + "\n";
+			md += '```' + "\n";
+		}
+		
+		if (job.stats) {
+			md += "\n### Job Stats\n\n";
+			md += '```json' + "\n";
+			md += JSON.stringify( job.stats, null, "\t" ) + "\n";
+			md += '```' + "\n";
 		}
 		
 		// md += "\n*(End of report)*\n";
