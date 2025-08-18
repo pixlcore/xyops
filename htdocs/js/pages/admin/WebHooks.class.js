@@ -614,8 +614,8 @@ Page.WebHooks = class WebHooks extends Page.PageUtils {
 			links.push( '<span class="link danger" onClick="$P().deleteHeader('+idx+')"><b>Delete</b></span>' );
 			
 			var tds = [
-				'<div class="td_big ellip"><i class="mdi mdi-form-textbox">&nbsp;</i><span class="link" onClick="$P().editHeader('+idx+')">' + encode_entities(item.name) + '</span></div>',
-				'<div class="ellip">' + encode_entities(item.value) + '</div>',
+				'<div class="td_big ellip monospace"><i class="mdi mdi-form-textbox">&nbsp;</i><span class="link" onClick="$P().editHeader('+idx+')">' + encode_entities(item.name) + '</span></div>',
+				'<div class="ellip monospace">' + encode_entities(item.value) + '</div>',
 				'<div class="ellip">' + links.join(' | ') + '</div>'
 			];
 			
@@ -641,6 +641,7 @@ Page.WebHooks = class WebHooks extends Page.PageUtils {
 			label: 'Header Name:',
 			content: this.getFormText({
 				id: 'fe_eh_name',
+				class: 'monospace',
 				spellcheck: 'false',
 				autocomplete: 'off',
 				maxlength: 8192,
@@ -655,6 +656,7 @@ Page.WebHooks = class WebHooks extends Page.PageUtils {
 			label: 'Header Value:',
 			content: this.getFormText({
 				id: 'fe_eh_value',
+				class: 'monospace',
 				spellcheck: 'false',
 				maxlength: 8192,
 				placeholder: '',
