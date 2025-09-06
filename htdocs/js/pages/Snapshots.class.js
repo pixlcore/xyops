@@ -452,7 +452,7 @@ Page.Snapshots = class Snapshots extends Page.ServerUtils {
 		html += '</div>'; // box
 		
 		// quickmon charts
-		html += '<div class="box charts" id="d_vs_quickmon">';
+		html += '<div class="box charts" id="d_vs_quickmon" style="display:none">';
 			html += '<div class="box_title">';
 			html += '<div class="box_title_widget" style="overflow:visible; margin-left:0;"><i class="mdi mdi-magnify" onMouseUp="$(this).next().focus()">&nbsp;</i><input type="text" placeholder="Filter" value="" onInput="$P().applyQuickMonitorFilter(this)"></div>';
 			html += this.getChartSizeSelector('chart_size_quick');
@@ -592,6 +592,9 @@ Page.Snapshots = class Snapshots extends Page.ServerUtils {
 		var snapshot = this.snapshot;
 		var server = app.servers[ snapshot.server ] || null;
 		
+		if (server && !server.info.quickmon) return;
+		if (!snapshot.quickmon || !snapshot.quickmon.length) return;
+		
 		var html = '';
 		html += '<div class="chart_grid_horiz ' + (app.getPref('chart_size_quick') || 'medium') + '">';
 		
@@ -601,6 +604,7 @@ Page.Snapshots = class Snapshots extends Page.ServerUtils {
 		} );
 		
 		html += '</div>';
+		this.div.find('#d_vs_quickmon').show();
 		this.div.find('#d_vs_quickmon > div.box_content').html( html );
 		
 		config.quick_monitors.forEach( function(def, idx) {
@@ -1037,6 +1041,13 @@ Page.Snapshots = class Snapshots extends Page.ServerUtils {
 		var group = this.group;
 		var html = '';
 		html += '<div class="chart_grid_horiz ' + (app.getPref('chart_size_quick') || 'medium') + '">';
+		
+		// see if any of our servers have quickmon data, hide if not
+		var yes_quickmon = false;
+		this.servers.forEach( function(server) {
+			if (server.quickmon && server.quickmon.length) yes_quickmon = true;
+		} );
+		if (!yes_quickmon) return;
 		
 		config.quick_monitors.forEach( function(def) {
 			// { "id": "cpu_load", "title": "CPU Load Average", "source": "cpu.avgLoad", "type": "float", "suffix": "" },
