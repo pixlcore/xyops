@@ -823,7 +823,7 @@ Page.Groups = class Groups extends Page.ServerUtils {
 		this.setupUpcomingJobs();
 		
 		var animate_max_servers = config.animate_max_servers || 100;
-		if (!app.reducedMotion() && (this.servers.length <= animate_max_servers)) this.animate();
+		if (!app.reducedMotion() && this.quickmonEnabled && (this.servers.length <= animate_max_servers)) this.animate();
 		
 		return true;
 	}
@@ -859,6 +859,13 @@ Page.Groups = class Groups extends Page.ServerUtils {
 		var html = '';
 		html += '<div class="chart_grid_horiz ' + (app.getPref('chart_size_quick') || 'medium') + '">';
 		
+		// see if any of our servers support quickmon
+		this.quickmonEnabled = false;
+		this.servers.forEach( function(server) {
+			if (server.info.quickmon) self.quickmonEnabled = true;
+		} );
+		if (!this.quickmonEnabled) return;
+		
 		config.quick_monitors.forEach( function(def) {
 			// { "id": "cpu_load", "title": "CPU Load Average", "source": "cpu.avgLoad", "type": "float", "suffix": "" },
 			html += '<div><canvas id="c_vg_' + def.id + '" class="chart"></canvas></div>';
@@ -892,7 +899,7 @@ Page.Groups = class Groups extends Page.ServerUtils {
 			self.setupCustomHeadroom(def.id);
 		});
 		
-		// request all data from server
+		// request all data from servers
 		app.api.post( 'app/get_quickmon_data', { group: this.group.id }, function(resp) {
 			if (!self.active) return; // sanity
 			
@@ -1089,6 +1096,16 @@ Page.Groups = class Groups extends Page.ServerUtils {
 			
 			// save snapshot in server object
 			server.snapshot = resp.data;
+			
+			// if no quickmon, set server.quick here based on snapshot, for donuts
+			if (!server.info.quickmon) {
+				server.quick = {
+					data: {
+						cpu: server.snapshot.data.cpu,
+						mem: server.snapshot.data.memory
+					}
+				};
+			}
 			
 			// prune all data older than 1 hour
 			resp.rows = resp.rows.filter( function(row) { return row.date >= min_epoch; } );
@@ -1311,6 +1328,16 @@ Page.Groups = class Groups extends Page.ServerUtils {
 		
 		server.snapshot = snapshot;
 		
+		// if no quickmon, set server.quick here based on snapshot, for donuts
+		if (!server.info.quickmon) {
+			server.quick = {
+				data: {
+					cpu: snapshot.data.cpu,
+					mem: snapshot.data.memory
+				}
+			};
+		}
+		
 		// uptime
 		var now = app.epoch;
 		var nice_uptime = (!server.offline && server.info.booted) ? this.getNiceUptime( now - server.info.booted ) : 'n/a';
@@ -1353,7 +1380,7 @@ Page.Groups = class Groups extends Page.ServerUtils {
 		}); // foreach mon
 		
 		// for quickmon, immediately delete layers for servers that went offline or left the group
-		config.quick_monitors.forEach( function(def, idx) {
+		if (this.quickmonEnabled) config.quick_monitors.forEach( function(def, idx) {
 			var chart = self.charts[ def.id ];
 			var need_delete = false;
 			
@@ -1668,6 +1695,7 @@ Page.Groups = class Groups extends Page.ServerUtils {
 		delete this.upcomingJobs;
 		delete this.upcomingOffset;
 		delete this.quickReady;
+		delete this.quickmonEnabled;
 		
 		// destroy charts if applicable (view page)
 		if (this.charts) {
