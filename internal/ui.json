@@ -507,6 +507,34 @@
 		}
 	},
 	
+	"pages": {
+		
+		"System": {
+			"d_sys_sat_targets": {
+				"label": "Upgrade Targets:",
+				"caption": "Select which groups and/or servers you want to upgrade."
+			},
+			"fe_sys_sat_targets": {
+				"title": "Select targets for upgrade",
+				"placeholder": "Select targets for upgrade..."
+			},
+			
+			"d_sys_sat_release": {
+				"label": "Satellite Version:",
+				"caption": "Select the desired xyOps Satellite version to be installed."
+			},
+			"fe_sys_sat_release": {
+				"title": "Select Satellite Version"
+			},
+			
+			"d_sys_sat_stagger": {
+				"label": "Stagger Installs:",
+				"caption": "Optionally stagger the install requests by a custom interval."
+			}
+		}
+		
+	},
+	
 	"errors": {
 		"api_error": "API Error: [err.description]",
 		"fe_ete_input": "Invalid JSON: [err.message]",
@@ -824,6 +852,6 @@
 	
 	"satellite_install_commands": {
 		"standard": "curl -s \"[base_url]/api/app/satellite/install?t=[token]\" | sudo sh",
-		"windows": "powershell -Command \"IEX (New-Object Net.WebClient).DownloadString('[base_url]/api/app/satellite/install?t=[token]&os=windows')\""
+		"windows": "powershell -Command \"IEX (Invoke-WebRequest -UseBasicParsing -Uri '[base_url]/api/app/satellite/install?t=[token]&os=windows').Content\""
 	}
 }
