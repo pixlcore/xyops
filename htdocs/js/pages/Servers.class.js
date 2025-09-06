@@ -640,13 +640,13 @@ Page.Servers = class Servers extends Page.ServerUtils {
 		
 		if (!this.active) return; // sanity
 		
-		// massage the DB search resp so that things are happy
-		// resp.rows = resp.records;
-		// resp.list = { length: resp.total };
+		// decorate with offline props
+		resp.rows.forEach( function(server) {
+			if (!app.servers[server.id]) server.offline = true;
+		} );
 		
 		this.lastSearchResp = resp;
-		this.servers = [];
-		if (resp.rows) this.servers = resp.rows;
+		this.servers = resp.rows;
 		
 		var grid_args = {
 			resp: resp,
