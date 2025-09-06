@@ -111,15 +111,21 @@ Page.System = class System extends Page.Base {
 		html += '</div>';
 		
 		// restart server
+		// html += '<div class="maint_unit">';
+		// 	html += '<div class="button danger" onClick="$P().restart_master()"><i class="mdi mdi-restart">&nbsp;</i>Restart Server...</div>';
+		// 	html += '<div class="caption">Restart the current conductor server (secondary will take over).  <a href="#">Learn More</a></div>';
+		// html += '</div>';
+		
+		// upgrade satellite
 		html += '<div class="maint_unit">';
-			html += '<div class="button danger" onClick="$P().restart_master()"><i class="mdi mdi-restart">&nbsp;</i>Restart Server...</div>';
-			html += '<div class="caption">Restart the current conductor server (secondary will take over).  <a href="#">Learn More</a></div>';
+			html += '<div class="button danger" onClick="$P().do_upgrade_satellite()"><i class="mdi mdi-cloud-upload-outline">&nbsp;</i>Upgrade Workers...</div>';
+			html += '<div class="caption">Upgrade or downgrade the xyOps Satellite software across your fleet of worker servers.  <a href="#">Learn More</a></div>';
 		html += '</div>';
 		
-		// upgrade server
+		// upgrade masters
 		html += '<div class="maint_unit">';
-			html += '<div class="button danger" onClick="$P().upgrade_master()"><i class="mdi mdi-cloud-upload-outline">&nbsp;</i>Upgrade Server...</div>';
-			html += '<div class="caption">Upgrade the current conductor server to the latest stable xyOps release.  <a href="#">Learn More</a></div>';
+			html += '<div class="button danger" onClick="$P().upgrade_master()"><i class="mdi mdi-database-arrow-up-outline">&nbsp;</i>Upgrade Masters...</div>';
+			html += '<div class="caption">Upgrade or downgrade xyOps on your master servers to any selected version.  <a href="#">Learn More</a></div>';
 		html += '</div>';
 		
 		html += '</div>'; // maint_grid
@@ -382,12 +388,10 @@ Page.System = class System extends Page.Base {
 	do_export_data() {
 		// select which data to export
 		var self = this;
-		var html = '<div class="dialog_box_content maximize" style="max-height:75vh; overflow-x:hidden; overflow-y:auto;">';
+		var html = '';
 		
-		html += this.getFormRow({
-			label: 'Description:',
-			content: `This allows you to bulk export xyOps data to your local machine.  A gzip-compressed text file will be downloaded when the process is complete.  Please select which categories of data you wish you export.`
-		});
+		html += `<div class="dialog_intro">This allows you to bulk export xyOps data to your local machine.  A gzip-compressed text file will be downloaded when the process is complete.  Please select which categories of data you wish you export.</div>`;
+		html += '<div class="dialog_box_content maximize" style="max-height:75vh; overflow-x:hidden; overflow-y:auto;">';
 		
 		html += this.getFormRow({
 			id: 'd_sys_ex_lists',
@@ -469,12 +473,10 @@ Page.System = class System extends Page.Base {
 	do_delete_data() {
 		// delete selected data
 		var self = this;
-		var html = '<div class="dialog_box_content maximize" style="max-height:75vh; overflow-x:hidden; overflow-y:auto;">';
+		var html = '';
 		
-		html += this.getFormRow({
-			label: 'Description:',
-			content: `This allows you to <b>permanently delete</b> xyOps data in bulk.  Please select which categories of data you wish you delete.  It is highly recommended that you stop all running jobs before deleting data.  Also note that the scheduler will automatically be paused if it is active.`
-		});
+		html += `<div class="dialog_intro">This allows you to <b>permanently delete</b> xyOps data in bulk.  Please select which categories of data you wish you delete.  It is highly recommended that you stop all running jobs before deleting data.  Also note that the scheduler will automatically be paused if it is active.</div>`;
+		html += '<div class="dialog_box_content maximize" style="max-height:75vh; overflow-x:hidden; overflow-y:auto;">';
 		
 		html += this.getFormRow({
 			id: 'd_sys_ex_lists',
@@ -621,6 +623,88 @@ Page.System = class System extends Page.Base {
 		app.api.post( 'app/test_internal_job', {}, function(resp) {
 			app.showMessage('success', "Your test job was successfully started.");
 		} ); // api resp
+	}
+	
+	do_upgrade_satellite() {
+		// upgrade satellite on selected worker servers
+		var self = this;
+		var html = '';
+		
+		html += `<div class="dialog_intro">This allows you to upgrade the xyOps Satellite (xySat) software on your worker servers.  The installer will also wait for all jobs to complete on each worker server before starting the upgrade process, to reduce potential disruptions.</div>`;
+		html += '<div class="dialog_box_content maximize" style="max-height:75vh; overflow-x:hidden; overflow-y:auto;">';
+		
+		// targets
+		html += this.getFormRow({
+			id: 'd_sys_sat_targets',
+			content: this.getFormMenuMulti({
+				id: 'fe_sys_sat_targets',
+				options: [].concat(
+					this.buildOptGroup(app.groups, config.ui.menu_bits.wf_targets_groups, 'server-network'),
+					this.buildServerOptGroup(config.ui.menu_bits.wf_targets_servers, 'router-network')
+				),
+				values: [],
+				'data-hold': 1,
+				'data-shrinkwrap': 1
+			})
+		});
+		
+		// release version
+		html += this.getFormRow({
+			id: 'd_sys_sat_release',
+			content: this.getFormMenuSingle({
+				id: 'fe_sys_sat_release',
+				options: [ { id: '', title: config.ui.menu_bits.generic_loading } ],
+				value: '',
+				'data-shrinkwrap': 1
+			})
+		});
+		
+		// delay between
+		html += this.getFormRow({
+			id: 'd_sys_sat_stagger',
+			content: this.getFormRelativeTime({
+				id: 'fe_sys_sat_stagger',
+				value: 30
+			})
+		});
+		
+		html += '</div>';
+		Dialog.confirmDanger( "Upgrade Worker Servers", html, ['cloud-upload-outline', "Upgrade Now"], function(result) {
+			if (!result) return;
+			app.clearError();
+			
+			var targets = $('#fe_sys_sat_targets').val();
+			if (!targets.length) return app.badField('#fe_sys_sat_targets', "Please select one or more groups or servers to upgrade.");
+			
+			var release = $('#fe_sys_sat_release').val();
+			var stagger = parseInt( $('#fe_sys_sat_stagger').val() ) || 0;
+			
+			Dialog.hide();
+			
+			// start the job
+			app.api.post( 'app/admin_upgrade_workers', { targets, release, stagger }, function(resp) {
+				app.showMessage('success', "Your upgrade job has started in the background.");
+			}); // api.post
+		}); // confirm
+		
+		SingleSelect.init('#fe_sys_sat_release');
+		MultiSelect.init( $('#fe_sys_sat_targets') );
+		RelativeTime.init( $('#fe_sys_sat_stagger') );
+		Dialog.autoResize();
+		
+		// load release list
+		app.api.get( 'app/get_satellite_releases', {}, function(resp) {
+			var title_map = {
+				latest: 'Latest Stable',
+				airgap: '(Air-gapped Custom)'
+			};
+			var items = (resp.releases || []).map( function(release) {
+				return { id: release, title: title_map[release] || release.replace(/^v([\d\.]+)$/, 'Version $1'), icon: title_map[release] ? 'tag-text' : 'tag-text-outline' };
+			} );
+			
+			// change menu items and fire onChange event for redraw
+			$('#fe_sys_sat_release').html( render_menu_options( items, items[0].id ) ).trigger('change');
+		} ); // api.get
 	}
 	
 	do_master_cmd(cmds) {
