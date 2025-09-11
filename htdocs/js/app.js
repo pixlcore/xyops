@@ -1190,7 +1190,6 @@ app.extend({
 			$('#filter_overlay').css('backdropFilter', filts.join(' ')).show();
 		}
 		else {
-			console.log("got here, none");
 			$('#filter_overlay').css('backdropFilter', 'none').hide();
 		}
 	},
