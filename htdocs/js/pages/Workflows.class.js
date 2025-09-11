@@ -48,6 +48,7 @@ Page.Workflows = class Workflows extends Page.Events {
 		if (this.getPageDraft()) {
 			// restore draft
 			this.event = this.checkRestorePageDraft();
+			this.workflow = this.event.workflow;
 			do_snap = false;
 		}
 		else {
