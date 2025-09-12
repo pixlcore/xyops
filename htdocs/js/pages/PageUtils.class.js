@@ -1820,6 +1820,8 @@ Page.PageUtils = class PageUtils extends Page.Base {
 				break;
 			} // switch type
 			
+			if (param.caption) html += '<div class="info_caption">' + strip_html(param.caption) + '</div>';
+			
 			html += '</div>';
 		} ); // foreach param
 		
@@ -3380,6 +3382,19 @@ Page.PageUtils = class PageUtils extends Page.Base {
 			caption: 'Enter the default value for the hidden field.'
 		});
 		
+		// caption
+		html += this.getFormRow({
+			label: 'Caption:',
+			content: this.getFormTextarea({
+				id: 'fe_epa_caption',
+				rows: 3,
+				spellcheck: 'false',
+				autocomplete: 'off',
+				value: param.caption || ''
+			}),
+			caption: 'Optionally enter a caption for the parameter, which will be displayed below it.'
+		});
+		
 		// required
 		html += this.getFormRow({
 			id: 'd_epa_required',
@@ -3415,6 +3430,7 @@ Page.PageUtils = class PageUtils extends Page.Base {
 			if (!param.title.length) return app.badField('#fe_epa_title', "The Title field is required.");
 			
 			param.type = $('#fe_epa_type').val();
+			param.caption = $('#fe_epa_caption').val();
 			param.locked = !!$('#fe_epa_locked').is(':checked');
 			
 			switch (param.type) {
@@ -3528,6 +3544,8 @@ Page.PageUtils = class PageUtils extends Page.Base {
 					html += self.getFormMenu({ id: elem_id, value: elem_value, options: param.value.split(/\,\s*/), disabled: elem_dis });
 				break;
 			} // switch type
+			
+			if (param.caption) html += '<div class="info_caption">' + strip_html(param.caption) + '</div>';
 			
 			html += '</div>';
 		} ); // foreach param
