@@ -182,6 +182,7 @@
 	
 	"client": {
 		"name": "xyOps",
+		"logo_url": "images/logotype.png",
 		
 		"items_per_page": 50,
 		"alt_items_per_page": 25,

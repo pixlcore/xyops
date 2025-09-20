@@ -4,6 +4,13 @@
 Released under the PixlCore Sustainable Use License.
 See the LICENSE.md file in this repository. */
 
+div.sidebar > div.title {
+	background-image: none;
+}
+div.header {
+	background-image: none;
+}
+
 div.header, div.main {
 	margin-left: 60px;
 	margin-right: 60px;
@@ -697,6 +704,37 @@ body.dark div.maint_unit {
 
 .dialog_content > .code_viewer > .markdown-body ul > li > strong:first-child {
 	padding-right: 6px;
+}
+
+.markdown-body .blocknote {
+	border-left: 3px solid var(--active-color);
+	margin-left: 0;
+	margin-bottom: 16px;
+	padding-left: 30px;
+	line-height: 1.5;
+}
+.markdown-body .blocknote .bn_title {
+	color: var(--active-color);
+	font-weight: bold;
+}
+.markdown-body .blocknote .bn_content {
+	font-style: italic;
+	color: var(--label-color);
+}
+.markdown-body .blocknote.note {
+	--active-color: var(--blue);
+}
+.markdown-body .blocknote.tip {
+	--active-color: var(--green);
+}
+.markdown-body .blocknote.important {
+	--active-color: var(--red);
+}
+.markdown-body .blocknote.warning {
+	--active-color: var(--yellow);
+}
+.markdown-body .blocknote.caution {
+	--active-color: var(--purple);
 }
 
 /* Swatch / Table Row Colors */

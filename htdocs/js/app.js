@@ -50,6 +50,9 @@ app.extend({
 		delete resp.code;
 		window.config = resp.config;
 		
+		// set logo image
+		$('div.sidebar > div.title').css('background-image', 'url(' + config.logo_url + ')');
+		
 		// apply menu item max
 		SingleSelect.maxMenuItems = config.max_menu_items || 1000;
 		
@@ -228,6 +231,18 @@ app.extend({
 				} );
 			}
 		} );
+	},
+	
+	showSidebar: function(visible) {
+		// show or hide sidebar
+		if (visible) {
+			$('body').addClass('sidebar');
+			$('div.header').css('background-image', 'none');
+		}
+		else {
+			$('body').removeClass('sidebar');
+			$('div.header').css('background-image', 'url(' + config.logo_url + ')');
+		}
 	},
 	
 	onThemeChange: function(theme) {
