@@ -24,32 +24,24 @@ Page.Search = class Search extends Page.PageUtils {
 		
 		app.showSidebar(true);
 		
-		var preset = args.preset ? find_object( app.user.searches, { name: args.preset } ) : null;
+		var preset = find_object( app.user.searches, { uri: Nav.currentAnchor() } );
 		
 		if (preset) {
-			// load preset
-			for (var key in preset) {
-				if (!args[key]) args[key] = preset[key];
-			}
-			delete args.name;
-			delete args.icon;
-			
 			// possibly highlight search preset tab
-			app.highlightTab( 'Search_' + args.preset.replace(/\W+/g, '') );
+			app.highlightTab( 'Search_' + preset.name.replace(/\W+/g, '') );
 			
 			// expand section if applicable
-			var $sect = $('#tab_Search_' + args.preset.replace(/\W+/g, '')).parent().prev();
+			var $sect = $('#tab_Search_' + preset.name.replace(/\W+/g, '')).parent().prev();
 			if ($sect.length && $sect.hasClass('section_title')) app.page_manager.expandSidebarGroup( $sect );
 			
 			var icon = preset.icon || '';
 			if (!icon) icon = 'magnify';
 			
-			app.setWindowTitle( args.preset );
-			app.setHeaderTitle( '<i class="mdi mdi-' + icon + '">&nbsp;</i>' + args.preset );
+			app.setWindowTitle( preset.name );
+			app.setHeaderTitle( '<i class="mdi mdi-' + icon + '">&nbsp;</i>' + preset.name );
 		}
 		else {
 			// default search
-			delete args.preset;
 			app.setWindowTitle('Job Search');
 			app.setHeaderTitle( '<i class="mdi mdi-cloud-search-outline">&nbsp;</i>Job Search' );
 		}
@@ -60,7 +52,7 @@ Page.Search = class Search extends Page.PageUtils {
 			
 			// search box
 			html += '<div class="search_box">';
-				html += '<i class="mdi mdi-magnify" onMouseUp="$(\'#fe_s_match\').focus()">&nbsp;</i>';
+				html += '<i class="mdi mdi-magnify" onClick="$(\'#fe_s_match\').focus()">&nbsp;</i>';
 				// html += '<div class="search_help"><a href="https://github.com/pixlcore/xyops#search" target="_blank">Search Help<i class="mdi mdi-open-in-new"></i></a></div>';
 				html += '<input type="text" id="fe_s_match" maxlength="128" placeholder="Search Job Files..." value="' + escape_text_field_value(args.match || '') + '">';
 				// html += '<div class="search_widget"><i class="mdi mdi-checkbox-marked">&nbsp;</i>RegExp</div>';
@@ -265,11 +257,11 @@ Page.Search = class Search extends Page.PageUtils {
 			html += '<div id="btn_s_reset" class="button phone_collapse" style="display:none" onClick="$P().resetFilters()"><i class="mdi mdi-undo-variant">&nbsp;</i>Reset</div>';
 			
 			if (preset) {
-				html += '<div class="button danger phone_collapse" onMouseUp="$P().doDeletePreset()"><i class="mdi mdi-trash-can-outline">&nbsp;</i><span>Delete Preset...</span></div>';
+				html += '<div class="button danger phone_collapse" onClick="$P().doDeletePreset()"><i class="mdi mdi-trash-can-outline">&nbsp;</i><span>Delete Preset...</span></div>';
 			}
-			html += '<div id="btn_s_save" class="button secondary phone_collapse" onMouseUp="$P().doSavePreset()"><i class="mdi mdi-floppy">&nbsp;</i><span>' + (preset ? 'Edit' : 'Save') + ' Preset...</span></div>';
-			// html += '<div class="button" id="btn_s_download" onMouseUp="$P().doDownload()"><i class="mdi mdi-cloud-download-outline">&nbsp;</i>Download All...</div>';
-			html += '<div class="button primary" onMouseUp="$P().navSearch(true)"><i class="mdi mdi-magnify">&nbsp;</i>Search</div>';
+			html += '<div id="btn_s_save" class="button secondary phone_collapse" onClick="$P().doSavePreset()"><i class="mdi mdi-floppy">&nbsp;</i><span>' + (preset ? 'Edit' : 'Save') + ' Preset...</span></div>';
+			// html += '<div class="button" id="btn_s_download" onClick="$P().doDownload()"><i class="mdi mdi-cloud-download-outline">&nbsp;</i>Download All...</div>';
+			html += '<div class="button primary" onClick="$P().navSearch(true)"><i class="mdi mdi-magnify">&nbsp;</i>Search</div>';
 			// html += '<div class="clear"></div>';
 		html += '</div>'; // box_buttons
 		
@@ -389,9 +381,6 @@ Page.Search = class Search extends Page.PageUtils {
 			Nav.go( this.selfNav({}) );
 			return;
 		}
-		
-		// save editing state across searches
-		if (this.args.preset) args.preset = this.args.preset;
 		
 		Nav.go( this.selfNav(args), force );
 	}
@@ -711,12 +700,8 @@ Page.Search = class Search extends Page.PageUtils {
 		var self = this;
 		app.clearError();
 		
-		var sargs = this.getSearchArgs() || {};
-		
-		var preset = {};
-		if (this.args.preset) {
-			preset = find_object( app.user.searches, { name: this.args.preset } ) || {};
-		}
+		// var sargs = this.getSearchArgs() || {};
+		var preset = find_object( app.user.searches, { uri: Nav.currentAnchor() } ) || {};
 		
 		var html = '';
 		html += '<div class="box_content" style="padding-bottom:15px;">';
@@ -727,7 +712,6 @@ Page.Search = class Search extends Page.PageUtils {
 				id: 'fe_sp_name',
 				spellcheck: 'false',
 				maxlength: 64,
-				disabled: !!preset.name,
 				value: preset.name || ''
 			}),
 			caption: preset.name ? 'You are editing an existing search preset.' : 'Enter a title for your search preset (this will show in the sidebar).'
@@ -755,13 +739,13 @@ Page.Search = class Search extends Page.PageUtils {
 		Dialog.confirm( title, html, btn, function(result) {
 			if (!result) return;
 			
-			preset = sargs;
+			preset = { uri: Nav.currentAnchor() };
 			preset.name = $('#fe_sp_name').val().trim();
 			preset.icon = $('#fe_sp_icon').val();
 			
 			if (!preset.name) return app.badField('#fe_sp_name', "Please enter a name for the search preset before saving.");
 			
-			var idx = find_object_idx(app.user.searches, { name: preset.name });
+			var idx = find_object_idx(app.user.searches, { uri: preset.uri });
 			if (idx > -1) {
 				// replace
 				app.user.searches[idx] = preset;
@@ -784,26 +768,29 @@ Page.Search = class Search extends Page.PageUtils {
 				if (!self.active) return; // sanity
 				
 				app.initSidebarTabs();
-				Nav.go( self.selfNav({ preset: preset.name }), true );
+				Nav.go( preset.uri, true );
 			} ); // api resp
 		} ); // Dialog.confirm
 		
-		$('#fe_sp_name').focus();
+		if (!preset.name) $('#fe_sp_name').focus();
 		SingleSelect.init( $('#fe_sp_icon') );
 	}
 	
 	doDeletePreset() {
 		// delete search preset, after confirmation
 		var self = this;
-		var preset_idx = find_object_idx( app.user.searches, { name: this.args.preset } );
+		var preset_idx = find_object_idx( app.user.searches, { uri: Nav.currentAnchor() } );
 		if (preset_idx == -1) return; // sanity
 		var preset = app.user.searches[preset_idx];
+		
+		if (preset.uri === 'Search') return app.doError("Sorry, you cannot delete the default search preset.");
 		
 		var msg = "Are you sure you want to delete the search preset &ldquo;<b>" + encode_entities(preset.name) + "</b>&rdquo;?  You cannot undo this action.";
 		
 		Dialog.confirmDanger( 'Delete Search Preset', msg, ['trash-can', 'Delete Preset'], function(result) {
 			if (result) {
 				app.user.searches.splice( preset_idx, 1 );
+				
 				Dialog.showProgress( 1.0, "Saving settings..." );
 				
 				app.api.post( 'app/user_settings', {
