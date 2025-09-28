@@ -1,0 +1,19 @@
+<!-- To: {{email_to}} -->
+<!-- Subject: {{config.client.name}} Ticket #{{ticket.num}} Is Overdue: {{ticket.subject}} -->
+<!-- Title: Ticket Overdue -->
+<!-- Button: View Ticket | {{links.ticket_url}} -->
+
+The following {{config.client.name}} {{display.type}} ticket is overdue: **#{{ticket.num}}**: {{ticket.subject}}
+
+### Ticket Attributes
+- **Subject:** {{ticket.subject}}
+- **Due Date:** {{display.due}}
+- **Number:** #{{ticket.num}}
+- **Type:** {{display.type}}
+- **Category:** {{display.category}}
+- **Status:** {{display.status}}
+- **Assignee:** {{display.assignee}}
+- **Tags:** {{display.tags}}
+
+### Ticket Link:
+{{links.ticket_url}}
