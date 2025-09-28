@@ -65,6 +65,14 @@
 	"search_file_threads": 1,
 	"search_file_regex": "\\.(txt|log|csv|tsv|xml|json)(\\.gz)?$",
 	
+	"tickets": {
+		"email_enabled": true,
+		"email_debounce_sec": 30,
+		"overdue_schedule": "04:30",
+		"due_date_format": "[dddd], [mmmm] [mday], [yyyy]",
+		"date_time_format": "[dddd], [mmmm] [mday], [yyyy] [hour12]:[mi] [ampm]"
+	},
+	
 	"hooks": {
 		"job_complete": { "shell_exec": "date" }
 	},
@@ -130,6 +138,7 @@
 		"edit_events": true,
 		"run_jobs": true,
 		"tag_jobs": true,
+		"ticket_jobs": true,
 		"comment_jobs": true
 	},
 	
@@ -154,7 +163,59 @@
 			"saturation": 100,
 			"sepia": 0,
 			"grayscale": 0
-		}
+		},
+		"searches": [
+			{
+				"name": "All Completed",
+				"uri": "Search",
+				"icon": "cloud-search-outline"
+			},
+			{
+				"name": "Successes",
+				"uri": "Search?result=success",
+				"icon": "check-circle-outline"
+			},
+			{
+				"name": "Errors",
+				"uri": "Search?result=error",
+				"icon": "alert-decagram-outline"
+			},
+			{
+				"name": "Warnings",
+				"uri": "Search?result=warning",
+				"icon": "alert-outline"
+			},
+			{
+				"name": "Criticals",
+				"uri": "Search?result=critical",
+				"icon": "fire-alert"
+			},
+			{
+				"name": "All Tickets",
+				"uri": "Tickets",
+				"icon": "text-box-multiple-outline"
+			},
+			{
+				"name": "Open Tickets",
+				"uri": "Tickets?status=open",
+				"icon": "label-variant-outline"
+			},
+			{
+				"name": "Overdue Tickets",
+				"uri": "Tickets?status=open&due=over",
+				"icon": "calendar-alert"
+			},
+			{
+				"name": "My InBox",
+				"uri": "Tickets?status=open&assignee=self",
+				"icon": "email-variant"
+			},
+			{
+				"name": "My Drafts",
+				"uri": "Tickets?status=draft&username=self",
+				"icon": "dots-horizontal"
+			}
+		]
 	},
 	
 	"db_maint": {
@@ -256,6 +317,11 @@
 		
 		"bucket_upload_settings": {
 			"max_files_per_bucket": 100,
+			"max_file_size": 1073741824,
+			"accepted_file_types": ""
+		},
+		"ticket_upload_settings": {
+			"max_files_per_ticket": 100,
 			"max_file_size": 1073741824,
 			"accepted_file_types": ""
 		},
@@ -403,6 +469,7 @@
 		"use_bcrypt": true,
 		"mail_logger": true,
 		"valid_username_match": "^[\\w\\-\\.]+$",
+		"block_username_match": "^(self|abuse|admin|administrator|localhost|127\\.0\\.0\\.1|nobody|noreply|root|support|sysadmin|webmaster|www|god|staff|null|0|constructor|__defineGetter__|__defineSetter__|hasOwnProperty|__lookupGetter__|__lookupSetter__|isPrototypeOf|propertyIsEnumerable|toString|valueOf|__proto__|toLocaleString)$",
 		"cookie_settings": {
 			"path": "/",
 			"secure": "auto",
