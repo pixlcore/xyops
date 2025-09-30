@@ -369,6 +369,16 @@ Page.Job = class Job extends Page.PageUtils {
 			html += '</div>'; // box_content
 		html += '</div>'; // box
 		
+		// tickets (hidden unless needed)
+		html += '<div class="box toggle" id="d_job_tickets" style="display:none">';
+			html += '<div class="box_title">';
+				html += '<i></i><span>Job Tickets</span>';
+			html += '</div>';
+			html += '<div class="box_content table">';
+				html += '<div class="loading_container"><div class="loading"></div></div>';
+			html += '</div>'; // box_content
+		html += '</div>'; // box
+		
 		// additional jobs (completed job only)
 		if (job.final && job.jobs && job.jobs.length) {
 			html += '<div class="box toggle" id="d_job_add_jobs>';
@@ -511,6 +521,7 @@ Page.Job = class Job extends Page.PageUtils {
 			// completed
 			this.getCompletedJobLog();
 			this.getAdditionalJobs();
+			this.getJobTickets();
 			this.renderPluginParams('#d_job_params');
 			this.renderEventParams();
 			this.renderJobActions();
@@ -2204,6 +2215,97 @@ Page.Job = class Job extends Page.PageUtils {
 		}
 	}
 	
+	getJobTickets() {
+		// load ticket info for display
+		var self = this;
+		var job = this.job;
+		
+		if (!job.tickets || !job.tickets.length) {
+			this.div.find('#d_job_tickets').hide();
+			return;
+		}
+		
+		app.api.post( 'app/get_tickets', { ids: job.tickets }, function(resp) {
+			self.tickets = resp.tickets || [];
+			self.renderJobTickets();
+		});
+	}
+	
+	renderJobTickets() {
+		// render tickets in table
+		var self = this;
+		var tickets = this.tickets;
+		var html = '';
+		
+		if (!tickets.length) {
+			this.div.find('#d_job_tickets').hide();
+			return;
+		}
+		
+		var grid_args = {
+			rows: tickets,
+			cols: ['#', 'Subject', 'Type', 'Status', 'Assignee', 'Tags', 'Created', 'Actions'],
+			data_type: 'ticket',
+			empty_msg: 'No tickets found.'
+		};
+		
+		html += this.getBasicGrid( grid_args, function(ticket, idx) {
+			var actions = [
+				'<span class="link danger" onClick="$P().doRemoveTicket(' + idx + ')"><b>Remove</b></span>'
+			];
+			
+			// handle deleted tickets (should be rare, as they're cleaned up in background)
+			if (ticket.err) return [
+				'<div class="monospace">#</div>',
+				'(Ticket was deleted)',
+				'n/a', // type
+				'n/a', // status
+				'n/a', // assignee
+				'n/a', // tags
+				'n/a', // created
+				'<span class="nowrap">' + actions.join(' | ') + '</span>'
+			];
+			
+			return [
+				'<div class="monospace">#' + ticket.num + '</div>',
+				self.getNiceTicket(ticket, true),
+				self.getNiceTicketType(ticket.type),
+				self.getNiceTicketStatus(ticket.status),
+				ticket.assignee ? self.getNiceUser(ticket.assignee, app.isAdmin()) : '(None)',
+				self.getNiceTagList( ticket.tags, false ),
+				self.getRelativeDateTime( ticket.created, true ),
+				'<span class="nowrap">' + actions.join(' | ') + '</span>'
+			];
+		});
+		
+		this.div.find('#d_job_tickets > .box_content').html(html);
+		this.div.find('#d_job_tickets').show();
+	}
+	
+	doRemoveTicket(idx) {
+		// remove ticket from job
+		var self = this;
+		var job = this.job;
+		var ticket = this.tickets[idx];
+		
+		Dialog.confirmDanger( 'Remove Ticket', "Are you sure you want to remove the ticket &ldquo;<b>" + ticket.subject + "</b>&rdquo; from the current job?  This will not delete the ticket itself.", ['trash-can', 'Remove'], function(result) {
+			if (!result) return;
+			app.clearError();
+			Dialog.showProgress( 1.0, "Removing Ticket..." );
+			
+			// remove our ticket id from the job ticket list
+			var new_tickets = job.tickets.filter( function(ticket_id) { return ticket_id != ticket.id } );
+			
+			app.api.post( 'app/manage_job_tickets', { id: job.id, tickets: new_tickets }, function(resp) {
+				Dialog.hideProgress();
+				app.cacheBust = hires_time_now();
+				job.tickets = new_tickets;
+				app.showMessage('success', "Ticket successfully removed.");
+				self.getJobTickets();
+			} ); // api.post
+		} ); // confirm
+	}
+	
 	getFileTable() {
 		// get table of job files, with download links
 		var self = this;
@@ -2568,7 +2670,7 @@ Page.Job = class Job extends Page.PageUtils {
 		delete this.metaRowCount;
 		delete this.live;
 		delete this.actions;
-		
+		delete this.tickets;
 		delete this.workflow;
 		delete this.wfScroll;
 		delete this.wfZoom;
