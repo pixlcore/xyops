@@ -635,7 +635,7 @@ Page.Tickets = class Tickets extends Page.PageUtils {
 		this.setup_dynamic_elements();
 		this.setupBoxButtonFloater();
 		
-		$('#fe_et_subject').focus();
+		$('#fe_nt_subject').focus();
 		
 		this.current_editor_type = 'new';
 	}
@@ -666,6 +666,7 @@ Page.Tickets = class Tickets extends Page.PageUtils {
 		this.ticket = resp.ticket;
 		this.ticket.created = this.ticket.modified = time_now();
 		
+		// Note: We MUST nav to the ticket id here, as the rest is being indexed in the background
 		Nav.go('Tickets?sub=view&id=' + this.ticket.id);
 		app.showMessage('success', "The new ticket was created successfully.");
 	}
@@ -702,157 +703,116 @@ Page.Tickets = class Tickets extends Page.PageUtils {
 		
 		// subject
 		html += this.getFormRow({
-			label: 'Subject:',
+			id: 'd_nt_subject',
 			content: this.getFormText({
-				id: 'fe_et_subject',
+				id: 'fe_nt_subject',
 				// spellcheck: 'false',
 				value: ticket.subject
-			}),
-			caption: 'Enter a subject line for the ticket (i.e. title, summary, etc.).'
+			})
 		});
 		
 		// body
 		html += this.getFormRow({
-			label: 'Body:',
+			id: 'd_nt_body',
 			content: '<div id="d_editor">' + this.getEditToolbar() + '<div onClick="$P().editor.focus()">' + this.getFormTextarea({
 				id: 'fe_editor',
 				rows: 10,
 				value: ticket.body
-			}) + '</div></div>',
-			caption: 'Enter the ticket body text using [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/) syntax.'
+			}) + '</div></div>'
 		});
 		
-		// html += '<div class="form_grid two_cols">';
-		
 		// type
-		// html += '<div class="form_cell">';
 		html += this.getFormRow({
-			label: 'Type:',
+			id: 'd_nt_type',
 			content: this.getFormMenuSingle({
-				id: 'fe_et_type',
-				title: 'Select type for ticket',
-				placeholder: 'Select type for ticket...',
+				id: 'fe_nt_type',
 				options: config.ui.ticket_types,
 				value: ticket.type || '',
 				// 'data-shrinkwrap': 1
-			}),
-			caption: 'Select the ticket type.'
+			})
 		});
 		
 		// status
-		// html += '<div class="form_cell">';
 		html += this.getFormRow({
-			label: 'Status:',
+			id: 'd_nt_status',
 			content: this.getFormMenuSingle({
-				id: 'fe_et_status',
-				title: 'Select status for ticket',
-				placeholder: 'Select status for ticket...',
+				id: 'fe_nt_status',
 				options: config.ui.ticket_statuses,
 				value: ticket.status || '',
 				// 'data-shrinkwrap': 1
-			}),
-			caption: 'Select the ticket status.'
+			})
 		});
-		// html += '</div>';
 		
 		// category
 		html += this.getFormRow({
-			label: 'Category:',
+			id: 'd_nt_category',
 			content: this.getFormMenuSingle({
-				id: 'fe_et_category',
+				id: 'fe_nt_category',
 				options: [['', '(None)']].concat( app.categories ),
 				value: ticket.category || '',
 				default_icon: 'folder-open-outline',
 				// 'data-shrinkwrap': 1
-			}),
-			caption: 'Optionally assign the ticket to a category.'
+			})
 		});
 		
 		// assigned to
-		// html += '<div class="form_cell">';
 		html += this.getFormRow({
-			label: 'Assigned To:',
+			id: 'd_nt_assignee',
 			content: this.getFormMenuSingle({
-				id: 'fe_et_assignee',
-				title: 'Select assignee for ticket',
-				placeholder: 'Select assignee for ticket...',
+				id: 'fe_nt_assignee',
 				options: [['', '(None)']].concat( app.users.map( function(user) { return { id: user.username, title: user.full_name, icon: user.icon || 'account' }; } ) ),
 				value: ticket.assignee,
 				auto_add: true,
 				// 'data-shrinkwrap': 1
-			}),
-			caption: 'Select the user responsible for executing the ticket.'
+			})
 		});
-		// html += '</div>';
 		
 		// cc
-		// html += '<div class="form_cell">';
 		html += this.getFormRow({
-			label: 'Cc:',
+			id: 'd_nt_cc',
 			content: this.getFormMenuMulti({
-				id: 'fe_et_cc',
-				title: 'Select users to carbon copy',
-				placeholder: 'Select users to carbon copy...',
+				id: 'fe_nt_cc',
 				options: app.users.map( function(user) { return { id: user.username, title: user.full_name, icon: user.icon || 'account' }; } ),
 				values: ticket.cc,
 				// 'data-shrinkwrap': 1
-			}),
-			caption: 'Optionally select users to receive updates for the ticket.'
+			})
 		});
-		// html += '</div>';
 		
 		// notify
-		// html += '<div class="form_cell">';
 		html += this.getFormRow({
-			label: 'Notify:',
+			id: 'd_nt_notify',
 			content: this.getFormMenuMulti({
-				id: 'fe_et_notify',
-				title: 'Add new recipient',
-				placeholder: 'Click to add recipient...',
+				id: 'fe_nt_notify',
 				icon: 'email-plus-outline',
-				description: 'Enter any e-mail address to receive ticket updates.',
-				confirm: 'Add Recipient',
 				options: ticket.notify,
 				values: ticket.notify,
 				trim: 1,
 				lower: 1,
 				// 'data-shrinkwrap': 1,
 				'data-validate': "^[\\w\\-\\.]+\\@[\\w\\-\\.]+$"
-			}),
-			caption: 'Optionally add custom e-mail addresses to receive updates for the ticket.'
+			})
 		});
-		// html += '</div>';
 		
 		// due date
-		// html += '<div class="form_cell">';
 		html += this.getFormRow({
-			label: 'Due Date:',
+			id: 'd_nt_due',
 			content: this.getFormText({
-				id: 'fe_et_due',
+				id: 'fe_nt_due',
 				type: 'date',
 				value: ticket.due ? this.formatDateTZ(ticket.due, '[yyyy]-[mm]-[dd]', config.tz) : '' // system timezone
-			}),
-			caption: 'Optionally select the ticket due date (reminders are sent out after this).'
+			})
 		});
-		// html += '</div>';
 		
 		// tags
-		// html += '<div class="form_cell">';
 		html += this.getFormRow({
-			label: 'Tags:',
+			id: 'd_nt_tags',
 			content: this.getFormMenuMulti({
-				id: 'fe_et_tags',
-				title: 'Select tags to apply',
-				placeholder: 'Select tags to apply...',
+				id: 'fe_nt_tags',
 				options: app.tags,
 				values: ticket.tags,
 				// 'data-shrinkwrap': 1
-			}),
-			caption: 'Optionally select tags to apply to the ticket.'
+			})
 		});
-		// html += '</div>';
-		
-		// html += '</div>'; // form_grid
 		
 		return html;
 	}
@@ -866,9 +826,9 @@ Page.Tickets = class Tickets extends Page.PageUtils {
 		// setup popups, uploads and codemirror
 		var self = this;
 		
-		SingleSelect.init( this.div.find('#fe_et_assignee, #fe_et_category, #fe_et_status, #fe_et_type') );
-		MultiSelect.init( this.div.find('#fe_et_tags, #fe_et_cc') );
-		TextSelect.init( this.div.find('#fe_et_notify') );
+		SingleSelect.init( this.div.find('#fe_nt_assignee, #fe_nt_category, #fe_nt_status, #fe_nt_type') );
+		MultiSelect.init( this.div.find('#fe_nt_tags, #fe_nt_cc') );
+		TextSelect.init( this.div.find('#fe_nt_notify') );
 		
 		// setup codemirror
 		this.setupEditor();
@@ -878,26 +838,26 @@ Page.Tickets = class Tickets extends Page.PageUtils {
 		// get api key elements from form, used for new or edit
 		var ticket = this.ticket;
 		
-		ticket.subject = this.div.find('#fe_et_subject').val().trim();
+		ticket.subject = this.div.find('#fe_nt_subject').val().trim();
 		ticket.body = this.editor.getValue();
-		ticket.status = this.div.find('#fe_et_status').val();
-		ticket.assignee = this.div.find('#fe_et_assignee').val();
-		ticket.cc = this.div.find('#fe_et_cc').val();
-		ticket.notify = this.div.find('#fe_et_notify').val();
-		ticket.category = this.div.find('#fe_et_category').val();
+		ticket.status = this.div.find('#fe_nt_status').val();
+		ticket.assignee = this.div.find('#fe_nt_assignee').val();
+		ticket.cc = this.div.find('#fe_nt_cc').val();
+		ticket.notify = this.div.find('#fe_nt_notify').val();
+		ticket.category = this.div.find('#fe_nt_category').val();
 		
-		if (this.div.find('#fe_et_due').val()) {
-			ticket.due = this.parseDateTZ( this.div.find('#fe_et_due').val() + ' 00:00:00', config.tz ); // use server's timezone for this
+		if (this.div.find('#fe_nt_due').val()) {
+			ticket.due = this.parseDateTZ( this.div.find('#fe_nt_due').val() + ' 00:00:00', config.tz ); // use server's timezone for this
 		}
 		else {
 			ticket.due = 0;
 		}
 		
-		ticket.type = this.div.find('#fe_et_type').val();
-		ticket.tags = this.div.find('#fe_et_tags').val();
+		ticket.type = this.div.find('#fe_nt_type').val();
+		ticket.tags = this.div.find('#fe_nt_tags').val();
 		
 		if (!ticket.subject.length) {
-			return app.badField('#fe_et_subject', "Please enter a subject line for the ticket.");
+			return app.badField('#fe_nt_subject', "Please enter a subject line for the ticket.");
 		}
 		if (!ticket.body.length) {
 			return app.doError("Please enter some body text for the ticket.");
@@ -2482,7 +2442,7 @@ Page.Tickets = class Tickets extends Page.PageUtils {
 	
 	editShowPreview() {
 		// show popup preview of markdown
-		this.viewMarkdownAuto( "Markdown Preview", this.ticket.body, " " );
+		this.viewMarkdownAuto( "Markdown Preview", this.editor.getValue(), " " );
 	}
 	
 	toggleScrollLock() {
