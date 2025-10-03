@@ -160,6 +160,22 @@ Page.Tickets = class Tickets extends Page.PageUtils {
 					});
 				html += '</div>';
 				
+				// server
+				html += '<div class="form_cell">';
+					html += this.getFormRow({
+						label: '<i class="icon mdi mdi-router-network">&nbsp;</i>Server:',
+						content: this.getFormMenuSingle({
+							id: 'fe_s_server',
+							title: 'Select Server',
+							placeholder: 'All Servers',
+							options: [['', 'Any Server']].concat( this.getCategorizedServers(true) ),
+							value: args.server || '',
+							default_icon: 'router-network',
+							'data-shrinkwrap': 1
+						})
+					});
+				html += '</div>';
+				
 				// tags
 				html += '<div class="form_cell">';
 					html += this.getFormRow({
@@ -238,7 +254,7 @@ Page.Tickets = class Tickets extends Page.PageUtils {
 		// if (!sargs) this.div.find('#btn_s_save').addClass('disabled');
 		
 		MultiSelect.init( this.div.find('#fe_s_tags') );
-		SingleSelect.init( this.div.find('#fe_s_type, #fe_s_assignee, #fe_s_username, #fe_s_status, #fe_s_category, #fe_s_date, #fe_s_sort') );
+		SingleSelect.init( this.div.find('#fe_s_type, #fe_s_assignee, #fe_s_username, #fe_s_status, #fe_s_category, #fe_s_server, #fe_s_date, #fe_s_sort') );
 		// $('.header_search_widget').hide();
 		this.setupSearchOpts();
 		
@@ -247,7 +263,7 @@ Page.Tickets = class Tickets extends Page.PageUtils {
 			else self.navSearch();
 		});
 		
-		this.div.find('#fe_s_tags, #fe_s_type, #fe_s_assignee, #fe_s_username, #fe_s_status, #fe_s_category, #fe_s_date, #fe_s_sort').on('change', function() {
+		this.div.find('#fe_s_tags, #fe_s_type, #fe_s_assignee, #fe_s_username, #fe_s_status, #fe_s_category, #fe_s_server, #fe_s_date, #fe_s_sort').on('change', function() {
 			self.navSearch();
 		});
 		
@@ -293,6 +309,9 @@ Page.Tickets = class Tickets extends Page.PageUtils {
 		var category = this.div.find('#fe_s_category').val();
 		if (category) args.category = category;
 		
+		var server = this.div.find('#fe_s_server').val();
+		if (server) args.server = server;
+		
 		var type = this.div.find('#fe_s_type').val();
 		if (type) args.type = type;
 		
@@ -336,6 +355,7 @@ Page.Tickets = class Tickets extends Page.PageUtils {
 		if (args.username) query += ' username:' + args.username;
 		if (args.status) query += ' status:' + args.status;
 		if (args.category) query += ' category:' + args.category;
+		if (args.server) query += ' server:' + args.server;
 		
 		if (args.tag) query += ' tags:' + args.tag;
 		
@@ -614,6 +634,7 @@ Page.Tickets = class Tickets extends Page.PageUtils {
 			subject: "",
 			body: "",
 			category: "",
+			server: "",
 			cc: [],
 			notify: [],
 			tags: []
@@ -755,6 +776,18 @@ Page.Tickets = class Tickets extends Page.PageUtils {
 			})
 		});
 		
+		// server
+		html += this.getFormRow({
+			id: 'd_nt_server',
+			content: this.getFormMenuSingle({
+				id: 'fe_nt_server',
+				options: [['', '(None)']].concat( this.getCategorizedServers(true) ),
+				value: ticket.server || '',
+				default_icon: 'router-network',
+				// 'data-shrinkwrap': 1
+			})
+		});
+		
 		// assigned to
 		html += this.getFormRow({
 			id: 'd_nt_assignee',
@@ -826,7 +859,7 @@ Page.Tickets = class Tickets extends Page.PageUtils {
 		// setup popups, uploads and codemirror
 		var self = this;
 		
-		SingleSelect.init( this.div.find('#fe_nt_assignee, #fe_nt_category, #fe_nt_status, #fe_nt_type') );
+		SingleSelect.init( this.div.find('#fe_nt_assignee, #fe_nt_category, #fe_nt_server, #fe_nt_status, #fe_nt_type') );
 		MultiSelect.init( this.div.find('#fe_nt_tags, #fe_nt_cc') );
 		TextSelect.init( this.div.find('#fe_nt_notify') );
 		
@@ -862,6 +895,7 @@ Page.Tickets = class Tickets extends Page.PageUtils {
 		ticket.cc = this.div.find('#fe_nt_cc').val();
 		ticket.notify = this.div.find('#fe_nt_notify').val();
 		ticket.category = this.div.find('#fe_nt_category').val();
+		ticket.server = this.div.find('#fe_nt_server').val();
 		
 		if (this.div.find('#fe_nt_due').val()) {
 			ticket.due = this.parseDateTZ( this.div.find('#fe_nt_due').val() + ' 00:00:00', config.tz ); // use server's timezone for this
@@ -1000,19 +1034,6 @@ Page.Tickets = class Tickets extends Page.PageUtils {
 		});
 		html += '</div>';
 		
-		// due date
-		html += '<div class="form_cell">';
-		html += this.getFormRow({
-			label: 'Due Date:',
-			content: this.getFormText({
-				id: 'fe_et_due',
-				type: 'date',
-				value: ticket.due ? this.formatDateTZ(ticket.due, '[yyyy]-[mm]-[dd]', config.tz) : '' // system timezone
-			}),
-			caption: 'Optionally set a due date for the ticket.'
-		});
-		html += '</div>';
-		
 		// category
 		html += '<div class="form_cell">';
 		html += this.getFormRow({
@@ -1027,6 +1048,37 @@ Page.Tickets = class Tickets extends Page.PageUtils {
 				'data-shrinkwrap': 1
 			}),
 			caption: 'Associate the ticket with a category.'
+		});
+		html += '</div>';
+		
+		// due date
+		html += '<div class="form_cell">';
+		html += this.getFormRow({
+			label: 'Due Date:',
+			content: this.getFormText({
+				id: 'fe_et_due',
+				type: 'date',
+				value: ticket.due ? this.formatDateTZ(ticket.due, '[yyyy]-[mm]-[dd]', config.tz) : '' // system timezone
+			}),
+			caption: 'Optionally set a due date for the ticket.'
+		});
+		html += '</div>';
+		
+		// server
+		html += '<div class="form_cell">';
+		html += this.getFormRow({
+			label: 'Server:',
+			content: this.getFormMenuSingle({
+				id: 'fe_et_server',
+				title: 'Select server for ticket',
+				placeholder: 'Select server for ticket...',
+				options: [['', '(None)']].concat( this.getCategorizedServers(true) ),
+				value: ticket.server,
+				default_icon: 'router-network',
+				auto_add: true,
+				'data-shrinkwrap': 1
+			}),
+			caption: 'Associate the ticket with a server.'
 		});
 		html += '</div>';
 		
@@ -1178,12 +1230,12 @@ Page.Tickets = class Tickets extends Page.PageUtils {
 		this.render_ticket_changes();
 		this.setupUploader();
 		
-		SingleSelect.init( this.div.find('#fe_et_assignee, #fe_et_type, #fe_et_status, #fe_et_category') );
+		SingleSelect.init( this.div.find('#fe_et_assignee, #fe_et_type, #fe_et_status, #fe_et_category, #fe_et_server') );
 		MultiSelect.init( this.div.find('#fe_et_tags, #fe_et_cc') );
 		TextSelect.init( this.div.find('#fe_et_notify') );
 		
 		// handle attribute block changes
-		this.div.find('#fe_et_assignee, #fe_et_type, #fe_et_status, #fe_et_category, #fe_et_tags, #fe_et_cc, #fe_et_notify, #fe_et_due').on('change', function() {
+		this.div.find('#fe_et_assignee, #fe_et_type, #fe_et_status, #fe_et_category, #fe_et_server, #fe_et_tags, #fe_et_cc, #fe_et_notify, #fe_et_due').on('change', function() {
 			var $this = $(this);
 			var field_id = $this.prop('id').replace(/^fe_et_/, '');
 			var data = { id: self.ticket.id };

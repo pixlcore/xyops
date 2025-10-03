@@ -625,6 +625,13 @@
 			"fe_nt_category": {
 				"title": "Select category for ticket"
 			},
+			"d_nt_server": {
+				"label": "Server:",
+				"caption": "Optionally assign the ticket to a server."
+			},
+			"fe_nt_server": {
+				"title": "Select server for ticket"
+			},
 			"d_nt_assignee": {
 				"label": "Assigned To:",
 				"caption": "Select the user responsible for executing the ticket."
