@@ -264,18 +264,22 @@ Page.Base = class Base extends Page {
 		// get formatted process cmd
 		var short_cmd = this.getNiceProcessText(item);
 		
+		var icon_name = 'console';
+		if (item.job && app.activeJobs[item.job]) icon_name = 'timer-play-outline';
+		else if (item.job) icon_name = 'timer-outline';
+		
 		var html = '<span class="nowrap">';
-		var icon = '<i class="mdi mdi-' + (item.job ? 'console' : 'console') + '"></i>';
+		var icon = '<i class="mdi mdi-' + icon_name + '"></i>';
 		if (link) {
 			if (typeof(link) != 'string') {
 				if (item.server) link = `$P().showGroupProcessInfo(${item.pid},'${item.server}')`;
 				else link = '$P().showProcessInfo(' + item.pid + ')';
 			}
 			html += '<span class="link" onClick="' + link + '" title="' + encode_attrib_entities(item.command) + '">';
-			html += icon + '<span>' + short_cmd + '</span></span>';
+			html += icon + '<span>' + encode_entities(short_cmd) + '</span></span>';
 		}
 		else {
-			html += icon + short_cmd;
+			html += icon + encode_entities(short_cmd);
 		}
 		
 		html += '</span>';
