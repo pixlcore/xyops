@@ -22,6 +22,7 @@
 	"temp_dir": "temp",
 	"pid_file": "logs/xyops.pid",
 	"debug_level": 9,
+	"tick_precision_ms": 50,
 	"maintenance": "04:00",
 	"ttl": 300,
 	
@@ -34,14 +35,7 @@
 	"max_jobs_per_min": 100,
 	"child_kill_timeout": 10,
 	"dead_job_timeout": 120,
-	"track_manual_jobs": false,
-	"copy_job_logs_to": "",
 	
-	"job_memory_max": 1073741824,
-	"job_memory_sustain": 0,
-	"job_cpu_max": 0,
-	"job_cpu_sustain": 0,
-	"job_log_max_size": 0,
 	"job_env": {},
 	
 	"job_universal_actions": {
@@ -66,10 +60,6 @@
 	
 	"hostname_display_strip": "\\.[\\w\\-]+\\.\\w+$",
 	"ip_display_strip": "^::ffff:",
-	"tick_precision_ms": 50,
-	
-	"alert_email_to": "",
-	"alert_web_hook": "",
 	
 	"search_file_threads": 1,
 	"search_file_regex": "\\.(txt|log|csv|tsv|xml|json)(\\.gz)?$",
