@@ -1005,6 +1005,7 @@
 		{ "id": "snapshot", "title": "Take Snapshot", "icon": "monitor-screenshot" },
 		{ "id": "store", "title": "Store Bucket", "icon": "import" },
 		{ "id": "fetch", "title": "Fetch Bucket", "icon": "export" },
+		{ "id": "ticket", "title": "Create Ticket", "icon": "text-box-plus-outline" },
 		{ "id": "disable", "title": "Disable Event", "icon": "cancel" },
 		{ "id": "delete", "title": "Delete Event", "icon": "trash-can-outline" },
 		{ "id": "plugin", "title": "Plugin", "icon": "power-plug" }
