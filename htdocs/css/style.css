@@ -644,11 +644,11 @@ body.dark div.maint_unit {
 	list-style-type: none;
 }
 
-.markdown-body li i.mdi {
+.code_viewer .markdown-body li i.mdi {
 	color: var(--label-color);
 	padding-right: 5px;
 }
-.markdown-body li i.mdi:before {
+.code_viewer .markdown-body li i.mdi:before {
 	transform: scale(1.20);
 }
 
