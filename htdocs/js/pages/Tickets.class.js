@@ -1205,14 +1205,14 @@ Page.Tickets = class Tickets extends Page.PageUtils {
 				// html += '<div class="button secondary mobile_collapse" onClick="$P().do_export()"><i class="mdi mdi-cloud-download-outline">&nbsp;</i><span>Export...</span></div>';
 				// html += '<div class="button secondary mobile_collapse" onClick="$P().go_edit_history()"><i class="mdi mdi-history">&nbsp;</i><span>History...</span></div>';
 				
-				html += '<div id="btn_et_add_event" class="button secondary mobile_collapse" onClick="$P().do_edit_event(-1)"><i class="mdi mdi-calendar-edit-outline">&nbsp;</i><span>Add Event...</span></div>';
-				html += '<div id="btn_et_add_event" class="button secondary mobile_collapse" onClick="$P().do_attach_files()"><i class="mdi mdi-cloud-upload-outline">&nbsp;</i><span>Attach Files...</span></div>';
+				html += '<div id="btn_et_add_event" class="button secondary mobile_collapse sm_hide" onClick="$P().do_edit_event(-1)"><i class="mdi mdi-calendar-edit-outline">&nbsp;</i><span>Add Event...</span></div>';
+				html += '<div id="btn_et_add_event" class="button secondary mobile_collapse sm_hide" onClick="$P().do_attach_files()"><i class="mdi mdi-cloud-upload-outline">&nbsp;</i><span>Attach Files...</span></div>';
 				html += '<div id="btn_et_assign" class="button mobile_collapse" onClick="$P().do_assign_to_me()"><i class="mdi mdi-account">&nbsp;</i><span>Assign to Me</span></div>';
 				
 				var is_fav = !!(ticket.cc && ticket.cc.includes(app.username));
 				html += '<div id="btn_et_fav" class="button mobile_collapse ' + (is_fav ? 'favorite' : '') + '" onClick="$P().do_toggle_follow()"><i class="mdi mdi-'+(is_fav ? 'heart' : 'heart-plus-outline')+'">&nbsp;</i><span>Follow</span></div>';
 				
-				html += '<div id="btn_et_close" class="button danger" onClick="$P().do_close_ticket()"><i class="mdi mdi-power">&nbsp;</i>Close Ticket</div>';
+				html += '<div id="btn_et_close" class="button danger phone_collapse" onClick="$P().do_close_ticket()"><i class="mdi mdi-power">&nbsp;</i><span>Close Ticket</span></div>';
 			html += '</div>'; // box_buttons
 		html += '</div>'; // box
 		
