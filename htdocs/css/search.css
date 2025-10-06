@@ -177,8 +177,12 @@ div.load_more {
 
 @media only screen and (min-width: 1025px) and (max-width: 1280px) {
 	
+	.form_grid {
+		grid-template-columns: 1fr 1fr 1fr;
+		grid-row-gap: 20px;
+	}
 	.form_grid .multiselect > .single, .form_grid .multiselect.multi > .placeholder {
-		max-width: 10vw;
+		max-width: 15vw;
 	}
 	.form_grid.four .multiselect > .single {
 		max-width: 15vw;
