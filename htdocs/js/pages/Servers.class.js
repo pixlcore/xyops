@@ -143,7 +143,7 @@ Page.Servers = class Servers extends Page.ServerUtils {
 			sort_dir: 1,
 			filter: this.isRowVisible.bind(this),
 			column_ids: ['label', 'ip', 'grp_labels', 'cpu_cores', 'mem_total', 'os_label', 'sat_ver', 'uptime', 'num_jobs', 'num_alerts' ],
-			column_labels: ['Server', 'IP Address', 'Groups', '# CPUs', 'RAM', 'OS', 'xySat', 'Uptime', '# Jobs', '# Alerts']
+			column_labels: ['Label', 'IP Address', 'Groups', '# CPUs', 'RAM', 'OS', 'xySat', 'Uptime', '# Jobs', '# Alerts']
 		};
 		
 		html += '<div class="box">';
