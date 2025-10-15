@@ -2778,7 +2778,7 @@ Page.PageUtils = class PageUtils extends Page.Base {
 		
 		var params = node.data.params;
 		var title = node.data.label || plugin.title;
-		var icon = node.data.icon || plugin.icon || config.ui.data_types.plugin.icon;
+		var icon = plugin.icon || config.ui.data_types.plugin.icon;
 		var none = '<span>(None)</span>';
 		
 		html += `<div id="d_wfn_${node.id}" class="${classes.join(' ')}" style="left:${pos.x}px; top:${pos.y}px;">

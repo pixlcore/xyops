@@ -1448,17 +1448,6 @@ Page.Workflows = class Workflows extends Page.Events {
 			})
 		});
 		
-		// icon
-		html += this.getFormRow({
-			id: 'd_wfdj_icon',
-			content: this.getFormMenuSingle({
-				id: 'fe_wfdj_icon',
-				options: [['', '(None)']].concat( iconFontNames.map( function(name) { return { id: name, title: name, icon: name }; } ) ),
-				value: node.data.icon || '',
-				// 'data-shrinkwrap': 1
-			})
-		});
-		
 		// category
 		html += this.getFormRow({
 			id: 'd_wfdj_cat',
@@ -1514,7 +1503,6 @@ Page.Workflows = class Workflows extends Page.Events {
 			app.clearError();
 			
 			node.data.label = strip_html( $('#fe_wfdj_title').val() );
-			node.data.icon = $('#fe_wfdj_icon').val();
 			node.data.category = $('#fe_wfdj_cat').val();
 			node.data.plugin = $('#fe_wfdj_plugin').val();
 			node.data.targets = $('#fe_wfdj_targets').val();
@@ -1559,7 +1547,7 @@ Page.Workflows = class Workflows extends Page.Events {
 		}); // Dialog.confirm
 		
 		MultiSelect.init( $('#fe_wfdj_targets') );
-		SingleSelect.init( $('#fe_wfdj_icon, #fe_wfdj_cat, #fe_wfdj_plugin, #fe_wfdj_algo') );
+		SingleSelect.init( $('#fe_wfdj_cat, #fe_wfdj_plugin, #fe_wfdj_algo') );
 		
 		// handle plugin change
 		var do_change_plugin = function() {

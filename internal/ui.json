@@ -439,14 +439,6 @@
 			"label": "Custom Title:",
 			"caption": "Optionally customize the title for the node (defaults to the Plugin name)."
 		},
-		"d_wfdj_icon": {
-			"label": "Custom Icon:",
-			"caption": "Optionally choose a custom icon for the plugin node (defaults to the Plugin icon)."
-		},
-		"fe_wfdj_icon": {
-			"title": "Select icon for job",
-			"placeholder": "Select icon for job..."
-		},
 		"d_wfdj_cat": {
 			"label": "Category:",
 			"caption": "Select a category for the plugin job (category limits and actions will apply)."
