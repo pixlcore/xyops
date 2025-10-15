@@ -2368,20 +2368,17 @@ Page.Workflows = class Workflows extends Page.Events {
 			suffix: `<div class="form_suffix_icon mdi mdi-folder-plus-outline" title="${config.ui.tooltips.quick_add_cat}" onClick="$P().quickAddCategory()" onMouseDown="event.preventDefault();"></div>`
 		});
 		
-		// tags TODO: remove this
+		// tags
 		html += this.getFormRow({
-			label: 'Tags:',
+			id: 'd_wf_tags',
 			content: this.getFormMenuMulti({
 				id: 'fe_wf_tags',
-				title: 'Select tags for workflow',
-				placeholder: 'Select tags for workflow...',
 				options: app.tags,
 				values: event.tags,
 				default_icon: 'tag-outline',
 				// 'data-shrinkwrap': 1
 			}),
-			suffix: '<div class="form_suffix_icon mdi mdi-tag-plus-outline" title="Quick Add Tag..." onClick="$P().quickAddTag()" onMouseDown="event.preventDefault();"></div>',
-			caption: 'Optionally select one or more tags for the workflow.  Jobs can also add their own tags at run time.'
+			suffix: '<div class="form_suffix_icon mdi mdi-tag-plus-outline" title="Quick Add Tag..." onClick="$P().quickAddTag()" onMouseDown="event.preventDefault();"></div>'
 		});
 		
 		// user fields

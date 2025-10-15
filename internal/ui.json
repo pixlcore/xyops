@@ -424,6 +424,14 @@
 				"title": "Select category for workflow",
 				"placeholder": "Select category for workflow..."
 			},
+			"d_wf_tags": {
+				"label": "Tags:",
+				"caption": "Optionally select one or more tags for the workflow.  Jobs can also add their own tags at run time."
+			},
+			"fe_wf_tags": {
+				"title": "Select tags for workflow",
+				"placeholder": "Select tags for workflow..."
+			},
 			"d_wf_user_fields": {
 				"label": "User Fields:",
 				"caption": "Optionally define custom parameters to be collected when a user runs your workflow manually."
