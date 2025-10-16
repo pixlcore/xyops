@@ -388,7 +388,7 @@ Page.Job = class Job extends Page.PageUtils {
 		
 		// additional jobs (completed job only)
 		if (job.final && job.jobs && job.jobs.length) {
-			html += '<div class="box toggle" id="d_job_add_jobs>';
+			html += '<div class="box toggle" id="d_job_add_jobs">';
 				html += '<div class="box_title">';
 					html += '<i></i><span>Additional Jobs</span>';
 				html += '</div>';
@@ -871,7 +871,7 @@ Page.Job = class Job extends Page.PageUtils {
 			} );
 		} // foreach node
 		
-		sort_by( completed_stubs, 'completed', { dir: -1, type: 'number' } );
+		sort_by( completed_stubs, 'completed', { dir: 1, type: 'number' } );
 		
 		// all together now
 		rows = rows.concat( completed_stubs );
@@ -972,6 +972,7 @@ Page.Job = class Job extends Page.PageUtils {
 					
 					// if 1+ jobs completed, set node class accordingly
 					(workflow.jobs[node.id] || []).forEach( function(stub) {
+						if (stub.retried) return; // skip decoration logic for retries
 						num_completed++;
 						if (!stub.code) num_success++;
 					} );
@@ -1335,7 +1336,7 @@ Page.Job = class Job extends Page.PageUtils {
 			if (!self.active) return; // sanity
 			
 			var jobs = resp.jobs || [];
-			var cols = ["Job ID", "Reason", "Event", "Category", "Plugin", "Server", "Actions"];
+			var cols = ["Job ID", "Reason", "Event/Plugin", "Category", "Plugin", "Server", "Result"];
 			var html = '';
 			
 			var grid_args = {
@@ -1345,18 +1346,19 @@ Page.Job = class Job extends Page.PageUtils {
 				class: 'data_grid job_additional'
 			};
 			
-			html += this.getBasicGrid( grid_args, function(item, idx) {
+			html += self.getBasicGrid( grid_args, function(item, idx) {
 				if (item.err) return [ '(Job deleted)', 'n/a', 'n/a', 'n/a', 'n/a', 'n/a', 'n/a' ];
 				
 				var reason = job.jobs[idx].reason;
 				return [
-					self.getNiceJob(item, true),
+					'<b>' + self.getNiceJob(item, true) + '</b>',
 					ucfirst(reason),
-					self.getNiceEvent(item.event, true),
+					self.getNiceJobEvent(item, true),
 					self.getNiceCategory(item.category, true),
 					self.getNicePlugin(item.plugin, true),
 					self.getNiceServer(item.server, true),
-					'<a href="#Job?id=' + item.id + '">Details</a>'
+					self.getNiceJobResult(item)
+					// '<a href="#Job?id=' + item.id + '"><b>Details</b></a>'
 				];
 			}); // grid
 			
