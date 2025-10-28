@@ -1924,7 +1924,8 @@ Page.PageUtils = class PageUtils extends Page.Base {
 						disabled: elem_dis, 
 						autocomplete: 'off' 
 					};
-					if (!param.variant || param.variant.match(/^(email|number|password|text|tel|url)$/)) {
+					if (!param.variant || param.variant.match(/^(password|text|tel)$/)) {
+						// only show explorer icon for non-validating text variants
 						html += explore_start + self.getFormText(text_args) + explore_end;
 					}
 					else {
@@ -2092,6 +2093,10 @@ Page.PageUtils = class PageUtils extends Page.Base {
 					params[ param.id ] = $('#fe_pp_' + plugin_id + '_' + param.id).val();
 					if (param.required && !params[ param.id ].length && !force) {
 						app.badField('#fe_pp_' + plugin_id + '_' + param.id, "The &ldquo;" + param.title + "&rdquo; field is required.");
+						is_valid = false;
+					}
+					else if (!force && param.variant && !param.variant.match(/^(password|text|tel)$/) && !$('#fe_pp_' + plugin_id + '_' + param.id)[0].validity.valid) {
+						app.badField('#fe_pp_' + plugin_id + '_' + param.id, "The &ldquo;" + param.title + "&rdquo; field is invalid.");
 						is_valid = false;
 					}
 				break;
@@ -4061,7 +4066,8 @@ Page.PageUtils = class PageUtils extends Page.Base {
 						disabled: elem_dis, 
 						autocomplete: 'off' 
 					};
-					if (!param.variant || param.variant.match(/^(email|number|password|text|tel|url)$/)) {
+					if (!param.variant || param.variant.match(/^(password|text|tel)$/)) {
+						// only show explorer icon for non-validating text variants
 						html += explore_start + self.getFormText(text_args) + explore_end;
 					}
 					else {
@@ -4143,6 +4149,10 @@ Page.PageUtils = class PageUtils extends Page.Base {
 				params[ param.id ] = $('#fe_uf_' + param.id).val();
 				if (param.required && !params[ param.id ].length && validate) {
 					app.badField('#fe_uf_' + param.id, "The &ldquo;" + param.title + "&rdquo; field is required.");
+					is_valid = false;
+				}
+				else if (validate && param.variant && !param.variant.match(/^(password|text|tel)$/) && !$('#fe_uf_' + param.id)[0].validity.valid) {
+					app.badField('#fe_uf_' + param.id, "The &ldquo;" + param.title + "&rdquo; field is invalid.");
 					is_valid = false;
 				}
 			}
