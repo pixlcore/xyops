@@ -839,7 +839,8 @@ Page.Alerts = class Alerts extends Page.PageUtils {
 				// '<a href="#Job?id=' + job.id + '">Details</a>'
 			];
 			
-			if (job.category) {
+			if (job.suspended) tds.className = 'suspended';
+			else if (job.category) {
 				var category = find_object( app.categories, { id: job.category } );
 				if (category && category.color) tds.className = 'clr_' + category.color;
 			}

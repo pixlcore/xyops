@@ -1238,7 +1238,8 @@ Page.Groups = class Groups extends Page.ServerUtils {
 				'<span class="link danger" onClick="$P().doAbortJob(\'' + job.id + '\')"><b>Abort Job</b></a>'
 			];
 			
-			if (job.category) {
+			if (job.suspended) tds.className = 'suspended';
+			else if (job.category) {
 				var category = find_object( app.categories, { id: job.category } );
 				if (category && category.color) tds.className = 'clr_' + category.color;
 			}
