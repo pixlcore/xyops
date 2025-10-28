@@ -1059,6 +1059,13 @@ div.td_big {
 	background: color-mix(in srgb, var(--red) 20%, transparent) !important;
 }
 
+.data_grid > ul.grid_row.suspended > div {
+	background: color-mix(in srgb, var(--orange) 20%, transparent) !important;
+}
+.data_grid > ul.grid_row.suspended > div a:hover, .data_grid > ul.grid_row.suspended > div span.link:hover {
+	color: var(--orange) !important;
+}
+
 .data_grid > ul.grid_row > div > code {
 	font-size: 12px;
 }
