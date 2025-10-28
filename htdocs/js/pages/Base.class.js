@@ -1268,14 +1268,36 @@ Page.Base = class Base extends Page {
 		var cx = Math.floor( counter * bar_width );
 		var label = '' + Math.floor( (counter / 1.0) * 100 ) + '%';
 		
-		if ((job.state == 'start_delay') || (job.state == 'queued')) {
+		if (job.suspended) {
 			extra_classes.push('pending');
 			cx = 0;
-			label = '';
+			label = '<i class="mdi mdi-motion-pause-outline"></i>';
 		}
-		else if (counter == 1.0) extra_classes.push('indeterminate');
+		else switch (job.state) {
+			case 'start_delay':
+				extra_classes.push('pending');
+				cx = 0;
+				label = '<i class="mdi mdi-clock-fast"></i>';
+			break;
+			
+			case 'retry_delay':
+				extra_classes.push('pending');
+				cx = 0;
+				label = '<i class="mdi mdi-update"></i>';
+			break;
+			
+			case 'queued':
+				extra_classes.push('pending');
+				cx = 0;
+				label = '<i class="mdi mdi-tray-full"></i>';
+			break;
+			
+			default:
+				if (counter == 1.0) extra_classes.push('indeterminate');
+			break;
+		}
 		
-		html += '<div class="progress_bar_container ' + extra_classes.join(' ') + '" style="width:' + bar_width + 'px; margin:0;">';
+		html += '<div class="progress_bar_container ' + extra_classes.join(' ') + '" style="width:' + bar_width + 'px;">';
 			html += '<div class="progress_bar_label first_half" style="width:' + bar_width + 'px;">' + label + '</div>';
 			html += '<div class="progress_bar_inner" style="width:' + cx + 'px;">';
 				html += '<div class="progress_bar_label second_half" style="width:' + bar_width + 'px;">' + label + '</div>';
@@ -1295,8 +1317,17 @@ Page.Base = class Base extends Page {
 		var label = '' + Math.floor( (counter / 1.0) * 100 ) + '%';
 		var indeterminate = !!(counter == 1.0);
 		
-		var pending = !!((job.state == 'start_delay') || (job.state == 'queued'));
-		if (pending) { cx = 0; label = ''; indeterminate = false; }
+		var pending = !!((job.state == 'start_delay') || (job.state == 'retry_delay') || (job.state == 'queued') || job.suspended);
+		if (pending) { 
+			cx = 0; 
+			label = ''; 
+			indeterminate = false; 
+			
+			if (job.suspended) label = '<i class="mdi mdi-motion-pause-outline"></i>';
+			else if (job.state == 'start_delay') label = '<i class="mdi mdi-clock-fast"></i>';
+			else if (job.state == 'retry_delay') label = '<i class="mdi mdi-update"></i>';
+			else if (job.state == 'queued') label = '<i class="mdi mdi-tray-full"></i>';
+		}
 		
 		$cont.toggleClass('indeterminate', indeterminate);
 		$cont.toggleClass('pending', pending);
@@ -1354,13 +1385,13 @@ Page.Base = class Base extends Page {
 	
 	getNiceJobState(job) {
 		// get nice job state given job
-		// (states: queued, start_delay, retry_delay, ready, active, finishing, complete)
+		// (states: queued, start_delay, retry_delay, ready, starting, active, finishing, complete)
 		var nice_state = ucfirst(job.state || 'unknown');
 		var now = app.epoch;
 		var icon = 'progress-question';
 		
 		switch (job.state) {
-			case 'queued': icon = 'motion-pause-outline'; break;
+			case 'queued': icon = 'tray-full'; break;
 			
 			case 'start_delay': 
 				icon = 'clock-fast';
@@ -1374,7 +1405,8 @@ Page.Base = class Base extends Page {
 				if (job.until && (job.until > now)) nice_state += ' (' + get_text_from_seconds(job.until - now, true, true) + ')';
 			break;
 			
-			case 'ready': icon = 'motion-play'; break;
+			case 'ready': icon = 'play-speed'; break;
+			case 'starting': icon = 'motion-play'; break;
 			case 'active': icon = 'motion-play-outline'; break;
 			case 'finishing': icon = 'progress-check'; break;
 			case 'complete': icon = 'check-circle-outline'; break;
@@ -1382,6 +1414,9 @@ Page.Base = class Base extends Page {
 		
 		// special case: If job is complete but not final, it's actually still finishing
 		if ((job.state == 'complete') && !job.final) { icon = 'progress-check'; nice_state = 'Finishing'; }
+		
+		// special case for suspended job
+		if (job.suspended && !job.final) { icon = 'motion-pause-outline'; nice_state = 'Suspended'; }
 		
 		return '<i class="mdi mdi-' + icon + '">&nbsp;</i>' + nice_state;
 	}
