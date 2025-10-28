@@ -510,7 +510,7 @@ Page.ServerUtils = class ServerUtils extends Page.PageUtils {
 		html += this.getBasicGrid( grid_args, function(job, idx) {
 			if (job.err) return [ '(Job deleted)', 'n/a', 'n/a', 'n/a', 'n/a', 'n/a', 'n/a' ];
 			
-			return [
+			var tds = [
 				'<b>' + self.getNiceJob(job, true) + '</b>',
 				self.getNiceServer(job.server, true),
 				self.getNiceJobSource(job),
@@ -520,6 +520,13 @@ Page.ServerUtils = class ServerUtils extends Page.PageUtils {
 				self.getNiceJobResult(job),
 				// '<a href="#Job?id=' + job.id + '">Details</a>'
 			];
+			
+			if (job.category) {
+				var category = find_object( app.categories, { id: job.category } );
+				if (category && category.color) tds.className = 'clr_' + category.color;
+			}
+			
+			return tds;
 		} );
 		
 		this.div.find('#d_vs_jobs > .box_content').html( html );
