@@ -386,6 +386,16 @@ Page.Job = class Job extends Page.PageUtils {
 			html += '</div>'; // box_content
 		html += '</div>'; // box
 		
+		// snapshots (hidden unless needed)
+		html += '<div class="box toggle" id="d_job_snapshots" style="display:none">';
+			html += '<div class="box_title">';
+				html += '<i></i><span>Server Snapshots</span>';
+			html += '</div>';
+			html += '<div class="box_content table">';
+				html += '<div class="loading_container"><div class="loading"></div></div>';
+			html += '</div>'; // box_content
+		html += '</div>'; // box
+		
 		// tickets (hidden unless needed)
 		html += '<div class="box toggle" id="d_job_tickets" style="display:none">';
 			html += '<div class="box_title">';
@@ -540,6 +550,7 @@ Page.Job = class Job extends Page.PageUtils {
 			this.getCompletedJobLog();
 			this.getAdditionalJobs();
 			this.getJobTickets();
+			this.getJobSnapshots();
 			this.renderPluginParams('#d_job_params');
 			this.renderEventParams();
 			this.renderJobActions();
@@ -1448,7 +1459,7 @@ Page.Job = class Job extends Page.PageUtils {
 		
 		details = header + details;
 		
-		var title = "Job Limit Details: " + limit_def.title;
+		var title = "Job Limit Exceeded: " + limit_def.title;
 		if (limit.code) title = '<span style="color:var(--red);">' + title + '</span>';
 		
 		this.viewMarkdownAuto( title, details.trim() );
@@ -1539,7 +1550,7 @@ Page.Job = class Job extends Page.PageUtils {
 		var opts = {
 			query: 'jobs:' + job.id,
 			offset: 0,
-			limit: config.items_per_page, // no pagination, so this is just a sanity limit
+			limit: config.alt_items_per_page, // no pagination, so this is just a sanity limit
 			sort_by: '_id',
 			sort_dir: -1,
 			ttl: 1
@@ -1633,6 +1644,67 @@ Page.Job = class Job extends Page.PageUtils {
 			
 			$('#d_job_add_jobs > div.box_content').html( html );
 		} ); // api.get
+	}
+	
+	getJobSnapshots() {
+		// get info on snapshots that were snapped during job's life
+		var self = this;
+		var job = this.job;
+		
+		var opts = {
+			query: 'jobs:' + job.id,
+			offset: 0,
+			limit: config.alt_items_per_page, // no pagination, so this is just a sanity limit
+			sort_by: '_id',
+			sort_dir: -1,
+			ttl: 1
+		};
+		
+		app.api.get( 'app/search_snapshots', opts, function(resp) {
+			self.snapshots = resp.rows || [];
+			self.renderJobSnapshots();
+		});
+	}
+	
+	renderJobSnapshots() {
+		// render details on job snapshots
+		var self = this;
+		
+		// make sure page is still active (API may be slow)
+		if (!this.active) return;
+		
+		if (!this.snapshots || !this.snapshots.length) {
+			$('#d_job_snapshots').hide();
+			return;
+		}
+		
+		var snapshots = this.snapshots;
+		var cols = ["Snapshot ID", "Source", "Server", "Uptime", "Load Avg", "Mem Avail", "Date/Time"];
+		var html = '';
+		
+		var grid_args = {
+			rows: snapshots,
+			cols: cols,
+			data_type: 'snapshot'
+		};
+		
+		html += this.getBasicGrid( grid_args, function(item, idx) {
+			if (!item.data) item.data = {}; // sanity
+			if (!item.data.memory) item.data.memory = {}; // sanity
+			
+			return [
+				'<b>' + self.getNiceSnapshotID(item, true) + '</b>',
+				self.getNiceSnapshotSource(item),
+				self.getNiceServer(item.server || '', true),
+				get_text_from_seconds(item.data.uptime_sec || 0, true, true),
+				item.data.load.map( function(value) { return short_float(value); } ).join(', '),
+				get_text_from_bytes(item.data.memory.available || 0),
+				self.getRelativeDateTime(item.date)
+			];
+		}); // grid
+		
+		$('#d_job_snapshots > div.box_content').html( html );
+		$('#d_job_snapshots').show();
 	}
 	
 	updateUserContent() {
@@ -3120,9 +3192,11 @@ Page.Job = class Job extends Page.PageUtils {
 			break;
 			
 			case 'limit_triggered':
+				app.cacheBust = hires_time_now();
 				app.showMessage('warning', pdata.msg);
 				this.job.limits = pdata.limits;
 				this.renderJobLimits();
+				this.getJobSnapshots();
 			break;
 		} // switch
 	}
@@ -3161,6 +3235,7 @@ Page.Job = class Job extends Page.PageUtils {
 		delete this.isWorkflow;
 		delete this.lastSuspendedCount;
 		delete this.limits;
+		delete this.snapshots;
 		
 		// destroy charts if applicable
 		if (this.charts) {
