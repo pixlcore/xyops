@@ -1219,16 +1219,14 @@ Page.PageUtils = class PageUtils extends Page.Base {
 			caption: 'Optionally enter custom text to be appended to the end of the web hook system message.'
 		});
 		
-		// abort job (checkbox)
+		// additional actions (checkboxes)
 		html += this.getFormRow({
-			id: 'd_erl_abort',
-			label: 'Action:',
-			content: this.getFormCheckbox({
-				id: 'fe_erl_abort',
-				label: 'Abort Job',
-				checked: !!limit.abort
-			}),
-			caption: 'Optionally abort the job when the limit is triggered.'
+			id: 'd_erl_actions',
+			label: 'Additional Actions:',
+			content: 
+				'<div style="margin-top:3px;">' + this.getFormCheckbox({ id: 'fe_erl_snapshot', label: 'Snapshot Server', checked: !!limit.snapshot }) + '</div>' + 
+				'<div style="margin-top:8px;">' + this.getFormCheckbox({ id: 'fe_erl_abort', label: 'Abort Job', checked: !!limit.abort }) + '</div>',
+			caption: 'Optionally take a server snapshot and/or abort the job when the limit is triggered.'
 		});
 		
 		html += '</div>';
@@ -1247,6 +1245,7 @@ Page.PageUtils = class PageUtils extends Page.Base {
 				limit.email = $('#fe_erl_email').val();
 				limit.web_hook = $('#fe_erl_web_hook').val();
 				limit.text = $('#fe_erl_web_hook_text').val().trim();
+				limit.snapshot = $('#fe_erl_snapshot').is(':checked');
 				limit.abort = $('#fe_erl_abort').is(':checked');
 			}
 			
@@ -1294,10 +1293,10 @@ Page.PageUtils = class PageUtils extends Page.Base {
 		} ); // Dialog.confirm
 		
 		var change_limit_type = function(new_type) {
-			$('#d_erl_byte_amount, #d_erl_raw_amount, #d_erl_duration, #d_erl_file_size, #d_erl_file_types, #d_erl_tags, #d_erl_users, #d_erl_email, #d_erl_web_hook, #d_erl_web_hook_text, #d_erl_abort').hide();
+			$('#d_erl_byte_amount, #d_erl_raw_amount, #d_erl_duration, #d_erl_file_size, #d_erl_file_types, #d_erl_tags, #d_erl_users, #d_erl_email, #d_erl_web_hook, #d_erl_web_hook_text, #d_erl_actions').hide();
 			
 			if (new_type.match(/^(time|mem|cpu|log)$/)) {
-				$('#d_erl_tags, #d_erl_users, #d_erl_email, #d_erl_web_hook, #d_erl_web_hook_text, #d_erl_abort').show();
+				$('#d_erl_tags, #d_erl_users, #d_erl_email, #d_erl_web_hook, #d_erl_web_hook_text, #d_erl_actions').show();
 			}
 			
 			switch (new_type) {
