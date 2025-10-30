@@ -278,9 +278,14 @@
 	.data_grid.webhook_grid { grid-template-columns: min-content auto auto 0px auto auto auto !important; }
 	.data_grid.webhook_grid > ul > div:nth-child(4) { visibility: hidden; }
 	
-	/* "Condition", "Type", "Description", "Date/Time", "Elapsed", "Result", "Actions" */
-	.data_grid.action_grid { grid-template-columns: auto auto auto 0px auto auto auto !important; }
+	/* "Condition", "Type", "Source", "Description", "Date/Time", "Elapsed", "Result", "Actions" */
+	.data_grid.action_grid { grid-template-columns: auto auto 0px 0px auto auto auto auto !important; }
+	.data_grid.action_grid > ul > div:nth-child(3) { visibility: hidden; }
 	.data_grid.action_grid > ul > div:nth-child(4) { visibility: hidden; }
+	
+	/* "Limit Type", "Source", "Description", "Date/Time", "Result", "Actions" */
+	.data_grid.limit_grid { grid-template-columns: auto auto auto 0px auto auto !important; }
+	.data_grid.limit_grid > ul > div:nth-child(4) { visibility: hidden; }
 	
 	/* 'Job ID', 'Title', 'Type', 'Username', 'Progress', 'Elapsed', 'Remaining' */
 	.data_grid.sys_job_grid { grid-template-columns: auto auto auto 0px auto auto auto !important; }
@@ -680,10 +685,16 @@
 	.data_grid.webhook_grid > ul > div:nth-child(4) { visibility: hidden; }
 	.data_grid.webhook_grid > ul > div:nth-child(5) { visibility: hidden; }
 	
-	/* "Condition", "Type", "Description", "Date/Time", "Elapsed", "Result", "Actions" */
-	.data_grid.action_grid { grid-template-columns: auto auto auto 0px 0px auto auto !important; }
+	/* "Condition", "Type", "Source", "Description", "Date/Time", "Elapsed", "Result", "Actions" */
+	.data_grid.action_grid { grid-template-columns: auto auto 0px 0px 0px auto auto auto !important; }
+	.data_grid.action_grid > ul > div:nth-child(3) { visibility: hidden; }
 	.data_grid.action_grid > ul > div:nth-child(4) { visibility: hidden; }
 	.data_grid.action_grid > ul > div:nth-child(5) { visibility: hidden; }
+	
+	/* "Limit Type", "Source", "Description", "Date/Time", "Result", "Actions" */
+	.data_grid.limit_grid { grid-template-columns: auto auto auto 0px 0px auto !important; }
+	.data_grid.limit_grid > ul > div:nth-child(4) { visibility: hidden; }
+	.data_grid.limit_grid > ul > div:nth-child(5) { visibility: hidden; }
 	
 	/* 'Job ID', 'Title', 'Type', 'Username', 'Progress', 'Elapsed', 'Remaining' */
 	.data_grid.sys_job_grid { grid-template-columns: auto auto 0px 0px auto auto auto !important; }
@@ -1216,11 +1227,18 @@
 	.data_grid.webhook_grid > ul > div:nth-child(5) { visibility: hidden; }
 	.data_grid.webhook_grid > ul > div:nth-child(6) { visibility: hidden; }
 	
-	/* "Condition", "Type", "Description", "Date/Time", "Elapsed", "Result", "Actions" */
-	.data_grid.action_grid { grid-template-columns: auto auto 0px 0px 0px auto auto !important; }
+	/* "Condition", "Type", "Source", "Description", "Date/Time", "Elapsed", "Result", "Actions" */
+	.data_grid.action_grid { grid-template-columns: auto auto 0px 0px 0px 0px auto auto !important; }
 	.data_grid.action_grid > ul > div:nth-child(3) { visibility: hidden; }
 	.data_grid.action_grid > ul > div:nth-child(4) { visibility: hidden; }
 	.data_grid.action_grid > ul > div:nth-child(5) { visibility: hidden; }
+	.data_grid.action_grid > ul > div:nth-child(6) { visibility: hidden; }
+	
+	/* "Limit Type", "Source", "Description", "Date/Time", "Result", "Actions" */
+	.data_grid.limit_grid { grid-template-columns: auto auto 0px 0px 0px auto !important; }
+	.data_grid.limit_grid > ul > div:nth-child(3) { visibility: hidden; }
+	.data_grid.limit_grid > ul > div:nth-child(4) { visibility: hidden; }
+	.data_grid.limit_grid > ul > div:nth-child(5) { visibility: hidden; }
 	
 	/* 'Job ID', 'Title', 'Type', 'Username', 'Progress', 'Elapsed', 'Remaining' */
 	.data_grid.sys_job_grid { grid-template-columns: auto auto 0px 0px auto 0px auto !important; }
@@ -1662,12 +1680,20 @@
 	.data_grid.webhook_grid > ul > div:nth-child(5) { visibility: hidden; }
 	.data_grid.webhook_grid > ul > div:nth-child(6) { visibility: hidden; }
 	
-	/* "Condition", "Type", "Description", "Date/Time", "Elapsed", "Result", "Actions" */
-	.data_grid.action_grid { grid-template-columns: auto auto 0px 0px 0px auto 0px !important; }
+	/* "Condition", "Type", "Source", "Description", "Date/Time", "Elapsed", "Result", "Actions" */
+	.data_grid.action_grid { grid-template-columns: auto auto 0px 0px 0px 0px 0px auto !important; }
 	.data_grid.action_grid > ul > div:nth-child(3) { visibility: hidden; }
 	.data_grid.action_grid > ul > div:nth-child(4) { visibility: hidden; }
 	.data_grid.action_grid > ul > div:nth-child(5) { visibility: hidden; }
+	.data_grid.action_grid > ul > div:nth-child(6) { visibility: hidden; }
 	.data_grid.action_grid > ul > div:nth-child(7) { visibility: hidden; }
+	
+	/* "Limit Type", "Source", "Description", "Date/Time", "Result", "Actions" */
+	.data_grid.limit_grid { grid-template-columns: auto auto 0px 0px 0px 0px !important; }
+	.data_grid.limit_grid > ul > div:nth-child(3) { visibility: hidden; }
+	.data_grid.limit_grid > ul > div:nth-child(4) { visibility: hidden; }
+	.data_grid.limit_grid > ul > div:nth-child(5) { visibility: hidden; }
+	.data_grid.limit_grid > ul > div:nth-child(6) { visibility: hidden; }
 	
 	/* 'Job ID', 'Title', 'Type', 'Username', 'Progress', 'Elapsed', 'Remaining' */
 	.data_grid.sys_job_grid { grid-template-columns: 0px auto 0px 0px 0px 0px auto !important; }
