@@ -1,5 +1,5 @@
 # Install the latest xyOps Satellite for Windows x64.
-# Copyright (c) 2025 PixlCore LLC.  BSD 3-Clause License.
+# Copyright (c) 2026 PixlCore LLC.  BSD 3-Clause License.
 
 # Pre-populated variables (these values will be replaced server-side)
 $auth_token = "[auth_token]"

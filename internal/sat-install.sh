@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Install the latest xyOps Satellite to /opt/xyops/satellite/
-# Copyright (c) 2025 PixlCore LLC.  BSD 3-Clause License.
+# Copyright (c) 2026 PixlCore LLC.  BSD 3-Clause License.
 
 set -eu
 

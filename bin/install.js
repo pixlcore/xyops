@@ -1,5 +1,5 @@
 // xyOps Auto Installer
-// Copyright (c) 2019 - 2025 PixlCore LLC
+// Copyright (c) 2019 - 2026 PixlCore LLC
 // Released under the BSD 3-Clause License.
 // https://github.com/pixlcore/xyops/blob/main/LICENSE.md
 
@@ -72,7 +72,7 @@ logonly( "\nStarting install run: " + (new Date()).toString() + "\n" );
 
 print( 
 	"\n" + "xyOps Installer v" + installer_version + "\n" + 
-	"Copyright (c) 2025 PixlCore.com. BSD 3-Clause License.\n" + 
+	"Copyright (c) 2026 PixlCore.com. BSD 3-Clause License.\n" + 
 	"Log File: " + log_file + "\n\n" 
 );
 
