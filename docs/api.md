@@ -68,7 +68,9 @@ See [Monitoring](monitoring.md) for details on the xyOps monitoring and alert sy
 GET /api/app/get_alerts/v1
 ```
 
-This fetches all the current alert definitions.  No input parameters are defined.  No specific privilege is required, besides a valid user session or API Key.  Example response:
+This fetches all the current alert definitions.  No input parameters are defined.  No specific privilege is required, besides a valid user session or API Key.
+
+In addition to the [Standard Response Format](#standard-response-format), this will include a `rows` array containing all alerts, and a `list` object containing list metadata (e.g. `length` for total rows without pagination). Example response:
 
 ```json
 {
@@ -89,13 +91,13 @@ This fetches all the current alert definitions.  No input parameters are defined
 			"username": "admin",
 			"modified": 1434125333,
 			"created": 1434125333
-		},
-		...
-	]
+		}
+	],
+	"list": { "length": 1 }
 }
 ```
 
-In addition to the [Standard Response Format](#standard-response-format), this API will also include a `rows` array containing information about every alert definition.
+In addition to the [Standard Response Format](#standard-response-format), this API will also include a `rows` array containing information about every alert definition, and a `list` object containing list metadata.
 
 See [Alert](data-structures.md#alert) for details on the properties on each alert.
 
@@ -284,7 +286,9 @@ A storage bucket is a logical container for storing files, for use in events and
 GET /api/app/get_buckets/v1
 ```
 
-This fetches all the current storage bucket defintions (sans actual data and files).  No input parameters are defined.  No specific privilege is required, besides a valid user session or API Key.  Example response:
+This fetches all the current storage bucket defintions (sans actual data and files).  No input parameters are defined.  No specific privilege is required, besides a valid user session or API Key.
+
+In addition to the [Standard Response Format](#standard-response-format), this will include a `rows` array containing all buckets, and a `list` object containing list metadata (e.g. `length` for total rows without pagination). Example response:
 
 ```json
 {
@@ -300,13 +304,13 @@ This fetches all the current storage bucket defintions (sans actual data and fil
 			"modified": 1754783050,
 			"created": 1754783023,
 			"revision": 2
-		},
-		...
-	]
+		}
+	],
+	"list": { "length": 1 }
 }
 ```
 
-In addition to the [Standard Response Format](#standard-response-format), this API will also include an `rows` array containing information about every bucket definition.
+In addition to the [Standard Response Format](#standard-response-format), this API will also include a `rows` array containing information about every bucket definition, and a `list` object containing list metadata.
 
 See [Bucket](data-structures.md#bucket) for details on the properties on each bucket.
 
