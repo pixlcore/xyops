@@ -53,7 +53,7 @@ The expression that defines the conditions under which the alert should fire.  T
 
 ## Alert.message
 
-The message to include in the alert notification. This can include mustache placeholders for inserting dynamic content.  Example: `CPU load average is too high: {{float(monitors.load_avg)}} ({{cpu.cores}} CPU cores)`.  See [Monitoring](monitoring.md) for more on this syntax.
+The message to include in the alert notification. This can include mustache placeholders for inserting dynamic content.  Example: `CPU load average is too high: {{float(monitors.load_avg)}} ({{cpu.cores}} CPU cores)`.  See [Monitoring](monitors.md) for more on this syntax.
 
 ## Alert.groups
 
@@ -3039,6 +3039,45 @@ xyOps captures "quick" monitoring data every second on every server, in a few ke
 ```
 
 The `date` is the sample time in Unix seconds.  The other properties correspond to the Quickmon monitor definitions in [quick_monitors](configuration.md#quick_monitors), and the values should all be raw numbers.
+
+## ServerTimelineData
+
+Every minute, xyOps takes the current [ServerMonitorData](#servermonitordata) from every server, pulls out all the [Monitor](#monitor) values, and stores them in a specialized timeseries database.  Here is an example entry in JSON format:
+
+```json
+{
+	"count": 1,
+	"date": 1754449800,
+	"epoch_div": 29240830,
+	"totals": {
+		"active_jobs": 0,
+		"cpu_usage": 0.14,
+		"disk_iops_sec": 17188,
+		"disk_read_sec": 818495488,
+		"disk_usage_root": 5.09,
+		"disk_write_sec": 26660864,
+		"io_wait": 0,
+		"load_avg": 0,
+		"mem_free": 16167579648,
+		"mem_used": 642805760,
+		"mmdze1gznbt": 41861120,
+		"net_conns": 4,
+		"open_files": 1152,
+		"os_bytes_in_sec": 122642,
+		"os_bytes_out_sec": 2633375,
+		"total_procs": 24
+	}
+}
+```
+
+The object consists of the following properties:
+
+| Property Path | Type | Description |
+|---------------|------|-------------|
+| `count` | Number | The number of samples represented in this DB entry.  For daily, monthly and yearly systems, this will generally be greater than 1, and the totals will all be divided by it (i.e. averaged). |
+| `date` | Number | The date/time of the first sample in the DB entry, in Unix seconds. |
+| `epoch_div` | Number | The Unix seconds divided by a constant defined by the current system. |
+| `totals` | Object | An object containing all the [Monitor](#monitor) totals. |
 
 ## File
 
