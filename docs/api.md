@@ -1432,19 +1432,294 @@ Examples:
 
 ### get_groups
 
+```
+GET /api/app/get_groups/v1
+```
+
+Fetch all server groups. No input parameters are required. No specific privilege is required beyond a valid user session or API Key.
+
+In addition to the [Standard Response Format](#standard-response-format), this will include a `rows` array containing all groups, and a `list` object containing list metadata (e.g. `length` for total rows without pagination).
+
+Example response:
+
+```json
+{
+    "code": 0,
+    "rows": [
+        {
+            "id": "main",
+            "title": "Main Group",
+            "hostname_match": ".+",
+            "sort_order": 0,
+            "username": "admin",
+            "modified": 1754365754,
+            "created": 1754365754,
+            "revision": 1
+        }
+        
+    ],
+    "list": { "length": 1 }
+}
+```
+
+See [Group](data-structures.md#group) for details on group properties.
+
 ### get_group
+
+```
+GET /api/app/get_group/v1
+```
+
+Fetch a single group definition by ID. No specific privilege is required beyond a valid user session or API Key. Both HTTP GET with query string parameters and HTTP POST with JSON are accepted.
+
+Parameters:
+
+| Property Name | Type | Description |
+|---------------|------|-------------|
+| `id` | String | **(Required)** The alphanumeric ID of the group to fetch. |
+
+Example request:
+
+```json
+{
+    "id": "main"
+}
+```
+
+Example response:
+
+```json
+{
+    "code": 0,
+    "group": {
+        "id": "main",
+        "title": "Main Group",
+        "hostname_match": ".+",
+        "sort_order": 0,
+        "username": "admin",
+        "modified": 1754365754,
+        "created": 1754365754,
+        "revision": 1
+    }
+}
+```
+
+In addition to the [Standard Response Format](#standard-response-format), this will include a `group` object containing the requested group.
+
+See [Group](data-structures.md#group) for details on group properties.
 
 ### create_group
 
+```
+POST /api/app/create_group/v1
+```
+
+Create a new server group. Requires the [create_groups](privileges.md#create_groups) privilege and group-level access to the specified ID, plus a valid user session or API Key. Send as HTTP POST with JSON. See [Group](data-structures.md#group) for property details. The `id` may be omitted and will be auto-generated; `username`, `created`, `modified`, `revision`, and `sort_order` are set by the server.
+
+Parameters (required fields):
+
+| Property Name | Type | Description |
+|---------------|------|-------------|
+| `title` | String | **(Required)** Visual name for the group. |
+| `hostname_match` | String | **(Required)** A regular expression string used to auto-match servers to the group. |
+
+Example request:
+
+```json
+{
+    "title": "Main Group",
+    "hostname_match": ".+",
+    "notes": "Primary workers"
+}
+```
+
+Example response:
+
+```json
+{
+    "code": 0,
+    "group": { /* full group object including auto-generated fields */ }
+}
+```
+
+In addition to the [Standard Response Format](#standard-response-format), this will include a `group` object containing the newly created group.
+
+Notes:
+
+- Group alert actions are validated (see [Action](data-structures.md#action)) via `alert_actions`.
+- `sort_order` is automatically assigned at the end of the current list.
+
 ### update_group
+
+```
+POST /api/app/update_group/v1
+```
+
+Update an existing group by ID. Requires the [edit_groups](privileges.md#edit_groups) privilege and group-level access to the specified ID, plus a valid user session or API Key. Send as HTTP POST with JSON. The request is shallow-merged into the existing group, so you can provide a sparse set of properties to update. The server updates `modified` and increments `revision` automatically.
+
+Parameters:
+
+| Property Name | Type | Description |
+|---------------|------|-------------|
+| `id` | String | **(Required)** The group ID to update. |
+| other fields | Various | Any updatable [Group](data-structures.md#group) fields (e.g. `title`, `hostname_match`, `icon`, `notes`, `alert_actions`). |
+
+Example request:
+
+```json
+{
+    "id": "main",
+    "title": "Main Group (prod)",
+    "hostname_match": "^prod-\\w+$"
+}
+```
+
+Example response:
+
+```json
+{
+    "code": 0
+}
+```
 
 ### delete_group
 
+```
+POST /api/app/delete_group/v1
+```
+
+Delete an existing group by ID. Requires the [delete_groups](privileges.md#delete_groups) privilege and group-level access to the specified ID, plus a valid user session or API Key.
+
+Parameters:
+
+| Property Name | Type | Description |
+|---------------|------|-------------|
+| `id` | String | **(Required)** The group ID to delete. |
+
+Example request:
+
+```json
+{
+    "id": "main"
+}
+```
+
+Example response:
+
+```json
+{
+    "code": 0
+}
+```
+
+Deletions are permanent and cannot be undone.
+
 ### multi_update_group
+
+```
+POST /api/app/multi_update_group/v1
+```
+
+Update multiple groups in a single call. This endpoint is intended for updating `sort_order` only (e.g., after drag-and-drop reordering in the UI). Requires the [edit_groups](privileges.md#edit_groups) privilege and group-level access to all groups (`*`), plus a valid user session or API Key.
+
+Parameters:
+
+| Property Name | Type | Description |
+|---------------|------|-------------|
+| `items` | Array<Object> | **(Required)** Array of objects, each with an `id` and the new `sort_order`. |
+
+Example request:
+
+```json
+{
+    "items": [
+        { "id": "main",   "sort_order": 0 },
+        { "id": "staging", "sort_order": 1 }
+    ]
+}
+```
+
+Example response:
+
+```json
+{
+    "code": 0
+}
+```
+
+Notes:
+
+- Only `sort_order` is updated by this endpoint.
+- `modified` and `revision` are not updated by design for multi-updates of sort order.
 
 ### watch_group
 
+```
+POST /api/app/watch_group/v1
+```
+
+Start or stop a watch on a group, which takes a snapshot once per minute for a specified duration. Requires the [create_snapshots](privileges.md#create_snapshots) privilege and a valid user session or API Key. Supports HTTP POST with JSON, or HTTP GET with query parameters.
+
+Parameters:
+
+| Property Name | Type | Description |
+|---------------|------|-------------|
+| `id` | String | **(Required)** The group ID to watch. |
+| `duration` | Number | **(Required)** Duration in seconds. Set to `0` to cancel an existing watch. |
+
+Example request:
+
+```json
+{
+    "id": "main",
+    "duration": 3600
+}
+```
+
+Example response:
+
+```json
+{
+    "code": 0
+}
+```
+
+See [Snapshots](snapshots.md) for more details.
+
 ### create_group_snapshot
+
+```
+POST /api/app/create_group_snapshot/v1
+```
+
+Create a snapshot for the specified group using the most recent server data. Requires the [create_snapshots](privileges.md#create_snapshots) privilege and a valid user session or API Key. Supports HTTP POST with JSON, or HTTP GET with query parameters.
+
+Parameters:
+
+| Property Name | Type | Description |
+|---------------|------|-------------|
+| `group` | String | **(Required)** The group ID for which to create a snapshot. |
+
+Example request:
+
+```json
+{
+    "group": "main"
+}
+```
+
+Example response:
+
+```json
+{
+    "code": 0,
+    "id": "snmhr6zkefh1"
+}
+```
+
+In addition to the [Standard Response Format](#standard-response-format), this will include an `id` property containing the new [GroupSnapshot.id](data-structures.md#groupsnapshot-id).
+
+See [Snapshots](snapshots.md) for more details.
 
 
 
@@ -1473,8 +1748,6 @@ Examples:
 ### job_toggle_notify_me
 
 ### manage_job_tags
-
-### manage_job_comments
 
 ### abort_job
 
