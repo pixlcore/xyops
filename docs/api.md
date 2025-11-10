@@ -636,7 +636,7 @@ Parameters:
 | Property Name | Type | Description |
 |---------------|------|-------------|
 | `id` | String | **(Required)** The category ID to update. |
-| other fields | Various | Any updatable [Category](data-structures.md#category) fields (e.g. `title`, `enabled`, `color`, `notes`, `limits`, `actions`). |
+| (Other) | Various | Any updatable [Category](data-structures.md#category) fields (e.g. `title`, `enabled`, `color`, `notes`, `limits`, `actions`). |
 
 Example request:
 
@@ -873,7 +873,7 @@ Parameters:
 | Property Name | Type | Description |
 |---------------|------|-------------|
 | `id` | String | **(Required)** The channel ID to update. |
-| other fields | Various | Any updatable [Channel](data-structures.md#channel) fields (e.g. `title`, `enabled`, `users`, `email`, `web_hook`, `run_event`, `sound`, `icon`, `max_per_day`, `notes`). |
+| (Other) | Various | Any updatable [Channel](data-structures.md#channel) fields (e.g. `title`, `enabled`, `users`, `email`, `web_hook`, `run_event`, `sound`, `icon`, `max_per_day`, `notes`). |
 
 Example request:
 
@@ -1110,7 +1110,7 @@ Parameters:
 | Property Name | Type | Description |
 |---------------|------|-------------|
 | `id` | String | **(Required)** The event ID to update. |
-| other fields | Various | Any updatable [Event](data-structures.md#event) fields (e.g. `title`, `enabled`, `category`, `targets`, `algo`, `plugin`, `params`, `triggers`, `limits`, `actions`, `notes`). |
+| (Other) | Various | Any updatable [Event](data-structures.md#event) fields (e.g. `title`, `enabled`, `category`, `targets`, `algo`, `plugin`, `params`, `triggers`, `limits`, `actions`, `notes`). |
 
 Special behavior:
 
@@ -1562,7 +1562,7 @@ Parameters:
 | Property Name | Type | Description |
 |---------------|------|-------------|
 | `id` | String | **(Required)** The group ID to update. |
-| other fields | Various | Any updatable [Group](data-structures.md#group) fields (e.g. `title`, `hostname_match`, `icon`, `notes`, `alert_actions`). |
+| (Other) | Various | Any updatable [Group](data-structures.md#group) fields (e.g. `title`, `hostname_match`, `icon`, `notes`, `alert_actions`). |
 
 Example request:
 
@@ -1978,7 +1978,7 @@ Parameters:
 | Property Name | Type | Description |
 |---------------|------|-------------|
 | `id` | String | **(Required)** The [Job.id](data-structures.md#job-id). |
-| other fields | Various | Any writable job fields to update. Running jobs are updated in-memory; completed jobs are updated in storage. |
+| (Other) | Various | Any writable job fields to update. Running jobs are updated in-memory; completed jobs are updated in storage. |
 
 Example response:
 
@@ -2286,7 +2286,7 @@ Parameters:
 | Property Name | Type | Description |
 |---------------|------|-------------|
 | `id` | String | **(Required)** The monitor ID to update. |
-| other fields | Various | Any updatable [Monitor](data-structures.md#monitor) fields (e.g. `title`, `source`, `data_type`, `suffix`, `display`, `min_vert_scale`, `groups`, `icon`, `notes`). |
+| (Other) | Various | Any updatable [Monitor](data-structures.md#monitor) fields (e.g. `title`, `source`, `data_type`, `suffix`, `display`, `min_vert_scale`, `groups`, `icon`, `notes`). |
 
 Validation and behavior:
 
@@ -2626,6 +2626,7 @@ Parameters:
 | Property Name | Type | Description |
 |---------------|------|-------------|
 | `id` | String | **(Required)** The alphanumeric ID of the plugin to update. |
+| (Other) | Various | Any updatable [Plugin](data-structures.md#plugin) fields (e.g. `title`, `enabled`, `type`, `command`, `script`, `params`, `groups`, `format`, `uid`, `gid`, `kill`, `icon`, `notes`). |
 
 Example request:
 
@@ -2822,6 +2823,7 @@ Parameters:
 | Property Name | Type | Description |
 |---------------|------|-------------|
 | `id` | String | **(Required)** The alphanumeric ID of the role to update. |
+| (Other) | Various | Any updatable [Role](data-structures.md#role) fields (e.g. `title`, `enabled`, `categories`, `groups`, `privileges`, `icon`, `notes`). |
 
 Example request:
 
@@ -3136,17 +3138,242 @@ In addition to the [Standard Response Format](#standard-response-format), this w
 
 ## Secrets
 
+### get_secrets
+
+```
+GET /api/app/get_secrets/v1
+```
+
+Fetch all secret metadata. No specific privilege is required, besides a valid user session or API Key. Note that this returns only secret metadata; the actual secret variable data is stored separately and encrypted.
+
+In addition to the [Standard Response Format](#standard-response-format), this will include a `rows` array containing all secrets, and a `list` object containing list metadata (e.g. `length` for total rows without pagination).
+
+Example response:
+
+```json
+{
+    "code": 0,
+    "rows": [
+        {
+            "id": "zmeejkeb8nu",
+            "title": "Dev Database Creds",
+            "enabled": true,
+            "icon": "",
+            "notes": "This secret provides access to the dev database.",
+            "names": ["DB_HOST", "DB_PASS", "DB_USER"],
+            "events": ["emeekm2ablu"],
+            "categories": [],
+            "plugins": [],
+            "web_hooks": ["example_hook"],
+            "username": "admin",
+            "modified": 1757204132,
+            "created": 1755365953,
+            "revision": 8
+        }
+    ],
+    "list": { "length": 1 }
+}
+```
+
+See [Secret](data-structures.md#secret) for details on the secret object and its properties. The actual encrypted data structure is described under [Secret.fields](data-structures.md#secret-fields).
+
 ### get_secret
 
-### get_secrets
+```
+GET /api/app/get_secret/v1
+```
+
+Fetch a single secret’s metadata by ID. No specific privilege is required, besides a valid user session or API Key. Both a HTTP GET with query string parameters and a HTTP POST with JSON are allowed. This returns only metadata; not the encrypted variable values.
+
+Parameters:
+
+| Property Name | Type | Description |
+|---------------|------|-------------|
+| `id` | String | **(Required)** The alphanumeric ID of the secret to fetch. |
+
+Example request:
+
+```json
+{ "id": "zmeejkeb8nu" }
+```
+
+Example response:
+
+```json
+{
+    "code": 0,
+    "secret": {
+        "id": "zmeejkeb8nu",
+        "title": "Dev Database Creds",
+        "enabled": true,
+        "icon": "",
+        "notes": "This secret provides access to the dev database.",
+        "names": ["DB_HOST", "DB_PASS", "DB_USER"],
+        "events": ["emeekm2ablu"],
+        "categories": [],
+        "plugins": [],
+        "web_hooks": ["example_hook"],
+        "username": "admin",
+        "modified": 1757204132,
+        "created": 1755365953,
+        "revision": 8
+    }
+}
+```
+
+In addition to the [Standard Response Format](#standard-response-format), this will include a `secret` object containing the requested secret metadata. To retrieve and decrypt the actual variable values, use [decrypt_secret](#decrypt_secret).
+
+See [Secret](data-structures.md#secret) for details on the metadata fields.
 
 ### decrypt_secret
 
+```
+GET /api/app/decrypt_secret/v1
+```
+
+Decrypt and return a secret’s variable data. Admin only. Requires a valid administrator session or API Key. Both a HTTP GET with query string parameters and a HTTP POST with JSON are allowed.
+
+Access to this API is logged as a transaction in the activity log (action type `secret_access`), tagged with the requesting username.
+
+Parameters:
+
+| Property Name | Type | Description |
+|---------------|------|-------------|
+| `id` | String | **(Required)** The alphanumeric ID of the secret to decrypt. |
+
+Example request:
+
+```json
+{ "id": "zmeejkeb8nu" }
+```
+
+Example response:
+
+```json
+{
+    "code": 0,
+    "fields": [
+        { "name": "DB_HOST", "value": "db.dev.internal" },
+        { "name": "DB_USER", "value": "appuser" },
+        { "name": "DB_PASS", "value": "CorrectHorseBatteryStaple" }
+    ]
+}
+```
+
+In addition to the [Standard Response Format](#standard-response-format), this will include a `fields` array containing the decrypted [Secret.fields](data-structures.md#secret-fields) entries.
+
 ### create_secret
+
+```
+POST /api/app/create_secret/v1
+```
+
+Create a new secret and store its encrypted variable data. Admin only. Requires a valid administrator session or API Key. The request must be sent as an HTTP POST with a JSON body.
+
+See [Secret](data-structures.md#secret) for details on the metadata properties. The `id`, `username`, `created`, `modified` and `revision` properties may be omitted, as they are automatically generated (a unique `id` will be assigned if omitted, and the initial `revision` will be set to `1`). Include [Secret.fields](data-structures.md#secret-fields) to define the variable names and values; these will be encrypted and stored separately from the metadata. The `names` list is auto-generated from `fields` and stored in plaintext for display.
+
+Example request:
+
+```json
+{
+    "title": "Dev Database Creds",
+    "enabled": true,
+    "icon": "database-lock",
+    "notes": "App DB credentials for dev",
+    "events": ["emeekm2ablu"],
+    "categories": ["cat_dev"],
+    "plugins": ["shellplug"],
+    "web_hooks": ["example_hook"],
+    "fields": [
+        { "name": "DB_HOST", "value": "db.dev.internal" },
+        { "name": "DB_USER", "value": "appuser" },
+        { "name": "DB_PASS", "value": "CorrectHorseBatteryStaple" }
+    ]
+}
+```
+
+Example response:
+
+```json
+{
+    "code": 0,
+    "secret": { /* full secret metadata, including auto-generated fields and names; excludes encrypted data */ }
+}
+```
+
+In addition to the [Standard Response Format](#standard-response-format), this will include a `secret` object containing the created secret metadata. The encrypted variable data is stored separately and is not returned here.
 
 ### update_secret
 
+```
+POST /api/app/update_secret/v1
+```
+
+Update an existing secret’s metadata and/or encrypted variable data. Admin only. Requires a valid administrator session or API Key. The request must be sent as an HTTP POST with a JSON body.
+
+See [Secret](data-structures.md#secret) for details on the metadata properties. The request is shallow-merged into the existing secret, so you can provide a sparse set of properties to update. If you include [Secret.fields](data-structures.md#secret-fields), the variables will be re-encrypted and stored; the `names` list will be regenerated from the provided field names. The `modified` timestamp is updated automatically, and the `revision` is incremented.
+
+Parameters:
+
+| Property Name | Type | Description |
+|---------------|------|-------------|
+| `id` | String | **(Required)** The alphanumeric ID of the secret to update. |
+| (Other) | Various | Any updatable [Secret](data-structures.md#secret) fields (e.g. `title`, `enabled`, `fields`, `events`, `categories`, `plugins`, `web_hooks`, `icon`, `notes`). |
+
+Example request (metadata-only update):
+
+```json
+{
+    "id": "zmeejkeb8nu",
+    "title": "Dev Database Credentials",
+    "enabled": false
+}
+```
+
+Example request (replace variables):
+
+```json
+{
+    "id": "zmeejkeb8nu",
+    "fields": [
+        { "name": "DB_HOST", "value": "db.dev.example.com" },
+        { "name": "DB_USER", "value": "appuser" },
+        { "name": "DB_PASS", "value": "NewStrongPassword123!" }
+    ]
+}
+```
+
+Example response:
+
+```json
+{ "code": 0 }
+```
+
 ### delete_secret
+
+```
+POST /api/app/delete_secret/v1
+```
+
+Delete an existing secret, including its encrypted variable data. Admin only. Requires a valid administrator session or API Key. The request must be sent as an HTTP POST with a JSON body.
+
+Parameters:
+
+| Property Name | Type | Description |
+|---------------|------|-------------|
+| `id` | String | **(Required)** The alphanumeric ID of the secret to delete. |
+
+Example request:
+
+```json
+{ "id": "zmeejkeb8nu" }
+```
+
+Example response:
+
+```json
+{ "code": 0 }
+```
 
 
 
