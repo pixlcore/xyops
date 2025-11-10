@@ -1393,6 +1393,10 @@ The display title for the tag.
 
 An optional icon ID for the tag, displayed in the UI. Icons are sourced from [Material Design Icons](https://materialdesignicons.com/).
 
+## Tag.notes
+
+Optional notes or comments about the tag, for your own use.
+
 ## Tag.username
 
 The username of the user who created the tag.
