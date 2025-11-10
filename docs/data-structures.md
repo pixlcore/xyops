@@ -1810,6 +1810,169 @@ An optional field for adding notes or comments about the web hook.
 
 An internal revision number for the web hook, used for tracking changes.
 
+# Activity
+
+When user or system actions are logged, an activity item is created and indexed in the DB for searchability.  Here is an example in JSON format:
+
+```json
+{
+    "action": "ticket_create",
+    "description": "tmg7023diyu",
+    "epoch": 1759263488,
+    "headers": {
+        "user-agent": "Mozilla/5.0 (Macintosh; ... Safari/605.1.15"
+    },
+    "id": "amg7023dtyv",
+    "ip": "127.0.0.1",
+    "ips": [
+        "127.0.0.1"
+    ],
+    "keywords": [
+        "tmg7023diyu",
+        "admin",
+        "127.0.0.1"
+    ],
+    "ticket": {
+        "assignee": "admin",
+        "body": "This ticket was created to discuss job `#jmfftq09eqz` (**Monitored value-added protocol**).\n",
+        "category": "cat1",
+        "cc": [],
+        "created": 1759263488,
+        "due": 0,
+        "events": [],
+        "id": "tmg7023diyu",
+        "modified": 1759263488,
+        "notify": [],
+        "num": 9,
+        "status": "open",
+        "subject": "Job #jmfftq09eqz succeeded (Monitored value-added protocol)",
+        "tags": [
+            "flag"
+        ],
+        "type": "issue",
+        "username": "admin"
+    },
+    "username": "admin"
+}
+```
+
+Each activity type (denoted by the `action` property) may have different custom properties.  However, see below for the common properties.
+
+## Activity.id
+
+A unique alphanumeric ID which is automatically assigned when the activity is logged.
+
+## Activity.action
+
+A string identifying the action which took place.  Here is the list of possible actions, along with a template string used to generate an action summary in the UI:
+
+| Action ID | Summary Template |
+|-----------|------------------|
+| `alert_create` | `Alert definition created: [description] ([alert.id])` |
+| `alert_update` | `Alert definition updated: [description] ([alert.id])` |
+| `alert_delete` | `Alert definition deleted: [description] ([alert.id])` |
+| `alert_update_tickets` | `Alert invocation tickets updated: #[description]` |
+| `alert_delete_invocation` | `Alert invocation deleted: #[description]` |
+| `apikey_create` | `API Key created: [description]` |
+| `apikey_update` | `API Key updated: [description]` |
+| `apikey_delete` | `API Key deleted: [description]` |
+| `category_create` | `Category created: [description] ([category.id])` |
+| `category_update` | `Category updated: [description] ([category.id])` |
+| `category_delete` | `Category deleted: [description] ([category.id])` |
+| `category_multi_update` | `Multiple categories updated ([updated]).` |
+| `channel_create` | `Channel created: [description] ([channel.id])` |
+| `channel_update` | `Channel updated: [description] ([channel.id])` |
+| `channel_delete` | `Channel deleted: [description] ([channel.id])` |
+| `event_create` | `Event created: [description] ([event.id])` |
+| `event_update` | `Event updated: [description] ([event.id])` |
+| `event_delete` | `Event deleted: [description] ([event.id])` |
+| `job_update` | `Job updated: #[description]` |
+| `job_update_tags` | `Job tags updated: #[description]` |
+| `job_update_tickets` | `Job tickets updated: #[description]` |
+| `job_update_comments` | `Job comments updated: #[description]` |
+| `job_abort` | `Job aborted: #[description]: [reason]` |
+| `job_delete` | `Job deleted: #[description]` |
+| `job_delete_file` | `Job file deleted: #[description]: [path]` |
+| `job_resume` | `Job has been resumed: #[description]` |
+| `queue_flush` | `Flushed job queue for event: #[description]` |
+| `group_create` | `Server group created: [description] ([group.id])` |
+| `group_update` | `Server group updated: [description] ([group.id])` |
+| `group_delete` | `Server group deleted: [description] ([group.id])` |
+| `group_multi_update` | `Multiple server groups updated ([updated]).` |
+| `group_watch` | `A watch for [duration] was set on the group: [group.title] ([group.id])` |
+| `monitor_create` | `Monitor created: [description] ([monitor.id])` |
+| `monitor_update` | `Monitor updated: [description] ([monitor.id])` |
+| `monitor_delete` | `Monitor deleted: [description] ([monitor.id])` |
+| `monitor_multi_update` | `Multiple monitors updated ([updated]).` |
+| `plugin_create` | `Plugin created: [description] ([plugin.id])` |
+| `plugin_update` | `Plugin updated: [description] ([plugin.id])` |
+| `plugin_delete` | `Plugin deleted: [description] ([plugin.id])` |
+| `tag_create` | `Tag created: [description] ([tag.id])` |
+| `tag_update` | `Tag updated: [description] ([tag.id])` |
+| `tag_delete` | `Tag deleted: [description] ([tag.id])` |
+| `web_hook_create` | `Web Hook created: [description] ([web_hook.id])` |
+| `web_hook_update` | `Web Hook updated: [description] ([web_hook.id])` |
+| `web_hook_delete` | `Web Hook deleted: [description] ([web_hook.id])` |
+| `bucket_create` | `Bucket created: [description] ([bucket.id])` |
+| `bucket_update` | `Bucket updated: [description] ([bucket.id])` |
+| `bucket_delete` | `Bucket deleted: [description] ([bucket.id])` |
+| `secret_create` | `Secret created: [description] ([secret.id])` |
+| `secret_update` | `Secret updated: [description] ([secret.id])` |
+| `secret_delete` | `Secret deleted: [description] ([secret.id])` |
+| `secret_access` | `Secret was accessed: [description] ([secret.id])` |
+| `ticket_create` | `Ticket #[ticket.num] created: [ticket.subject] ([ticket.id])` |
+| `ticket_update` | `Ticket #[ticket.num] updated: [ticket.subject] ([ticket.id])` |
+| `ticket_delete` | `Ticket #[ticket.num] deleted: [ticket.subject] ([ticket.id])` |
+| `ticket_add_change` | `Ticket comment added: #[ticket.num]: [ticket.subject] ([ticket.id])` |
+| `ticket_update_change` | `Ticket comment updated: #[ticket.num]: [ticket.subject] ([ticket.id])` |
+| `user_create` | `User created: [user.full_name] ([user.username])` |
+| `user_update` | `User updated: [user.full_name] ([user.username])` |
+| `user_delete` | `User deleted: [user.full_name] ([user.username])` |
+| `user_login` | `User logged in: [user.full_name] ([user.username])` |
+| `user_password` | `User password was changed: [user.full_name] ([user.username])` |
+| `role_create` | `Role created: [description] ([role.id])` |
+| `role_update` | `Role updated: [description] ([role.id])` |
+| `role_delete` | `Role deleted: [description] ([role.id])` |
+| `server_add` | `Server connected to the network: [hostname]` |
+| `server_remove` | `Server disconnected from the network: [hostname]` |
+| `server_delete` | `Server deleted: [hostname]` |
+| `server_update` | `Server information was updated: [hostname]` |
+| `server_watch` | `A watch for [duration] was set on the server: [hostname]` |
+| `master_primary` | `Master server is now primary: [host]` |
+| `peer_add` | `Master server added to the network: [host]` |
+| `peer_disconnect` | `Master serfer disconnected from the network: [host]` |
+| `peer_command` | `Control command [commands] sent to master server: [host]` |
+| `state_update` | `Internal state updated: [description]` |
+| `internal_job` | `Internal job completed: [job.title]` |
+
+## Activity.description
+
+A short "description" of the action, which is typically a specific item ID.
+
+## Activity.epoch
+
+The date/time when the activity took place, represented in Unix seconds.
+
+## Activity.headers
+
+If the activity was initiated by a HTTP request, this contains the incoming request headers (sans cookies).
+
+## Activity.ip
+
+If the activity was initiated by a HTTP request, this contains the primary IP address of the client.
+
+## Activity.ips
+
+If the activity was initiated by a HTTP request, this contains all of the IP addresses (including proxies).
+
+## Activity.keywords
+
+An array of keywords used to search for the activity in the UI.
+
+## Activity.username
+
+If the activity was initiated by a user, this contains the username (or API Key ID).
+
 # AlertInvocation
 
 An alert invocation is a specific instance of an alert being triggered. It contains information about the alert, the server it applies to, and the context in which it was triggered.  Here is an example alert invocation in JSON format:
