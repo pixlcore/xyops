@@ -89,6 +89,9 @@ Delete jobs and their associated files or logs (where applicable).
 ### tag_jobs
 Add or update tags on completed jobs.
 
+### comment_jobs
+Add, edit, or delete comments on completed jobs.
+
 ## Monitors
 
 ### create_monitors
@@ -110,6 +113,17 @@ Edit existing plugin definitions and their configuration.
 
 ### delete_plugins
 Delete plugins from the system.
+
+## Roles
+
+### create_roles
+Create new roles that bundle sets of privileges.
+
+### edit_roles
+Edit existing roles, including titles and assigned privileges.
+
+### delete_roles
+Delete roles from the system.
 
 ## Tags
 
@@ -144,3 +158,7 @@ Edit existing web hooks and their request details.
 ### delete_web_hooks
 Delete web hooks from the system.
 
+## Servers
+
+### create_snapshots
+Create on-demand server snapshots and set/cancel watches that take periodic snapshots.
