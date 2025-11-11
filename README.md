@@ -1,96 +1,96 @@
 # Overview
 
-SCREENSHOT
+![xyOps Screenshot](https://pixlcore.com/images/blog/xyops/workflow-edit.webp)
 
-xyOps is a flexible job scheduler and server monitoring system, featuring workflows with a graphical editor, custom monitors and alerts, and Plugins which you can write in any language.  This is your complete job scheduling and monitoring solution.  Nothing else is needed.
+xyOps™ is a next-generation system for job scheduling, workflow automation, server monitoring, alerting, and incident response -- all combined into a single, cohesive platform. It's built for developers and operations teams who want to control their automation stack without surrendering data, freedom, or visibility. xyOps doesn't hide features behind paywalls or push telemetry back to anyone. It's open, extensible, and designed to run anywhere.
 
-# Features
+## The Idea Behind xyOps
 
-# Screenshots
+Most automation platforms focus on workflow orchestration -- they run tasks, but they don't really help you see what's happening behind them. xyOps takes it further. It doesn't just schedule jobs; it connects them to real-time monitoring, alerts, server snapshots, and ticketing, creating a single, integrated feedback loop. When an alert fires, the email includes the running jobs on that server. One click opens a snapshot showing every process, CPU load, and network connection. If a job fails, xyOps can open a ticket with full context -- logs, history, and linked metrics. Everything in xyOps talks to everything else, so you can trace an issue from detection to resolution without ever leaving the system.
+
+## Features at a Glance
+
+- **Why xyOps?**
+  - Schedule jobs across your fleet, track performance, set alerts, and view everything live, all in one place.
+- **Job Scheduling Reimagined**
+  - xyOps brings superpowers to job scheduling, way beyond cron.
+- **Build Workflows Visually**
+  - Use the graphical workflow editor to connect events, triggers, actions, and monitors into meaningful pipelines.
+- **Monitor Everything**
+  - Define exactly what you want to monitor, and get notified the moment things go wrong.
+- **Smart Alerts**
+  - Rich alerting with full customization and complex triggers.
+- **Built for Fleets**
+  - Whether you have five servers or five thousand, xyOps adapts to your needs.
+- **Developer-Friendly**
+  - Designed with you in mind. Yes, **you**!
+- **Simple Setup**
+  - From download to deployment in minutes.
+- **Licensing**
+  - xyOps is BSD-licensed for maximum flexibility.
 
 # Installation
 
-- For production, we highly recommend our managed [xyOps Cloud](https://xyops.io/cloud) service.
-- For enterprise, including on-prem air-gapped installs, sign up for an [Enterprise License](https://xyops.io/enterprise).
-- For development, testing and home labs, check out our [Self-Hosting Guide](self-hosting.md).
+- For production, we highly recommend our managed **[xyOps Cloud](https://xyops.io/cloud)** service.
+- For enterprise, including on-prem air-gapped installs, sign up for an **[Enterprise License](https://xyops.io/enterprise)**.
+- For development, testing and home labs, check out our **[Self-Hosting Guide](docs/self-hosting.md)**.
+
+Just want to test out xyOps locally really quick?  One-liner Docker command:
+
+```sh
+docker run --init -v xy-data:/opt/xyops/data -p 5522:5522 -p 5523:5523 --name "xyops01" --hostname "xyops01" -e XYOPS_secret_key="MY_SECRET_KEY" -e TZ="America/Los_Angeles" ghcr.io/pixlcore/xyops:latest
+```
+
+Then open http://localhost:5522 in your browser, and use username `admin` and password `admin`.
+
+# Documentation
+
+Check out our docs here: **[xyOps Documentation Index](docs/index.md)**
+
+Full documentation is also provided inside the xyOps app.  Just click the "Documentation" link in the sidebar.
+
+# Contributing
+
+Please read our **[Contributing Guide](CONTRIBUTING.md)** before opening a pull request.
+
+TL;DR; we do not accept feature PRs, but there are **lots** of other ways you can contribute!  See the guide for details.
+
+# Development
+
+See our **[Development Guide](docs/development.md)** for local dev setup.  In short, install [Node.js LTS](https://nodejs.org/en/download) and then:
+
+```sh
+git clone https://github.com/pixlcore/xyops.git
+cd xyops
+npm install
+node bin/build.js dev
+bin/debug.sh
+```
+
+# Security
+
+Read our **[Security Guide](docs/security.md)** to learn how to report security vulnerabilities to the xyOps team.
+
+Please do **not** submit vulnerabilities as GitHub issues!
+
+# Governance
+
+The xyOps project exists to empower users and developers through openness, reliability, and fairness.
+
+Our **[Governance Model](docs/governance.md)** is designed to preserve these principles indefinitely.
+
+# Longevity
+
+Please read our open source **[Longevity Pledge](LONGEVITY.md)**.  The TL;DR; is:
+
+xyOps will always be open-licensed, and always OSI-approved. No rug pulls.
 
 # License
 
-xyOps is MIT licensed.
+xyOps™ is licensed under the **BSD-3-Clause** license, and it always will be.
 
+See [LICENSE.md](LICENSE.md) for full license text.
 
+# Legal
 
-# xyOps: Coming Soon!
-
-- Tagline: All your servers in harmony.  OR: Your symphony of servers in perfect harmony.
-- Tagline: A job scheduler from the future.
-- Tagline: Schedule jobs across your server fleet, and monitor them with ease.
-
-xyOps is a flexible job scheduler and server monitoring system, featuring workflows with a graphical editor, custom monitors and alerts, web hooks, and Plugins which you can write in any language.  This is your complete job scheduling and monitoring solution.  Nothing else is needed.
-
-- Custom scheduler system with multiple schedules per event, and advanced features.
-	- Import from crontab
-	- Start and end date.
-	- Schedule blackout date ranges.
-	- Write your own Scheduler Plugins!
-	- Continuous mode for forever jobs.
-	- Single-shot to run a job once at a specific date/time.
-
-- Assign custom actions to triggers such as web hooks or user notifications.
-- Attach limiters on events to restrict things like maximum time, log size, or CPU / memory.
-
-- Create custom workflows chaining many events together using a graphical editor.
-- Define custom monitors that can measure anything on your servers, and custom alerts that trigger on them.
-
-- One-click easy install for satellite agent on macOS, Linux and Windows.  Even Raspberry Pi!
-- Add your entire fleet of servers with ease.
-- Add to your cloud infrastructure so new servers automatically connect.
-
-- Import and export data right from the UI.
-
-- Custom output, reports, charts and graphs for your jobs.
-- Track custom performance metrics which are rendered into beautiful charts.
-
-- Customize the look of your servers (label + icon)
-- One-click copy & paste easy add new server (show screenshot of this dialog)
-
-- Single or multi-server setup.
-- Automated failover to backup servers.
-- Auto-discovery of nearby servers.
-- Real-time job status with live log viewer.
-- Plugins can be written in any language.
-- Schedule events in multiple timezones.
-- Optionally queue up long-running events.
-- Track CPU and memory usage for each job.
-- Historical stats with performance graphs.
-- Simple JSON messaging system for Plugins.
-- Web hooks for external notification systems.
-- Simple REST API for scheduling and running events.
-- API Keys for authenticating remote apps.
-
-- Easy to install, configure and run
-- Monitor any number of servers
-- New servers are added to the system automatically
-- Assign servers to groups manually or automatically
-- Supports ephemeral servers (serverless, autoscale, etc.)
-- Metrics are collected every minute
-- Multiple graph scales: hourly, daily, monthly, yearly
-- Real-time views with auto-refreshing graphs
-- View graphs for individual servers or entire groups
-- Add custom commands for graphing your own metrics
-- Alerts with custom trigger expressions
-- Alert e-mails and web hooks for notification
-- Alert snooze feature to silence notifications
-- Snapshot feature provides extra server details
-- One click snapshot-to-URL-to-clipboard for graphs
-- Graph data can be kept indefinitely or auto-expired
-- Light and dark themes for the UI
-
-- Free tier you can host yourself.
-	- BSD 3-Clause License
-- Professional tier with full cloud hosting and support (24h).
-	- $100 / month, or $1,000 / year.
-- Enterprise tier with on-prem hosting, SSO, a dedicated account manager, and priority support (1h).
-	- $1,000 / month, or $10,000 / year.
-
-
+"PixlCore", "xyOps", and "xySat" are all trademarks of PixlCore LLC.  You may fork and modify this software under the terms in the BSD-3-Clause license, but you may not use the names "PixlCore", "xyOps", or "xySat" to refer to your fork without written permission. You must use a distinct name and logo to distinguish your version from the original.
