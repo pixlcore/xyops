@@ -4577,40 +4577,494 @@ Administrative APIs provide system-wide maintenance and export/import utilities 
 
 ### get_servers
 
+```
+GET /api/app/get_servers/v1
+```
+
+Fetch a live snapshot of all connected worker servers and master/peer servers. Admin only.
+
+No input parameters.
+
+In addition to the [Standard Response Format](#standard-response-format), this returns:
+
+- `servers`: Object keyed by server ID containing [Server](data-structures.md#server) objects for all currently connected workers.
+- `masters`: Object keyed by master/peer host ID with [Master](data-structures.md#master) objects for master status, version and basic stats.
+
+Example response:
+
+```json
+{
+  "code": 0,
+  "servers": {
+    "sorbstack01": { "id": "sorbstack01", "hostname": "centos-9-arm", "groups": ["main"], "enabled": true, "modified": 1754872218, "info": { /* see Server */ } }
+  },
+  "masters": {
+    "master-a": { "id": "master-a", "online": true, "master": true, "date": 1754800000, "version": "0.0.0", "ping": 0, "stats": { /* mem, load */ } }
+  }
+}
+```
+
 ### get_master_state
+
+```
+GET /api/app/get_master_state/v1
+```
+
+Fetch the in-memory master [State](data-structures.md#state) object. This includes runtime flags (e.g., scheduler enabled), watches, and other internal state used by the master. Admin session or API Key is required.
+
+No input parameters.
+
+In addition to the [Standard Response Format](#standard-response-format), this returns a `state` object containing current master state. The contents are primarily internal and subject to change between releases.
+
+Example response:
+
+```json
+{
+  "code": 0,
+  "state": {
+    "scheduler": { "enabled": true },
+    "watches": { /* server/group watch timers */ }
+  }
+}
+```
+
+See [State](data-structures.md#state) for more details.
 
 ### update_master_state
 
+```
+POST /api/app/update_master_state/v1
+```
+
+Update one or more master state values using “dot” property paths in the [State](data-structures.md#state) object. Admin only. Useful for toggling system features without a restart (e.g., pausing the scheduler).
+
+Parameters:
+
+| Property Name | Type | Description |
+|---------------|------|-------------|
+| (Other) | Various | One or more dot-path properties to update in the master state (e.g., `"scheduler.enabled": false`). |
+
+Example request:
+
+```json
+{ "scheduler.enabled": false }
+```
+
+Example response:
+
+```json
+{ "code": 0 }
+```
+
+All updates are audited in the activity log as `state_update` transactions.
+
 ### test_internal_job
+
+```
+POST /api/app/test_internal_job/v1
+```
+
+Create a dummy internal job that runs for ~60 seconds and reports progress. Admin only. This is intended to test the Internal System Jobs UI and notification mechanisms.
+
+No input parameters.
+
+Example response:
+
+```json
+{ "code": 0 }
+```
+
+The test job appears in the Internal Jobs panel and completes automatically.
 
 ### bulk_search_delete_jobs
 
+```
+POST /api/app/bulk_search_delete_jobs/v1
+```
+
+Start a background job to delete completed jobs in bulk by search query. Requires the [delete_jobs](privileges.md#delete_jobs) privilege.
+
+Parameters:
+
+| Property Name | Type | Description |
+|---------------|------|-------------|
+| `query` | String | Optional. [Unbase-style query](https://github.com/jhuckaby/pixl-server-storage/blob/master/docs/Indexer.md#simple-queries). Defaults to `*` (all jobs). |
+
+Example request:
+
+```json
+{ "query": "category:ops code:0" }
+```
+
+Example response:
+
+```json
+{ "code": 0 }
+```
+
+Deletion runs in the background. Progress and results are visible in Internal Jobs and the activity log.
+
 ### bulk_search_delete
+
+```
+POST /api/app/bulk_search_delete/v1
+```
+
+Start a background job to delete records in an arbitrary index by search query. Admin only.
+
+Parameters:
+
+| Property Name | Type | Description |
+|---------------|------|-------------|
+| `index` | String | **(Required)** Target database index ID (e.g., `jobs`, `servers`, `snapshots`, `alerts`, `activity`). |
+| `query` | String | **(Required)** [Unbase-style query](https://github.com/jhuckaby/pixl-server-storage/blob/master/docs/Indexer.md#simple-queries). |
+
+Example request:
+
+```json
+{ "index": "jobs", "query": "category:ops code:0" }
+```
+
+Example response:
+
+```json
+{ "code": 0, "id": "ijob12345" }
+```
+
+In addition to the [Standard Response Format](#standard-response-format), this includes `id` with the internal job ID tracking the background deletion.
 
 ### admin_run_maintenance
 
+```
+POST /api/app/admin_run_maintenance/v1
+```
+
+Run nightly maintenance immediately (state cleanup, trimming timelines and DBs, and storage maintenance). Admin only.
+
+No input parameters. Returns immediately while maintenance continues in the background as an internal job.
+
+Example response:
+
+```json
+{ "code": 0 }
+```
+
 ### admin_run_optimization
+
+```
+POST /api/app/admin_run_optimization/v1
+```
+
+Run a SQLite database integrity check and compaction (VACUUM). Admin only. Only applicable if SQLite is being used in the storage backend.  If the current storage engine is not SQLite or no database file is present, this returns an error.
+
+No input parameters. On success, optimization runs as an internal job and a detailed report is generated.
+
+Example response:
+
+```json
+{ "code": 0 }
+```
 
 ### admin_reset_daily_stats
 
+```
+POST /api/app/admin_reset_daily_stats/v1
+```
+
+Reset daily statistics counters (dashboard day graphs). Admin only. This also pushes the current stats snapshot into historical storage and broadcasts refreshed stats to connected users.
+
+No input parameters.
+
+Example response:
+
+```json
+{ "code": 0 }
+```
+
 ### get_transfer_token
+
+```
+POST /api/app/get_transfer_token/v1
+```
+
+Generate a single-use, short-lived token (60 seconds) that authorizes a subsequent data transfer call (e.g., [admin_export_data](#admin_export_data)). Admin only.
+
+Parameters: Same payload you would pass to [admin_export_data](#admin_export_data) (e.g., `lists`, `indexes`, `extras`, or `items`). The token binds to your session and the provided parameters.
+
+Example response:
+
+```json
+{ "code": 0, "token": "tme4wxyz9ab" }
+```
+
+In addition to the [Standard Response Format](#standard-response-format), this returns a `token` string to include in a follow-up GET.
 
 ### admin_stats
 
+```
+GET /api/app/admin_stats/v1
+```
+
+Return extended system statistics for the System Status page. Admin only.
+
+No input parameters.
+
+In addition to the [Standard Response Format](#standard-response-format), this returns a `stats` object including:
+
+- `version`: xyOps version.
+- `node.version`: Node.js version.
+- `db.sqlite`: Total on-disk bytes for SQLite DB + WAL (if present).
+- `db.records`: Map of index ID → row count (e.g., `jobs`, `servers`, `snapshots`, `alerts`, `activity`).
+- `unbase`: Low-level indexer statistics.
+- `cache`: Storage cache stats (if enabled).
+- `sockets`: Connected user and server sockets with metadata (ID, IP, type, username, server, ping).
+
+Example response:
+
+```json
+{ "code": 0, "stats": { "version": "0.0.0", "db": { "sqlite": 123456, "records": { "jobs": 287 } } } }
+```
+
 ### admin_import_data
+
+```
+POST /api/app/admin_import_data/v1
+```
+
+Bulk import data from a local archive file. Send as `multipart/form-data` with a single file field. Admin only. The file may be plain text or gzip-compressed. The import runs as an internal job; the API responds early with the job ID.
+
+Parameters (multipart/form-data fields):
+
+| Property Name | Type | Description |
+|---------------|------|-------------|
+| `file` | File | **(Required)** NDJSON file to import (may be `.gz`). The field name may be arbitrary; only one file should be included. |
+| `format` | String | Optional. `xyops` (default) or `cronicle`. When `cronicle`, the server will convert known structures before importing. |
+
+NDJSON line formats supported:
+
+- `{ "index": INDEX, "id": ID, "record": { ... } }` to upsert a DB record.
+- `{ "key": KEY, "value": VALUE }` to write a storage key (binary values are base64-encoded).
+- `{ "cmd": CMD, "args": [ ... ] }` to execute a storage command (e.g., `listDelete`).
+
+Example response:
+
+```json
+{ "code": 0, "id": "ijobabc123" }
+```
+
+Notes:
+
+- The scheduler is automatically paused for the import, all queued jobs are flushed, and running jobs are aborted prior to import for data integrity.
+- A detailed report is attached to the internal job and emailed to the user who issued the request.
+- After import, global lists are reloaded, monitors/alerts are recompiled, and the UI is refreshed for connected users.
 
 ### admin_export_data
 
+```
+GET /api/app/admin_export_data/v1
+```
+
+Stream a gzip-compressed NDJSON archive of selected data to the client. Admin only. For browser downloads, first call [get_transfer_token](#get_transfer_token) and then include `?token=...` on this GET to authorize and apply the parameters pre-bound to the token.
+
+Parameters (choose either the high-level selectors or a custom `items` array):
+
+| Property Name | Type | Description |
+|---------------|------|-------------|
+| `lists` | Array<String> or String | List IDs from `config.ui.list_list` or the literal string `"all"`. Each exports the corresponding `global/NAME` list and pages. |
+| `indexes` | Array<String> or String | Database index IDs from `config.ui.database_list` or `"all"`. Exports matching DB records (newest to oldest). |
+| `extras` | Array<String> or String | Optional extras or `"all"`. Supported: `user_avatars`, `job_files`, `job_logs`, `monitor_data`, `stat_data`. |
+| `items` | Array<Object> | Advanced mode. Array of export items such as `{ type: "list", key }`, `{ type: "index", index, query?, max_rows? }`, `{ type: "users", avatars? }`, `{ type: "jobFiles", query?, max_rows?, max_size?, logs?, files? }`, `{ type: "monitorData", query? }`, `{ type: "bucketData" }`, `{ type: "bucketFiles", max_size? }`, `{ type: "secretData" }`. |
+| `token` | String | Single-use token from [get_transfer_token](#get_transfer_token). When present, parameters from the token are applied and the token is invalidated. |
+
+Response: A `200 OK` streaming gzip file. The content is NDJSON containing a mix of:
+
+- `{ "index": INDEX, "id": ID, "record": { ... } }` for DB records.
+- `{ "key": KEY, "value": VALUE }` for storage keys or files (binary values are base64-encoded).
+
+Notes:
+
+- Job logs/files are exported only if under 1 MB each.
+- Bucket files are exported as base64 with a manifest of file metadata.
+- Secret data is exported as encrypted values (as stored).
+
 ### admin_delete_data
+
+```
+POST /api/app/admin_delete_data/v1
+```
+
+Permanently delete selected data in bulk. Admin only. Runs as an internal job and compiles a report with counts and any errors/warnings.
+
+Parameters:
+
+| Property Name | Type | Description |
+|---------------|------|-------------|
+| `items` | Array<Object> | **(Required)** Array of delete actions. Supported types: `{ type: "list", key }`, `{ type: "index", index, query? }`, `{ type: "users" }`, `{ type: "bucketData" }`, `{ type: "bucketFiles" }`, `{ type: "secretData" }`. |
+
+Example request:
+
+```json
+{ "items": [ { "type": "users" }, { "type": "list", "key": "global/stats" }, { "type": "index", "index": "jobs" } ] }
+```
+
+Example response:
+
+```json
+{ "code": 0 }
+```
+
+Notes:
+
+- Consider stopping or pausing jobs before deletion. The scheduler is not automatically paused for deletions.
+- Some types perform deep cleanup first (e.g., `users` removes avatars and security logs; bucket delete types remove data and files before the `global/buckets` list is altered).
 
 ### admin_logout_all
 
-### get_api_keys 
+```
+POST /api/app/admin_logout_all/v1
+```
+
+Log out all active sessions for a specific user and deauthorize any connected sockets. Admin only. Executes as an internal job; returns immediately.
+
+Parameters:
+
+| Property Name | Type | Description |
+|---------------|------|-------------|
+| `username` | String | **(Required)** Username to log out. |
+
+Example request:
+
+```json
+{ "username": "jdoe" }
+```
+
+Example response:
+
+```json
+{ "code": 0 }
+```
+
+### get_api_keys
+
+```
+GET /api/app/get_api_keys/v1
+```
+
+Fetch all API Keys. Admin only. No input parameters.
+
+In addition to the [Standard Response Format](#standard-response-format), this includes a `rows` array of [APIKey](data-structures.md#apikey) objects and a `list` object with list metadata.
+
+Example response:
+
+```json
+{ "code": 0, "rows": [ { "id": "k1", "title": "My App", "key": "rPEu2GRpK3TPgVnmSFVPFTT9", "active": 1 } ], "list": { "length": 1 } }
+```
 
 ### get_api_key
 
+```
+GET /api/app/get_api_key/v1
+```
+
+Fetch a single API Key by ID. Admin only. Supports HTTP GET with query parameters or HTTP POST with JSON.
+
+Parameters:
+
+| Property Name | Type | Description |
+|---------------|------|-------------|
+| `id` | String | **(Required)** API Key ID to fetch. |
+
+Example response:
+
+```json
+{ "code": 0, "api_key": { "id": "k1", "title": "My App", "key": "rPEu2GRpK3TPgVnmSFVPFTT9", "active": 1 } }
+```
+
+In addition to the [Standard Response Format](#standard-response-format), this includes an `api_key` object. See [APIKey](data-structures.md#apikey) for field details.
+
 ### create_api_key
+
+```
+POST /api/app/create_api_key/v1
+```
+
+Create a new API Key. Admin only. Send as HTTP POST with JSON. The `id`, `username`, `created`, `modified`, and `revision` fields are auto-generated by the server.
+
+Parameters:
+
+| Property Name | Type | Description |
+|---------------|------|-------------|
+| `title` | String | **(Required)** Visual title for the API Key. |
+| `key` | String | **(Required)** API Key string (minimum 16 characters). |
+| (Other) | Various | Optional [APIKey](data-structures.md#apikey) fields such as `active`, `description`, `privileges`, `roles`. |
+
+Example request:
+
+```json
+{
+  "title": "Build Bot",
+  "key": "muJm8T6QSzqQzuO6MvbOdtlB",
+  "active": 1,
+  "privileges": { "run_jobs": 1, "admin": 1 },
+  "roles": []
+}
+```
+
+Example response:
+
+```json
+{ "code": 0, "api_key": { /* full APIKey object including auto fields */ } }
+```
 
 ### update_api_key
 
+```
+POST /api/app/update_api_key/v1
+```
+
+Update an existing API Key by ID. Admin only. Send as HTTP POST with JSON. The request is shallow-merged into the existing key; `modified` and `revision` are updated automatically. The actual `key` value cannot be changed via this endpoint.
+
+Parameters:
+
+| Property Name | Type | Description |
+|---------------|------|-------------|
+| `id` | String | **(Required)** API Key ID to update. |
+| (Other) | Various | Any updatable [APIKey](data-structures.md#apikey) fields except `key`. |
+
+Example request:
+
+```json
+{ "id": "k1", "title": "Build Bot (prod)", "active": 0 }
+```
+
+Example response:
+
+```json
+{ "code": 0 }
+```
+
 ### delete_api_key
+
+```
+POST /api/app/delete_api_key/v1
+```
+
+Delete an existing API Key by ID. Admin only. This action is permanent.
+
+Parameters:
+
+| Property Name | Type | Description |
+|---------------|------|-------------|
+| `id` | String | **(Required)** API Key ID to delete. |
+
+Example request:
+
+```json
+{ "id": "k1" }
+```
+
+Example response:
+
+```json
+{ "code": 0 }
+```
