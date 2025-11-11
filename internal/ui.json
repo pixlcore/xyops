@@ -40,6 +40,10 @@
 		{ "id": "edit_plugins", "title": "Edit Plugins", "icon": "power-plug-outline" },
 		{ "id": "delete_plugins", "title": "Delete Plugins", "icon": "power-plug-outline" },
 		
+		{ "id": "create_roles", "title": "Create Roles", "icon": "account-group" },
+		{ "id": "edit_roles", "title": "Edit Roles", "icon": "account-group" },
+		{ "id": "delete_roles", "title": "Delete Roles", "icon": "account-group" },
+		
 		{ "id": "create_tags", "title": "Create Tags", "icon": "tag-outline" },
 		{ "id": "edit_tags", "title": "Edit Tags", "icon": "tag-outline" },
 		{ "id": "delete_tags", "title": "Delete Tags", "icon": "tag-outline" },
@@ -50,7 +54,9 @@
 		
 		{ "id": "create_web_hooks", "title": "Create Web Hooks", "icon": "webhook" },
 		{ "id": "edit_web_hooks", "title": "Edit Web Hooks", "icon": "webhook" },
-		{ "id": "delete_web_hooks", "title": "Delete Web Hooks", "icon": "webhook" }
+		{ "id": "delete_web_hooks", "title": "Delete Web Hooks", "icon": "webhook" },
+		
+		{ "id": "create_snapshots", "title": "Create Snapshots", "icon": "monitor-screenshot" }
 	],
 	
 	"globalMemoryLists": ["groups", "plugins", "categories", "events", "channels", "web_hooks", "buckets", "secrets", "monitors", "alerts", "tags", "roles"],
