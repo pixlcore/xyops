@@ -341,7 +341,7 @@ An optional icon ID for the channel, displayed in the UI.  Icons are sourced fro
 
 ## Channel.users
 
-An array of usernames who are subscribed to the channel, and will receive email and UI notifications for channel events.
+An array of [User.username](#user-username)s who are subscribed to the channel, and will receive email and UI notifications for channel events.
 
 ## Channel.email
 
