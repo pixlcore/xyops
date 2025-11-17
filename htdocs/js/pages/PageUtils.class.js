@@ -406,7 +406,7 @@ Page.PageUtils = class PageUtils extends Page.Base {
 		var buttons_html = "";
 		buttons_html += '<div class="button mobile_collapse" onClick="Dialog.hide()"><i class="mdi mdi-close-circle-outline">&nbsp;</i><span>Cancel</span></div>';
 		buttons_html += '<div class="button mobile_collapse" onClick="$P().copyExportToClipboard()"><i class="mdi mdi-clipboard-text-outline">&nbsp;</i><span>Copy to Clipboard</span></div>';
-		buttons_html += '<div class="button secondary mobile_collapse" onClick="$P().copyExportToAPITool()"><i class="mdi mdi-send">&nbsp;</i><span>Copy to API Tool...</span></div>';
+		// buttons_html += '<div class="button secondary mobile_collapse" onClick="$P().copyExportToAPITool()"><i class="mdi mdi-send">&nbsp;</i><span>Copy to API Tool...</span></div>';
 		buttons_html += '<div class="button primary" onClick="Dialog.confirm_click(true)"><i class="mdi mdi-cloud-download-outline">&nbsp;</i>Download File</div>';
 		
 		Dialog.showSimpleDialog(title, html, buttons_html);
@@ -2198,7 +2198,7 @@ Page.PageUtils = class PageUtils extends Page.Base {
 	
 	changePluginParamTool(plugin_id, param_id, explore = false) {
 		// change tool in toolset, redraw fields
-		var elem_id = 'fe_pp_' + plugin_id + '_' + param_id;
+		var elem_id = 'fe_pp_' + plugin_id + '_' + CSS.escape(param_id);
 		var elem_value = $('#' + elem_id).val();
 		
 		var plugin = find_object( app.plugins, { id: plugin_id } );
@@ -2213,7 +2213,7 @@ Page.PageUtils = class PageUtils extends Page.Base {
 		var tool = find_object( tools, { id: elem_value } );
 		if (!tool) return; // sanity
 		
-		var $fieldset = $(`#fs_toolset_${plugin_id}_${param_id}`);
+		var $fieldset = $(`#fs_toolset_${plugin_id}_${CSS.escape(param_id)}`);
 		var html = '';
 		
 		html += `<legend>${strip_html(tool.title)}</legend>`;
@@ -2225,7 +2225,7 @@ Page.PageUtils = class PageUtils extends Page.Base {
 	
 	viewPluginParamCode(plugin_id, param_id) {
 		// show plugin param code (no editing)
-		var elem_id = 'fe_pp_' + plugin_id + '_' + param_id;
+		var elem_id = 'fe_pp_' + plugin_id + '_' + CSS.escape(param_id);
 		var elem_value = $('#' + elem_id).val();
 		
 		var plugin = find_object( app.plugins, { id: plugin_id } );
@@ -2240,7 +2240,7 @@ Page.PageUtils = class PageUtils extends Page.Base {
 	editPluginParamCode(plugin_id, param_id) {
 		// open editor for code plugin param
 		var self = this;
-		var elem_id = 'fe_pp_' + plugin_id + '_' + param_id;
+		var elem_id = 'fe_pp_' + plugin_id + '_' + CSS.escape(param_id);
 		var elem_value = $('#' + elem_id).val();
 		
 		var plugin = find_object( app.plugins, { id: plugin_id } );
@@ -2270,11 +2270,11 @@ Page.PageUtils = class PageUtils extends Page.Base {
 				break;
 				
 				case 'checkbox':
-					params[ param.id ] = !!$('#fe_pp_' + plugin_id + '_' + param.id).is(':checked');
+					params[ param.id ] = !!$('#fe_pp_' + plugin_id + '_' + CSS.escape(param.id)).is(':checked');
 				break;
 				
 				case 'toolset':
-					var tool_id = params[ param.id ] = $('#fe_pp_' + plugin_id + '_' + param.id).val();
+					var tool_id = params[ param.id ] = $('#fe_pp_' + plugin_id + '_' + CSS.escape(param.id)).val();
 					
 					if (!param.data || !param.data.tools) return; // sanity
 					var tool = find_object( param.data.tools, { id: tool_id } );
@@ -2287,13 +2287,13 @@ Page.PageUtils = class PageUtils extends Page.Base {
 				break;
 				
 				default:
-					params[ param.id ] = $('#fe_pp_' + plugin_id + '_' + param.id).val();
+					params[ param.id ] = $('#fe_pp_' + plugin_id + '_' + CSS.escape(param.id)).val();
 					if (param.required && !params[ param.id ].length && !force) {
-						app.badField('#fe_pp_' + plugin_id + '_' + param.id, "The &ldquo;" + param.title + "&rdquo; field is required.");
+						app.badField('#fe_pp_' + plugin_id + '_' + CSS.escape(param.id), "The &ldquo;" + param.title + "&rdquo; field is required.");
 						is_valid = false;
 					}
-					else if (!force && param.variant && !param.variant.match(/^(password|text|tel)$/) && !$('#fe_pp_' + plugin_id + '_' + param.id)[0].validity.valid) {
-						app.badField('#fe_pp_' + plugin_id + '_' + param.id, "The &ldquo;" + param.title + "&rdquo; field is invalid.");
+					else if (!force && param.variant && !param.variant.match(/^(password|text|tel)$/) && !$('#fe_pp_' + plugin_id + '_' + CSS.escape(param.id))[0].validity.valid) {
+						app.badField('#fe_pp_' + plugin_id + '_' + CSS.escape(param.id), "The &ldquo;" + param.title + "&rdquo; field is invalid.");
 						is_valid = false;
 					}
 				break;
@@ -4039,8 +4039,11 @@ Page.PageUtils = class PageUtils extends Page.Base {
 			var old_param = param;
 			param = {};
 			
-			param.id = $('#fe_epa_id').val().trim().replace(/\W+/g, '').toLowerCase();
+			param.id = $('#fe_epa_id').val().trim();
 			if (!param.id.length) return app.badField('#fe_epa_id', "The ID field is required.");
+			if (!param.id.match(/^[\w\-\.]+$/)) return app.badField('#fe_epa_id', `The ID field must contain only alphanumerics, underscore, dash and period.`);
+			if (!param.id.match(/^[A-Za-z_]/)) return app.badField('#fe_epa_id', `The ID field must begin with an alpha character or underscore.`);
+			if (param.id.match(app.MATCH_BAD_KEY)) return app.badField('#fe_epa_id', `The ID field is invalid (reserved word).`);
 			
 			// check for ID collisions!  must consider NEW and EDIT modes
 			if (idx == -1) {
@@ -4097,7 +4100,7 @@ Page.PageUtils = class PageUtils extends Page.Base {
 					if (!self.validateToolsetData(param)) return false;
 					
 					delete param.required;
-					delete param.value;
+					delete param.value; // TODO: remove locked for toolset?  don't think it makes sense
 				break;
 			} // switch action.type
 			
@@ -4164,6 +4167,7 @@ Page.PageUtils = class PageUtils extends Page.Base {
 			if (!tool.id) { err_msg = `Tool #${idx+1} is missing an ID.`; is_valid = false; return; }
 			if (typeof(tool.id) != 'string') { err_msg = `Tool #${idx+1} ID is not a string.`; is_valid = false; return; }
 			if (!tool.id.match(/^[\w\-\.]+$/)) { err_msg = `Tool #${idx+1} ID must contain only alphanumerics, underscore, dash and period.`; is_valid = false; return; }
+			if (!tool.id.match(/^[A-Za-z_]/)) { err_msg = `Tool #${idx+1} ID must begin with an alpha character or underscore.`; is_valid = false; return; }
 			if (tool.id.match(app.MATCH_BAD_KEY)) { err_msg = `Tool '${tool.id}' ID is invalid (reserved word).`; is_valid = false; return; }
 			
 			if (ids[tool.id]) { err_msg = `Tool ID '${tool.id}' is duplicated (each must be unique).`; is_valid = false; return; }
@@ -4332,7 +4336,7 @@ Page.PageUtils = class PageUtils extends Page.Base {
 	
 	viewParamCode(param_id) {
 		// show param code (no editing)
-		var elem_id = 'fe_uf_' + param_id;
+		var elem_id = 'fe_uf_' + CSS.escape(param_id);
 		var elem_value = $('#' + elem_id).val();
 		var title = $('#' + elem_id).data('title');
 		
@@ -4342,7 +4346,7 @@ Page.PageUtils = class PageUtils extends Page.Base {
 	editParamCode(param_id) {
 		// open editor for code plugin param
 		var self = this;
-		var elem_id = 'fe_uf_' + param_id;
+		var elem_id = 'fe_uf_' + CSS.escape(param_id);
 		var elem_value = $('#' + elem_id).val();
 		var title = $('#' + elem_id).data('title');
 		
@@ -4360,15 +4364,15 @@ Page.PageUtils = class PageUtils extends Page.Base {
 		
 		fields.forEach( function(param) {
 			if (param.type == 'hidden') params[ param.id ] = param.value;
-			else if (param.type == 'checkbox') params[ param.id ] = !!$('#fe_uf_' + param.id).is(':checked');
+			else if (param.type == 'checkbox') params[ param.id ] = !!$('#fe_uf_' + CSS.escape(param.id)).is(':checked');
 			else {
-				params[ param.id ] = $('#fe_uf_' + param.id).val();
+				params[ param.id ] = $('#fe_uf_' + CSS.escape(param.id)).val();
 				if (param.required && !params[ param.id ].length && validate) {
-					app.badField('#fe_uf_' + param.id, "The &ldquo;" + param.title + "&rdquo; field is required.");
+					app.badField('#fe_uf_' + CSS.escape(param.id), "The &ldquo;" + param.title + "&rdquo; field is required.");
 					is_valid = false;
 				}
 				else if (validate && param.variant && !param.variant.match(/^(password|text|tel)$/) && !$('#fe_uf_' + param.id)[0].validity.valid) {
-					app.badField('#fe_uf_' + param.id, "The &ldquo;" + param.title + "&rdquo; field is invalid.");
+					app.badField('#fe_uf_' + CSS.escape(param.id), "The &ldquo;" + param.title + "&rdquo; field is invalid.");
 					is_valid = false;
 				}
 			}
