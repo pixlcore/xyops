@@ -311,4 +311,4 @@ Example:
 - Multiple similar limits: If multiple sources define the same type, the event/workflow definition takes precedence for start‑time checks.
 - Queues and scope: Queues are per event. For ad‑hoc workflow node runs, the queue scope includes the node identifier to avoid cross‑contending unrelated nodes. Queues are used both when `job` concurrency is saturated and when no matching servers are currently available.
 
-See also: [Limit](data-structures.md#limit) and [Limit Types](data-structures.md#limit-types) for the canonical data structure definitions.
+See also: [Limit](data-structures.md#limit) and [Limit Types](data-structures.md#limit-type) for the canonical data structure definitions.
