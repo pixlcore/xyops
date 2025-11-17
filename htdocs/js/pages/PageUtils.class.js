@@ -4021,6 +4021,7 @@ Page.PageUtils = class PageUtils extends Page.Base {
 		
 		// admin lock
 		html += this.getFormRow({
+			id: 'd_epa_locked',
 			label: 'Security:',
 			content: this.getFormCheckbox({
 				id: 'fe_epa_locked',
@@ -4100,7 +4101,8 @@ Page.PageUtils = class PageUtils extends Page.Base {
 					if (!self.validateToolsetData(param)) return false;
 					
 					delete param.required;
-					delete param.value; // TODO: remove locked for toolset?  don't think it makes sense
+					delete param.value;
+					delete param.locked;
 				break;
 			} // switch action.type
 			
@@ -4125,6 +4127,7 @@ Page.PageUtils = class PageUtils extends Page.Base {
 			$('#d_epa_value_' + new_type).show();
 			$('#d_epa_required').toggle( !!new_type.match(/^(text|textarea|code)$/) );
 			$('#d_epa_text_variant').toggle( !!new_type.match(/^(text)$/) );
+			$('#d_epa_locked').toggle( !new_type.match(/^(toolset)$/) );
 			Dialog.autoResize();
 		}; // change_action_type
 		
