@@ -30,27 +30,27 @@ You can create and edit events in the Events page of the UI or via the API. The 
 
 Running an event produces a job. Here is the lifecycle from trigger to execution:
 
-1) **Trigger fires**
+1. **Trigger fires**
 	- The scheduler evaluates all event triggers once per minute (with optional second precision) and emits launches when conditions match.
 	- Manual runs from the UI/API also count as launches. 
-2) **Job object is created**
+2. **Job object is created**
 	- The job starts as a copy of the event plus trigger context and any user/API overrides. 
 	- It is assigned a unique `job.id`, and `job.event` is set to the event’s ID. 
 	- Category-defined actions/limits and system defaults are merged in. 
-3) **Parameters resolved**
+3. **Parameters resolved**
 	- `event.params` and any prompted `fields` are merged and can use `{{ macros }}` that resolve against the job context (including `input.data` and `input.files` if present).
-4) **Target selection**
+4. **Target selection**
 	- The system collects candidate servers from targets (servers and/or groups), filters to enabled, online servers, and optionally removes servers under active job-limiting alerts. 
 	- If no servers are available, a queue limit (if configured) may place the job in a queue; otherwise the job aborts and may be eligible for retry. 
 	- Details on server algorithms appear below.
-5) **Plugin execution**
+5. **Plugin execution**
 	- Once a server is chosen, the job is dispatched to that server’s xySat agent and the Event Plugin runs with the final parameters and environment. 
 	- Output streams into the job log; CPU/memory/IO metrics are sampled for limits and history. 
 	- See [Event Plugins](plugins.md#event-plugins) for plugin anatomy and execution details.
-6) **Limits and actions**
+6. **Limits and actions**
 	- Active limits (time, log size, CPU, memory, etc.) are continuously evaluated. 
 	- When exceeded, configured actions fire (email, web hooks, tags, snapshots, abort, etc.).
-7) **Completion**
+7. **Completion**
 	- On finish, final actions run (success/fail/progress/abort, plus any tag‑based actions), and the job record is stored in history for searching and analytics.
 
 ## Triggers
