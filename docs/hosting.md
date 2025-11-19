@@ -43,7 +43,7 @@ The xyOps main configuration file is located at `/opt/xyops/conf/config.json`.  
 -v /local/path/to/config.json:/opt/xyops/conf/config.json
 ```
 
-See the [Configuration Guide](configuration.md) for full details on how to customize this file.
+See the [Configuration Guide](config.md) for full details on how to customize this file.
 
 # Manual Install
 
@@ -101,14 +101,14 @@ For overriding configuration properties by environment variable, you can specify
 | `XYOPS_foreground` | `true` | Run xyOps in the foreground (no background daemon fork). |
 | `XYOPS_echo` | `true` | Echo the event log to the console (STDOUT), use in conjunction with `XYOPS_foreground`. |
 | `XYOPS_color` | `true` | Echo the event log with color-coded columns, use in conjunction with `XYOPS_echo`. |
-| `XYOPS_base_app_url` | `http://xyops.yourcompany.com` | Override the [base_app_url](configuration.md#base_app_url) configuration property. |
-| `XYOPS_email_from` | `xyops@yourcompany.com` | Override the [email_from](configuration.md#email_from) configuration property. |
-| `XYOPS_secret_key` | `CorrectHorseBatteryStaple` | Override the [secret_key](configuration.md#secret_key) configuration property. |
-| `XYOPS_WebServer__port` | `80` | Override the `port` property *inside* the [WebServer](configuration.md#webserver) object. |
-| `XYOPS_WebServer__https_port` | `443` | Override the `https_port` property *inside* the [WebServer](configuration.md#webserver) object. |
-| `XYOPS_Storage__Filesystem__base_dir` | `/data/xyops` | Override the `base_dir` property *inside* the [Filesystem](configuration.md#storage-filesystem) object *inside* the [Storage](configuration.md#storage) object. |
+| `XYOPS_base_app_url` | `http://xyops.yourcompany.com` | Override the [base_app_url](config.md#base_app_url) configuration property. |
+| `XYOPS_email_from` | `xyops@yourcompany.com` | Override the [email_from](config.md#email_from) configuration property. |
+| `XYOPS_secret_key` | `CorrectHorseBatteryStaple` | Override the [secret_key](config.md#secret_key) configuration property. |
+| `XYOPS_WebServer__port` | `80` | Override the `port` property *inside* the [WebServer](config.md#webserver) object. |
+| `XYOPS_WebServer__https_port` | `443` | Override the `https_port` property *inside* the [WebServer](config.md#webserver) object. |
+| `XYOPS_Storage__Filesystem__base_dir` | `/data/xyops` | Override the `base_dir` property *inside* the [Filesystem](config.md#storage-filesystem) object *inside* the [Storage](config.md#storage) object. |
 
-Almost every [configuration property](configuration.md) can be overridden using this environment variable syntax.  The only exceptions are things like arrays, e.g. [log_columns](configuration.md#log_columns).
+Almost every [configuration property](config.md) can be overridden using this environment variable syntax.  The only exceptions are things like arrays, e.g. [log_columns](config.md#log_columns).
 
 # Daily Backups
 
@@ -242,7 +242,7 @@ A few things to note here:
 - The timezone (`TZ`) should be set to your company's main timezone, so things like midnight log rotation and daily stat resets work as expected.
 - You will need to supply the configuration file: `config.json`.  See below.
 
-Grab our sample [config.json](https://github.com/pixlcore/xyops/blob/main/sample_conf/config.json) file to use as a starting point to create yours.  See the [xyOps Configuration Guide](configuration.md) for details on how to customize this file.
+Grab our sample [config.json](https://github.com/pixlcore/xyops/blob/main/sample_conf/config.json) file to use as a starting point to create yours.  See the [xyOps Configuration Guide](config.md) for details on how to customize this file.
 
 # Satellite
 
@@ -252,7 +252,7 @@ For instructions on how to install xySat, see [Adding Servers](servers.md#adding
 
 ## Configuration
 
-xySat is configured automatically via the xyOps master server.  The [satellite.config](configuration.md#satellite-config) object is automatically sent to each server after it connects and authenticates, so you can keep a master version of the xySat configuration which is auto-synced to all servers.  Here is the default config:
+xySat is configured automatically via the xyOps master server.  The [satellite.config](config.md#satellite-config) object is automatically sent to each server after it connects and authenticates, so you can keep a master version of the xySat configuration which is auto-synced to all servers.  Here is the default config:
 
 ```json
 { 
@@ -304,7 +304,7 @@ To do this, add a `host` property into the xySat config as a top-level JSON prop
 /opt/xyops/satellite/config.json
 ```
 
-Note that you should **not** add a `host` property into the [satellite.config](configuration.md#satellite-config) object on the master server, unless you want **all** of your servers to connect to the static host.
+Note that you should **not** add a `host` property into the [satellite.config](config.md#satellite-config) object on the master server, unless you want **all** of your servers to connect to the static host.
 
 When both `hosts` and `host` exist in the config file, `host` takes precedence.
 
@@ -312,7 +312,7 @@ When both `hosts` and `host` exist in the config file, `host` takes precedence.
 
 xyOps supports air-gapped installs, which prevent it from making unauthorized outbound connections beyond a specified IP range.  You can configure which IP ranges it is allowed to connect to, via whitelist and/or blacklist.  The usual setup is to allow local LAN requests so servers can communicate with each other in your infra.
 
-To configure air-gapped mode, use the [airgap](configuration.md#airgap) section in the main config file.  Example:
+To configure air-gapped mode, use the [airgap](config.md#airgap) section in the main config file.  Example:
 
 ```json
 "airgap": {

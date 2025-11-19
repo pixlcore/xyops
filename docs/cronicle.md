@@ -41,7 +41,7 @@ This is how xyOps differentiates its own API versus other random JSON that may b
 { "progress": 0.5 }
 ```
 
-If you have written existing Cronicle Plugins that you want to migrate to xyOps *without having to make any code changes*, you can enable a special compatibility mode.  Once turned on, it drops the `xy` property requirement, and also recognizes and converts several other Cronicle-specific Plugin APIs like `chain`, `chain_error`, `chain_data`, `notify_success` and `notify_fail`.  To enable compatibility mode, add a `cronicle` property set to `true` inside the [satellite.config](configuration.md#satellite-config) object.
+If you have written existing Cronicle Plugins that you want to migrate to xyOps *without having to make any code changes*, you can enable a special compatibility mode.  Once turned on, it drops the `xy` property requirement, and also recognizes and converts several other Cronicle-specific Plugin APIs like `chain`, `chain_error`, `chain_data`, `notify_success` and `notify_fail`.  To enable compatibility mode, add a `cronicle` property set to `true` inside the [satellite.config](config.md#satellite-config) object.
 
 You can also set it via environment variable if you like:
 
@@ -54,7 +54,7 @@ XYOPS_satellite__config__cronicle="true"
 
 ## White-Label UI
 
-If you want to white-label the xyOps UI so it resembles Cronicle, you can change both the app "name" (used in a variety of places) and the logo image shown in the top-left corner.  To do this, modify these two configuration properties: [client.name](configuration.md#client-name) and [client.logo_url](configuration.md#client-logo_url) with the following overridden values:
+If you want to white-label the xyOps UI so it resembles Cronicle, you can change both the app "name" (used in a variety of places) and the logo image shown in the top-left corner.  To do this, modify these two configuration properties: [client.name](config.md#client-name) and [client.logo_url](config.md#client-logo_url) with the following overridden values:
 
 ```json
 "name": "Cronicle",

@@ -3283,7 +3283,7 @@ When job actions are executed, including firing web hooks and sending emails, th
 | `display.perf` | String | A string representing the job performance metrics, if provided. |
 | `display.mem` | String | A human-readable string representing the average memory usage of the job, if available. |
 | `display.cpu` | String | A human-readable string representing the average CPU usage of the job, if available. |
-| `text` | String | A short summary of the action, using [hook_text_templates](configuration.md#hook_text_templates) as the template, and all macros expanded. |
+| `text` | String | A short summary of the action, using [hook_text_templates](config.md#hook_text_templates) as the template, and all macros expanded. |
 
 ## AlertHookData
 
@@ -3313,7 +3313,7 @@ When alerts fire and clear, the following data structure is used to expand macro
 | `links` | Object | An object containing URLs for use in the email body text or web hook text. |
 | `links.server_url` | String | A fully-qualified URL to the job details page (requires login). |
 | `links.alert_url` | String | A fully-qualified URL to the job details page (requires login). |
-| `text` | String | A short summary of the action, using [hook_text_templates](configuration.md#hook_text_templates) as the template, and all macros expanded. |
+| `text` | String | A short summary of the action, using [hook_text_templates](config.md#hook_text_templates) as the template, and all macros expanded. |
 
 ## QuickmonData
 
@@ -3333,7 +3333,7 @@ xyOps captures "quick" monitoring data every second on every server, in a few ke
 }
 ```
 
-The `date` is the sample time in Unix seconds.  The other properties correspond to the Quickmon monitor definitions in [quick_monitors](configuration.md#quick_monitors), and the values should all be raw numbers.
+The `date` is the sample time in Unix seconds.  The other properties correspond to the Quickmon monitor definitions in [quick_monitors](config.md#quick_monitors), and the values should all be raw numbers.
 
 ## ServerTimelineData
 

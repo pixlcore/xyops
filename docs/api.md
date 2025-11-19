@@ -1277,7 +1277,7 @@ Upload one or more files for the authenticated user. This is a general-purpose u
 
 Notes:
 
-- Files are stored under a user-specific path and automatically expire per server configuration (see [file_expiration](configuration.md#file_expiration)).
+- Files are stored under a user-specific path and automatically expire per server configuration (see [file_expiration](config.md#file_expiration)).
 - Field names are arbitrary; all files in the request are processed.
 
 In addition to the [Standard Response Format](#standard-response-format), this will include a `urls` array of absolute URLs for the uploaded files.
@@ -1386,7 +1386,7 @@ Upload one or more files intended as input to a job before it starts (e.g., from
 
 Notes:
 
-- Files automatically expire per [client.job_upload_settings.user_file_expiration](configuration.md#client-job_upload_settings) in server configuration.
+- Files automatically expire per [client.job_upload_settings.user_file_expiration](config.md#client-job_upload_settings) in server configuration.
 - The response provides metadata that can be supplied to `run_event` under `input.files`.
 
 In addition to the [Standard Response Format](#standard-response-format), this will include a `files` array with metadata for each uploaded file.
@@ -3993,7 +3993,7 @@ Parameters (JSON):
 | `job` | String | Required when `template` is `job`. The [Job.id](data.md#job-id) to use for the template content. |
 | `alert` | String | Required when `template` is `alert`. The [AlertInvocation.id](data.md#alertinvocation-id) to use for the template content. |
 
-When using `multipart/form-data`, attach one or more file fields (any field names). Files are saved and added to [Ticket.files](data.md#ticket-files) with metadata. Files auto-expire per [file_expiration](configuration.md#file_expiration) configuration setting.
+When using `multipart/form-data`, attach one or more file fields (any field names). Files are saved and added to [Ticket.files](data.md#ticket-files) with metadata. Files auto-expire per [file_expiration](config.md#file_expiration) configuration setting.
 
 Defaults: If not provided, the server sets `status` to `open`, `body` to an empty string, `due` to `0`, and initializes `changes` with an initial “created” entry.
 

@@ -289,7 +289,7 @@ Example:
 
 ## Universal Limits
 
-Set universal defaults in the server config under [job_universal_limits](configuration.md#job_universal_limits). You can define separate arrays for `default` (regular events) and `workflow` limits. These are appended after category and event limits, so event/workflow settings take precedence.
+Set universal defaults in the server config under [job_universal_limits](config.md#job_universal_limits). You can define separate arrays for `default` (regular events) and `workflow` limits. These are appended after category and event limits, so event/workflow settings take precedence.
 
 Example:
 

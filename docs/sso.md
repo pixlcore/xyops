@@ -190,7 +190,7 @@ These complications are why it's important to first follow the initial [Setup](#
 
 ## Default User Privileges
 
-When users are first created via SSO, a default set of privileges is applied.  This is configured in the main `/opt/xyops/conf/config.json` file in the [default_user_privileges](configuration.md#default_user_privileges) property.  The default set is:
+When users are first created via SSO, a default set of privileges is applied.  This is configured in the main `/opt/xyops/conf/config.json` file in the [default_user_privileges](config.md#default_user_privileges) property.  The default set is:
 
 ```json
 "default_user_privileges": {
@@ -336,9 +336,9 @@ A few things to note here:
 - You'll need to point a domain at the proxy, and add it to `OAUTH2_PROXY_WHITELIST_DOMAINS` (as well as your IdP domain).
 - Generate your TLS certificate files, and place them where Docker can find them (see `volumes:` above).
 
-For the xyOps container, it needs two configuration files.  Grab our sample [config.json](https://github.com/pixlcore/xyops/blob/main/sample_conf/config.json) and [sso.json](https://github.com/pixlcore/xyops/blob/main/sample_conf/sso.json) files to use as starting points to create yours.  See the [xyOps Configuration Guide](configuration.md) for details on how to customize these files.
+For the xyOps container, it needs two configuration files.  Grab our sample [config.json](https://github.com/pixlcore/xyops/blob/main/sample_conf/config.json) and [sso.json](https://github.com/pixlcore/xyops/blob/main/sample_conf/sso.json) files to use as starting points to create yours.  See the [xyOps Configuration Guide](config.md) for details on how to customize these files.
 
-At the very least, make sure you set the [base_app_url](configuration.md#base_app_url) property to the domain that routes to the proxy (which sits in front), with a `https://` prefix.  You should also set the `XYOPS_hostname` to the same hostname (without the protocol prefix).  This is what xyOps uses to advertise itself to the server cluster, and generate URLs for new servers to connect.
+At the very least, make sure you set the [base_app_url](config.md#base_app_url) property to the domain that routes to the proxy (which sits in front), with a `https://` prefix.  You should also set the `XYOPS_hostname` to the same hostname (without the protocol prefix).  This is what xyOps uses to advertise itself to the server cluster, and generate URLs for new servers to connect.
 
 In this case, since we are only running a single master server, we can route *everything* through the proxy, making things simpler.  You don't even need to expose any ports on the xyOps container.  Users hit the root `/` URI path and are authenticated via SSO, and API calls and server connections both hit the `/api` prefix, which is routed directly through to xyOps, and that uses its own authentication layer (API keys, tokens, etc.).
 
@@ -453,7 +453,7 @@ A few things to note here:
 - The timezone (`TZ`) should be set to your company's main timezone, so things like midnight log rotation and daily stat resets work as expected.
 - You will need to supply two configuration files, `config.json` and `sso.json`.  See below.
 
-Grab our sample [config.json](https://github.com/pixlcore/xyops/blob/main/sample_conf/config.json) and [sso.json](https://github.com/pixlcore/xyops/blob/main/sample_conf/sso.json) files to use as starting points to create yours.  See the [xyOps Configuration Guide](configuration.md) for details on how to customize these files.  Specifically though, let's talk about `sso.conf` for this configuration.  This file is largely discussed above (see [Configuration](#configuration) above), but the [Header Map](#header-map) in particular is going to be different for Nginx + OAuth2-Proxy: 
+Grab our sample [config.json](https://github.com/pixlcore/xyops/blob/main/sample_conf/config.json) and [sso.json](https://github.com/pixlcore/xyops/blob/main/sample_conf/sso.json) files to use as starting points to create yours.  See the [xyOps Configuration Guide](config.md) for details on how to customize these files.  Specifically though, let's talk about `sso.conf` for this configuration.  This file is largely discussed above (see [Configuration](#configuration) above), but the [Header Map](#header-map) in particular is going to be different for Nginx + OAuth2-Proxy: 
 
 ```json
 "header_map": {
@@ -479,7 +479,7 @@ OAUTH2_PROXY_REQUEST_LOGGING: "true"
 OAUTH2_PROXY_SHOW_DEBUG_ON_ERROR: "true"
 ```
 
-For debugging issues on the xyOps side, set the [debug_level](configuration.md#debug_level) configuration property to `9`, and also enable the global [debug](configuration.md#debug) flag.  These options can also be set by environment variables:
+For debugging issues on the xyOps side, set the [debug_level](config.md#debug_level) configuration property to `9`, and also enable the global [debug](config.md#debug) flag.  These options can also be set by environment variables:
 
 ```
 XYOPS_debug_level: 9
@@ -611,7 +611,7 @@ In a production environment, it is crucial to ensure the security and reliabilit
 4. **Whitelist Trusted IPs**: Use an IP whitelist to restrict where the trusted headers can come from (see below).
 5. **Secure-Only Cookies**: Remember to set `OAUTH2_PROXY_COOKIE_SECURE` to `true` for live production.
 6. **Restrict Email Domains**: Set `OAUTH2_PROXY_EMAIL_DOMAINS` to restrict your login email domain list.
-7. **xyOps Base App URL**: Remember to set the [base_app_url](configuration.md#base_app_url) configuration property for your live production setup.
+7. **xyOps Base App URL**: Remember to set the [base_app_url](config.md#base_app_url) configuration property for your live production setup.
 8. **Use Multiple Availability Zones**: For running multiple xyOps master servers, ideally put them in separate AZs.
 
 ## IP Whitelist

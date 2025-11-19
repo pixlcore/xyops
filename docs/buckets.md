@@ -29,7 +29,7 @@ Users with the appropriate privileges can create, edit and delete buckets from t
 - Delete files: Remove individual files from the list; deletions are permanent.
 - Download files: Click a file to download via a direct URL. Links use the `files/bucket/...` path.
 
-Filenames are normalized on upload (lowercased; non‑alphanumerics except dashes and periods become underscores). Uploads respect configured limits (max size/count/types) via `client.bucket_upload_settings` and server‑side enforcement. See [Configuration](configuration.md) for details.
+Filenames are normalized on upload (lowercased; non‑alphanumerics except dashes and periods become underscores). Uploads respect configured limits (max size/count/types) via `client.bucket_upload_settings` and server‑side enforcement. See [Configuration](config.md) for details.
 
 ### Required Privileges
 

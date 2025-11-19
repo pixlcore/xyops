@@ -111,7 +111,7 @@ To avoid thundering herd effects on masters, each server deterministically stagg
 ## Lifecycle and Health
 
 - **Online/offline**: A server is online while its xySat WebSocket is connected. If the socket drops, the server is immediately marked offline. The UI updates in real time.
-- **Running jobs**: Jobs are not aborted immediately when a server goes offline. Instead, masters wait for `dead_job_timeout` before declaring the job dead and aborting it (default: 120 seconds). See [Configuration](configuration.md#dead_job_timeout).
+- **Running jobs**: Jobs are not aborted immediately when a server goes offline. Instead, masters wait for `dead_job_timeout` before declaring the job dead and aborting it (default: 120 seconds). See [Configuration](config.md#dead_job_timeout).
 - **Enable/disable**: Disabling a server removes it from job selection but it can remain online and continue reporting metrics.
 
 ## Scalability
