@@ -33,7 +33,7 @@ A few things to note here:
 - In this case xyOps will have a self-signed cert for TLS, which the worker will accept by default.  See [TLS](#tls) for more details.
 - Change the `TZ` environment variable to your local timezone, for proper midnight log rotation and daily stat resets.
 
-As an aside, when you add worker servers via the UI, secret keys are not used (nor are they *ever* sent over the wire).  Instead, a special cryptographic token is used to authenticate new worker servers.  You can also add batches of servers in bulk via API Keys.  See [Adding Servers](usage.md#adding-servers) for more details.
+As an aside, when you add worker servers via the UI, secret keys are not used (nor are they *ever* sent over the wire).  Instead, a special cryptographic token is used to authenticate new worker servers.  You can also add batches of servers in bulk via API Keys.  See [Adding Servers](servers.md#adding-servers) for more details.
 
 ## Configuration
 
@@ -74,93 +74,7 @@ Replace `v1.0.0` with the desired xyOps version from the [official release list]
 
 ## Command Line
 
-Here are all the xyOps services available to you on the command line.  Most of these are accessed via the following shell script:
-
-```
-/opt/xyops/bin/control.sh [COMMAND]
-```
-
-Here are all the accepted commands:
-
-| Command | Description |
-|---------|-------------|
-| `start` | Starts xyOps in daemon mode. See below. |
-| `stop` | Stops the xyOps daemon and waits for exit. See below. |
-| `restart` | Calls `stop`, then `start`, in sequence. See below.  |
-| `status` | Checks whether xyOps is currently running. See below.  |
-| `admin` | Creates new emergency admin account (specify user / pass). See [Recover Admin Access](#recover-admin-access). |
-| `upgrade` | Upgrades xyOps to the latest stable (or specify version). See [Upgrading](#upgrading). |
-| `version` | Outputs the current xyOps package version and exits. |
-| `help` | Displays a list of available commands. |
-
-### Starting and Stopping
-
-To start the service, use the `start` command:
-
-```
-/opt/xyops/bin/control.sh start
-```
-
-And to stop it, the `stop` command:
-
-```
-/opt/xyops/bin/control.sh stop
-```
-
-You can also issue a quick stop + start with the `restart` command:
-
-```
-/opt/xyops/bin/control.sh restart
-```
-
-The `status` command will tell you if the service is running or not:
-
-```
-/opt/xyops/bin/control.sh status
-```
-
-## Start at Boot
-
-To have xyOps automatically start on boot, run this command to add it to [systemd](https://en.wikipedia.org/wiki/Systemd) (or [launchd](https://en.wikipedia.org/wiki/Launchd) on macOS):
-
-```sh
-cd /opt/xyops
-sudo npm run boot
-```
-
-## Upgrading
-
-To upgrade xyOps that was manually installed, you can use the built-in `upgrade` command:
-
-```
-/opt/xyops/bin/control.sh upgrade
-```
-
-This will upgrade the app and all dependencies to the latest stable release, if a new one is available.  It will not affect your data storage, users, or configuration settings.  All those will be preserved and imported to the new version.  For multi-server clusters, you'll need to repeat this command on each master server.
-
-Alternately, you can specify the exact version you want to upgrade (or downgrade) to:
-
-```
-/opt/xyops/bin/control.sh upgrade 1.0.4
-```
-
-If you upgrade to the `HEAD` version, this will grab the very latest from GitHub.  Note that this is primarily for developers or beta-testers, and is likely going to contain bugs.  Use at your own risk:
-
-```
-/opt/xyops/bin/control.sh upgrade HEAD
-```
-
-## Recover Admin Access
-
-Lost access to your admin account?  You can create a new temporary administrator account on the command-line.  Just execute this command on your primary server:
-
-```
-/opt/xyops/bin/control.sh admin USERNAME PASSWORD
-```
-
-Replace `USERNAME` with the desired username, and `PASSWORD` with the desired password for the new account.  Note that the new user will not show up in the main list of users in the UI.  But you will be able to login using the provided credentials.  This is more of an emergency operation, just to allow you to get back into the system.  *This is not a good way to create permanent users*.  Once you are logged back in, you should consider creating another account from the UI, then deleting the emergency admin account.
-
-Note that this trick does **not** work with [SSO](sso.md).  It only applies to setups that use the built-in user management system.
+See our [Command Line Guide](cli.md) for controlling the xyOps service via command-line.
 
 ## Uninstall
 
@@ -173,6 +87,8 @@ npm run unboot # deregister as system startup service
 rm -rf /opt/xyops
 cd -
 ```
+
+Make sure you [decommission your servers](servers.md#decommissioning-servers) first.
 
 # Environment Variables
 
@@ -190,18 +106,18 @@ For overriding configuration properties by environment variable, you can specify
 | `XYOPS_secret_key` | `CorrectHorseBatteryStaple` | Override the [secret_key](configuration.md#secret_key) configuration property. |
 | `XYOPS_WebServer__port` | `80` | Override the `port` property *inside* the [WebServer](configuration.md#webserver) object. |
 | `XYOPS_WebServer__https_port` | `443` | Override the `https_port` property *inside* the [WebServer](configuration.md#webserver) object. |
-| `XYOPS_Storage__Filesystem__base_dir` | `/data/xyops` | Override the `base_dir` property *inside* the [Filesystem](configuration.md#filesystem) object *inside* the [Storage](configuration.md#storage) object. |
+| `XYOPS_Storage__Filesystem__base_dir` | `/data/xyops` | Override the `base_dir` property *inside* the [Filesystem](configuration.md#storage-filesystem) object *inside* the [Storage](configuration.md#storage) object. |
 
 Almost every [configuration property](configuration.md) can be overridden using this environment variable syntax.  The only exceptions are things like arrays, e.g. [log_columns](configuration.md#log_columns).
 
 # Daily Backups
 
-Here is how you can generate daily backups of all the xyOps data, regardless of your backend storage engine.  First, create an [API Key](api.md#api-keys) and grant it full administrator privileges (this is required to use the [admin_export_data](api.md#admin_export_data) API).  You can then request a full backup using a [curl](https://curl.se/) command like this:
+Here is how you can generate daily backups of critical xyOps data, regardless of your backend storage engine.  First, create an [API Key](api.md#api-keys) and grant it full administrator privileges (this is required to use the [admin_export_data](api.md#admin_export_data) API).  You can then request a backup using a [curl](https://curl.se/) command like this:
 
 ```sh
 curl -X POST "https://xyops.yourcompany.com/api/app/admin_export_data" \
 	-H "X-API-Key: YOUR_API_KEY_HERE" -H "Content-Type: application/json" \
-	-d '{"lists":"all","indexes":"all","extras":"all"}' -O
+	-d '{"lists":"all",indexes:["tickets"]}' -O -J
 ```
 
 This will save the backup as a `.txt.gz` file in the current directory named using this filename pattern:
@@ -210,38 +126,193 @@ This will save the backup as a `.txt.gz` file in the current directory named usi
 xyops-data-export-YYYY-MM-DD-UNIQUEID.txt.gz
 ```
 
-Please note that this example will export **everything**, and can take quite a while and produce a very large file depending on your xyOps database size.  To limit what exactly gets included in the backup, consult the [admin_export_data](api.md#admin_export_data) API docs.
+Please note that this example will only export **critical** data, and is not a full backup (notably absent is job history, alert history, snapshot history, server history, and activity log).  To backup *everything*, change the JSON in the curl request to: `{"lists":"all","indexes":"all","extras":"all"}`.  Note that this can take quite a while and produce a very large file depending on your xyOps database size.  To limit what exactly gets included in the backup, consult the [admin_export_data](api.md#admin_export_data) API docs.
 
 # TLS
 
+The xyOps built-in web server ([pixl-server-web](https://github.com/jhuckaby/pixl-server-web)) supports TLS.  Please read the following guide for setup instructions:
 
+[Let's Encrypt / ACME TLS Certificates](https://github.com/jhuckaby/pixl-server-web#lets-encrypt--acme-tls-certificates)
 
-sso guide links here (no longer?  yes, it still does -- talk about how to configure HTTPS with real certs, satellite reject unauthorized flag, etc.)
-
-let's encrypt!  make sure your instructions still work!
-
-
+Alternatively, you can setup a proxy to sit in front of xyOps and handle TLS for you (see next section).
 
 # Multi-Master with Nginx
 
+For a load balanced multi-master setup with Nginx w/TLS, please read this section.  This is a complex setup, and requires advanced knowledge of all the components used.  Let me recommend our [Enterprise Plan](https://xyops.io/enterprise) here, as we can set all this up for you.  Now, the way this configuration works is as follows:
 
+- [Nginx](https://nginx.org/) sits in front, and handles TLS termination, as well as routing requests to various backends.
+- Nginx handles xyOps multi-master using an embedded [Health Check Daemon](https://github.com/pixlcore/xyops-healthcheck) which runs in the same container.
+	- The health check keeps track of which server is master, and dynamically reconfigures and hot-reloads Nginx as needed.
+	- We maintain our own custom Nginx docker image for this (shown below), or you can [build your own from source](https://github.com/pixlcore/xyops-nginx/blob/main/Dockerfile).
+
+A few prerequisites for this setup:
+
+- For multi-master setups, **you must have an external storage backend**, such as NFS, S3, or S3-compatible (MinIO, etc.).
+- You will need a custom domain configured and TLS certs created and ready to attach.
+- You have your xyOps configuration file customized and ready to go ([config.json](https://github.com/pixlcore/xyops/blob/main/sample_conf/config.json)) (see below).
+
+For the examples below, we'll be using the following domain placeholders:
+
+- `xyops.yourcompany.com` - User-facing domain which should route to Nginx / SSO.
+- `xyops01.yourcompany.com` - Internal domain for master server #1.
+- `xyops02.yourcompany.com` - Internal domain for master server #2.
+
+The reason why the master servers each need their own unique (internal) domain name is because of how the multi-master system works.  Each master server needs to be individually addressable, and reachable by all of your worker servers in your org.  Worker servers don't know or care about Nginx -- they contact masters directly, and have their own auto-failover system.  Also, worker servers use a persistent WebSocket connection, and can send a large amount of traffic, depending on how many worker servers you have and how many jobs you run.  For these reasons, it's better to have worker servers connect the masters directly, especially at production scale.
+
+That being said, you *can* configure your worker servers to connect through the Nginx front door if you want.  This can be useful if you have worker servers in another network or out in the wild, but it is not recommended for most setups.  To do this, please see [Overriding The Connect URL](hosting.md#overriding-the-connect-url) in our self-hosting guide.
+
+Here is a docker command for running Nginx:
+
+```sh
+docker run \
+	--name xyops-nginx \
+	--init \
+	-e XYOPS_masters="xyops01.yourcompany.com,xyops02.yourcompany.com" \
+	-e XYOPS_port="5522" \
+	-v "$(pwd)/tls.crt:/etc/tls.crt:ro" \
+	-v "$(pwd)/tls.key:/etc/tls.key:ro" \
+	-p 443:443 \
+	ghcr.io/pixlcore/xyops-nginx:latest
+```
+
+Here it is as a docker compose file:
+
+```yaml
+services:
+  nginx:
+	image: ghcr.io/pixlcore/xyops-nginx:latest
+	init: true
+	environment:
+	  XYOPS_masters: xyops01.yourcompany.com,xyops02.yourcompany.com
+	  XYOPS_port: 5522
+	volumes:
+	  - "./tls.crt:/etc/tls.crt:ro"
+	  - "./tls.key:/etc/tls.key:ro"
+	ports:
+	  - "443:443"
+```
+
+Let's talk about the Nginx setup.  We are pulling in our own Docker image here ([xyops-nginx](https://github.com/pixlcore/xyops-nginx)).  This is a wrapper around the official Nginx docker image, but it includes our [xyOps Health Check](https://github.com/pixlcore/xyops-healthcheck) daemon.  The health check monitors which master server is currently primary, and dynamically reconfigures Nginx on-the-fly as needed (so Nginx always routes to the current primary server only).  The image also comes with a fully preconfigured Nginx.  To use this image you will need to provide:
+
+- Your TLS certificate files, named `tls.crt` and `tls.key`, which are bound to `/etc/tls.crt` and `/etc/tls.key`, respectively.
+- The list of xyOps master server domain names, as a CSV list in the `XYOPS_masters` environment variable (used by health check).
+
+Once you have Nginx running, we can fire up the xyOps backend.  This is documented separately as you'll usually want to run these on separate servers.  Here is the multi-master configuration as a single Docker run command:
+
+```sh
+docker run \
+	--name xyops1 \
+	--hostname xyops01.yourcompany.com \
+	--init \
+	-e XYOPS_masters="xyops01.yourcompany.com,xyops02.yourcompany.com" \
+	-e TZ="America/Los_Angeles" \
+	-v "$(pwd)/config.json:/opt/xyops/conf/config.json:ro" \
+	-v "$(pwd)/sso.json:/opt/xyops/conf/sso.json:ro" \
+	-p 5522:5522 \
+	-p 5523:5523 \
+	ghcr.io/pixlcore/xyops:latest
+```
+
+And here it is as a docker compose file.
+
+```yaml
+services:
+  xyops1:
+	image: ghcr.io/pixlcore/xyops:latest
+	hostname: xyops01.yourcompany.com # change this per master server
+	init: true
+	environment:
+	  XYOPS_masters: xyops01.yourcompany.com,xyops02.yourcompany.com
+	  TZ: America/Los_Angeles
+	volumes:
+	  - "./config.json:/opt/xyops/conf/config.json:ro"
+	  - "./sso.json:/opt/xyops/conf/sso.json:ro"
+	ports:
+	  - "5522:5522"
+	  - "5523:5523"
+```
+
+For additional master servers you can simply duplicate the command and change the hostname.
+
+A few things to note here:
+
+- We're using our official xyOps Docker image, but you can always [build your own from source](https://github.com/pixlcore/xyops/blob/main/Dockerfile).
+- All master server hostnames need to be listed in the `XYOPS_masters` environment variable, comma-separated.
+- All master servers need to be able to route to each other via their hostnames, so they can self-negotiate and hold elections.
+- The timezone (`TZ`) should be set to your company's main timezone, so things like midnight log rotation and daily stat resets work as expected.
+- You will need to supply the configuration file: `config.json`.  See below.
+
+Grab our sample [config.json](https://github.com/pixlcore/xyops/blob/main/sample_conf/config.json) file to use as a starting point to create yours.  See the [xyOps Configuration Guide](configuration.md) for details on how to customize this file.
 
 # Satellite
 
-**xyOps Satellite (xySat)** is a companion to the [xyOps](https://xyops.io) workflow automation and server monitoring platform.  It is both a job runner, and a data collector for server monitoring and alerting.  xySat is designed to be installed on *all* of your servers, so it is lean and mean, and has zero dependencies.
+**xyOps Satellite (xySat)** is a companion to the xyOps system.  It is both a job runner, and a data collector for server monitoring and alerting.  xySat is designed to be installed on *all* of your servers, so it is lean, mean, and has zero dependencies.
 
+For instructions on how to install xySat, see [Adding Servers](servers.md#adding-servers).
 
+## Configuration
 
-## Overriding The Connect URL
+xySat is configured automatically via the xyOps master server.  The [satellite.config](configuration.md#satellite-config) object is automatically sent to each server after it connects and authenticates, so you can keep a master version of the xySat configuration which is auto-synced to all servers.  Here is the default config:
 
-sso guide links here
+```json
+{ 
+	"port": 5522,
+	"secure": false,
+	"socket_opts": { "rejectUnauthorized": false },
+	"pid_file": "pid.txt",
+	"log_dir": "logs",
+	"log_filename": "[component].log",
+	"log_crashes": true,
+	"log_archive_path": "logs/archives/[filename]-[yyyy]-[mm]-[dd].log.gz",
+	"log_archive_keep": "7 days",
+	"temp_dir": "temp",
+	"debug_level": 5,
+	"child_kill_timeout": 10,
+	"monitoring_enabled": true,
+	"quickmon_enabled": true
+}
+```
 
+Here are descriptions of the configuration properties:
 
+| Property Name | Type | Description |
+|---------------|------|-------------|
+| `port` | Number | Specifies which port the xyOps master server will be listening on (default is `5522` for ws:// and `5523` for wss://). |
+| `secure` | Boolean | Set to `true` to use secure WebSocket (wss://) and HTTPS connections. |
+| `socket_opts` | Object | Options to pass to the WebSocket connection (see [WebSocket](https://github.com/websockets/ws/blob/master/doc/ws.md#class-websocket)). |
+| `pid_file` | String | Location of the PID file to ensure two satellites don't run simultaneously. |
+| `log_dir` | String | Location of the log directory, relative to the xySat base dir (`/opt/xyops/satellite`). |
+| `log_filename` | String | This string is the filename pattern used by the core logger (default: `[component].log`); supports log column placeholders like `[component]`. |
+| `log_crashes` | Boolean | This boolean enables capturing uncaught exceptions and crashes in the logger subsystem (default: `true`). |
+| `log_archive_path` | String | This string sets the nightly log archive path pattern (default: `logs/archives/[filename]-[yyyy]-[mm]-[dd].log.gz`). |
+| `log_archive_keep` | String | How many days to keep log archives before auto-deleting the oldest ones. |
+| `temp_dir` | String | Location of temp directory, relative to the base dir (`/opt/xyops/satellite`). |
+| `debug_level` | Number | This number sets the verbosity level for the logger (default: `5`; 1 = quiet, 10 = very verbose). |
+| `child_kill_timeout` | Number | Number of seconds to wait after sending a SIGTERM to follow-up with a SIGKILL. |
+| `monitoring_enabled` | Boolean | Enable or disable the monitoring subsystem (i.e. send monitoring metrics every minute). |
+| `quickmon_enabled` | Boolean | Enable or disable the quick monitors, which send lightweight metrics every second. |
 
+### Overriding The Connect URL
+
+When xySat is first installed, it is provided an array of hosts to connect to, which becomes a `hosts` array in the xySat config file on each server.  When xySat starts up, it connects to a *random host* from this array, and figures out which master is primary, and reconnects to that host.  If the master cluster changes, a new `hosts` array is automatically distributed to all servers by the current master.
+
+In certain situations you may need to have xySat connect to a specific master host, instead of the default master list.  For e.g. you may have servers "out in the wild" and they need to connect through a proxy, or some other kind of complex network topology.  Either way, you can override the usual array of hosts that xySat connects to, and specify a static value instead.
+
+To do this, add a `host` property into the xySat config as a top-level JSON property, on each server that requires it.  The xySat config file is be located at:
+
+```
+/opt/xyops/satellite/config.json
+```
+
+Note that you should **not** add a `host` property into the [satellite.config](configuration.md#satellite-config) object on the master server, unless you want **all** of your servers to connect to the static host.
+
+When both `hosts` and `host` exist in the config file, `host` takes precedence.
 
 # Air-Gapped Mode
 
+xyOps supports air-gapped installs, which prevent it from making unauthorized outbound connections beyond a specified IP range.  You can configure which IP ranges it is allowed to connect to, via whitelist and/or blacklist.  The usual setup is to allow local LAN requests so servers can communicate with each other in your infra.
 
+To configure air-gapped mode, use the [airgap](configuration.md#airgap) section in the main config file.  Example:
 
 ```json
 "airgap": {
@@ -251,6 +322,10 @@ sso guide links here
 }
 ```
 
-These rules automatically propagate to all connected worker servers, and affect things like the [HTTP Plugin](plugins.md#http-plugin).
+Set the `enabled` property to `true` to enable air-gapped mode, and set the `outbound_whitelist` and/or `outbound_blacklist` arrays to IP addresses or [CIDR blocks](https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing).  The default whitelist includes all IPs in the [private range](https://en.wikipedia.org/wiki/Private_network).
 
-TODO: Talk about satellite, and the local filesystem package thing.  We need to create an air-gapped package for enterprise customers.
+The air-gapped rules apply to both xyOps itself, and automatically propagate to all connected worker servers, to govern things like the [HTTP Plugin](plugins.md#http-request-plugin).  However, it is important to point out that they do **not** govern your own Plugin code, your own shell scripts, nor marketplace Plugins.
+
+For handling air-gapped software upgrades safely, please contact [xyOps Support](mailto:support@pixlcore.com).  As part of the enterprise plan we can send you signed, encrypted packages with instructions on how to install them.
+
+All xyOps documentation is available offline inside the xyOps app.
