@@ -51,7 +51,7 @@ Page.Users = class Users extends Page.PageUtils {
 		if (!this.active) return; // sanity
 		
 		// NOTE: Don't change these columns without also changing the responsive css column collapse rules in style.css
-		var cols = ['Full Name', 'Username', 'Email Address', 'Status', 'Type', 'Created', 'Actions'];
+		var cols = ['Display Name', 'Username', 'Email Address', 'Status', 'Type', 'Created', 'Actions'];
 		
 		html += '<div class="box">';
 		
@@ -520,14 +520,14 @@ Page.Users = class Users extends Page.PageUtils {
 		
 		// full name
 		html += this.getFormRow({
-			label: 'Full Name:',
+			label: 'Display Name:',
 			content: this.getFormText({
 				id: 'fe_eu_fullname',
 				spellcheck: 'false',
 				value: user.full_name,
 				'data-private': ''
 			}),
-			caption: 'The user\'s first and last names.  This will not be shared with anyone outside the server.'
+			caption: 'The user\'s first and last names, or display name.  This will not be shared with anyone outside the server.'
 		});
 		
 		// email
