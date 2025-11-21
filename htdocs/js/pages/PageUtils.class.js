@@ -185,7 +185,7 @@ Page.PageUtils = class PageUtils extends Page.Base {
 		
 		if (args.id) keywords.push( args.id );
 		if (args.username) keywords.push( args.username.replace(/\W/g, '_') );
-		if (keywords.length) query += ' keywords:' + keywords.join('&'); // AND
+		if (keywords.length) query += ' keywords:' + keywords.join(' '); // AND
 		
 		if (args.date) {
 			query += ' ' + this.getDateRangeQuery('date', args.date);

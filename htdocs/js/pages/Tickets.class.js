@@ -349,7 +349,7 @@ Page.Tickets = class Tickets extends Page.PageUtils {
 	getSearchQuery(args) {
 		// construct actual unbase simple query syntax
 		var query = args.query ? args.query.toString().toLowerCase().trim() : ''; //  : 'status:open|closed'; // omit drafts
-		if (args.tags) query += ' tags:' + args.tags.split(/\,\s*/).join('&');
+		if (args.tags) query += ' tags:' + args.tags.split(/\,\s*/).join(' ');
 		if (args.type) query += ' type:' + args.type;
 		if (args.assignee) query += ' assignees:' + args.assignee;
 		if (args.username) query += ' username:' + args.username;

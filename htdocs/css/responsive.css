@@ -256,10 +256,10 @@
 	.data_grid.server_search_grid { grid-template-columns: auto auto auto auto auto 0px auto auto !important; }
 	.data_grid.server_search_grid > ul > div:nth-child(6) { visibility: hidden; }
 	
-	/* 'Job ID', 'Event', 'Category', 'Server', 'Source', 'Started', 'Elapsed', 'Result' */
-	.data_grid.job_search_grid { grid-template-columns: auto auto auto 0px 0px auto auto auto !important; }
-	.data_grid.job_search_grid > ul > div:nth-child(4) { visibility: hidden; }
+	/* 'Job ID', 'Event', 'Category', 'Server', 'Source', 'Tags', 'Completed', 'Elapsed', 'Result' */
+	.data_grid.job_search_grid { grid-template-columns: auto auto auto auto 0px 0px auto auto auto !important; }
 	.data_grid.job_search_grid > ul > div:nth-child(5) { visibility: hidden; }
+	.data_grid.job_search_grid > ul > div:nth-child(6) { visibility: hidden; }
 	
 	/* 'Host ID', 'Status', 'Version', 'Load Avg', 'Ping', 'Uptime', 'Actions' */
 	.data_grid.master_grid { grid-template-columns: auto auto auto 0px auto auto auto !important; }
@@ -650,12 +650,13 @@
 	.data_grid.server_search_grid > ul > div:nth-child(5) { visibility: hidden; }
 	.data_grid.server_search_grid > ul > div:nth-child(6) { visibility: hidden; }
 	
-	/* 'Job ID', 'Event', 'Category', 'Server', 'Source', 'Started', 'Elapsed', 'Result' */
-	.data_grid.job_search_grid { grid-template-columns: auto auto auto 0px 0px 0px 0px auto !important; }
+	/* 'Job ID', 'Event', 'Category', 'Server', 'Source', 'Tags', 'Completed', 'Elapsed', 'Result' */
+	.data_grid.job_search_grid { grid-template-columns: auto auto auto 0px 0px 0px 0px 0px auto !important; }
 	.data_grid.job_search_grid > ul > div:nth-child(4) { visibility: hidden; }
 	.data_grid.job_search_grid > ul > div:nth-child(5) { visibility: hidden; }
 	.data_grid.job_search_grid > ul > div:nth-child(6) { visibility: hidden; }
 	.data_grid.job_search_grid > ul > div:nth-child(7) { visibility: hidden; }
+	.data_grid.job_search_grid > ul > div:nth-child(8) { visibility: hidden; }
 	
 	/* 'Host ID', 'Status', 'Version', 'Load Avg', 'Ping', 'Uptime', 'Actions' */
 	.data_grid.master_grid { grid-template-columns: auto auto auto 0px 0px 0px auto !important; }
@@ -1186,13 +1187,14 @@
 	.data_grid.server_search_grid > ul > div:nth-child(7) { visibility: hidden; }
 	.data_grid.server_search_grid > ul > div:nth-child(8) { visibility: hidden; }
 	
-	/* 'Job ID', 'Event', 'Category', 'Server', 'Source', 'Started', 'Elapsed', 'Result' */
-	.data_grid.job_search_grid { grid-template-columns: auto auto auto 0px 0px 0px 0px 0px !important; }
+	/* 'Job ID', 'Event', 'Category', 'Server', 'Source', 'Tags', 'Completed', 'Elapsed', 'Result' */
+	.data_grid.job_search_grid { grid-template-columns: auto auto auto 0px 0px 0px 0px 0px 0px !important; }
 	.data_grid.job_search_grid > ul > div:nth-child(4) { visibility: hidden; }
 	.data_grid.job_search_grid > ul > div:nth-child(5) { visibility: hidden; }
 	.data_grid.job_search_grid > ul > div:nth-child(6) { visibility: hidden; }
 	.data_grid.job_search_grid > ul > div:nth-child(7) { visibility: hidden; }
 	.data_grid.job_search_grid > ul > div:nth-child(8) { visibility: hidden; }
+	.data_grid.job_search_grid > ul > div:nth-child(9) { visibility: hidden; }
 	
 	/* 'Host ID', 'Status', 'Version', 'Load Avg', 'Ping', 'Uptime', 'Actions' */
 	.data_grid.master_grid { grid-template-columns: auto auto 0px 0px 0px 0px auto !important; }
@@ -1633,14 +1635,15 @@
 	.data_grid.server_search_grid > ul > div:nth-child(7) { visibility: hidden; }
 	.data_grid.server_search_grid > ul > div:nth-child(8) { visibility: hidden; }
 	
-	/* 'Job ID', 'Event', 'Category', 'Server', 'Source', 'Started', 'Elapsed', 'Result' */
-	.data_grid.job_search_grid { grid-template-columns: auto auto 0px 0px 0px 0px 0px 0px !important; }
+	/* 'Job ID', 'Event', 'Category', 'Server', 'Source', 'Tags', 'Completed', 'Elapsed', 'Result' */
+	.data_grid.job_search_grid { grid-template-columns: auto auto 0px 0px 0px 0px 0px 0px 0px !important; }
 	.data_grid.job_search_grid > ul > div:nth-child(3) { visibility: hidden; }
 	.data_grid.job_search_grid > ul > div:nth-child(4) { visibility: hidden; }
 	.data_grid.job_search_grid > ul > div:nth-child(5) { visibility: hidden; }
 	.data_grid.job_search_grid > ul > div:nth-child(6) { visibility: hidden; }
 	.data_grid.job_search_grid > ul > div:nth-child(7) { visibility: hidden; }
 	.data_grid.job_search_grid > ul > div:nth-child(8) { visibility: hidden; }
+	.data_grid.job_search_grid > ul > div:nth-child(9) { visibility: hidden; }
 	
 	/* 'Host ID', 'Status', 'Version', 'Load Avg', 'Ping', 'Uptime', 'Actions' */
 	.data_grid.master_grid { grid-template-columns: auto auto 0px 0px 0px 0px 0px !important; }

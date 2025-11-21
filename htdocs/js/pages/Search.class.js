@@ -121,17 +121,17 @@ Page.Search = class Search extends Page.PageUtils {
 				// tag
 				html += '<div class="form_cell">';
 					html += this.getFormRow({
-						label: '<i class="icon mdi mdi-tag-multiple-outline">&nbsp;</i>Tag:',
-						content: this.getFormMenuSingle({
-							id: 'fe_s_tag',
-							title: 'Select Tag',
+						label: '<i class="icon mdi mdi-tag-multiple-outline">&nbsp;</i>Tags:',
+						content: this.getFormMenuMulti({
+							id: 'fe_s_tags',
+							title: 'Select Tags',
+							placeholder: 'Any Tag',
 							options: [['', 'Any Tag']].concat( app.tags, [ 
 								{ id: '_retried', title: "Retried", icon: 'refresh', group: "System Tags:" },
 								{ id: '_last', title: "Last in Set", icon: 'page-last' },
 								{ id: '_test', title: "Test Job", icon: 'test-tube' }
 							]),
-							value: args.tag || '',
-							default_icon: 'tag-outline',
+							values: args.tags ? args.tags.split(/\,\s*/) : [],
 							'data-shrinkwrap': 1
 						})
 					});
@@ -273,8 +273,8 @@ Page.Search = class Search extends Page.PageUtils {
 		// var sargs = this.getSearchArgs();
 		// if (!sargs) this.div.find('#btn_s_save').addClass('disabled');
 		
-		// MultiSelect.init( this.div.find('#fe_s_tags') );
-		SingleSelect.init( this.div.find('#fe_s_tag, #fe_s_result, #fe_s_event, #fe_s_source, #fe_s_date, #fe_s_category, #fe_s_plugin, #fe_s_server, #fe_s_group, #fe_s_sort') );
+		MultiSelect.init( this.div.find('#fe_s_tags') );
+		SingleSelect.init( this.div.find('#fe_s_result, #fe_s_event, #fe_s_source, #fe_s_date, #fe_s_category, #fe_s_plugin, #fe_s_server, #fe_s_group, #fe_s_sort') );
 		// $('.header_search_widget').hide();
 		this.setupSearchOpts();
 		
@@ -283,7 +283,7 @@ Page.Search = class Search extends Page.PageUtils {
 			else self.navSearch();
 		});
 		
-		this.div.find('#fe_s_tag, #fe_s_result, #fe_s_event, #fe_s_source, #fe_s_category, #fe_s_plugin, #fe_s_server, #fe_s_group, #fe_s_sort').on('change', function() {
+		this.div.find('#fe_s_tags, #fe_s_result, #fe_s_event, #fe_s_source, #fe_s_category, #fe_s_plugin, #fe_s_server, #fe_s_group, #fe_s_sort').on('change', function() {
 			self.navSearch();
 		});
 		
@@ -328,8 +328,8 @@ Page.Search = class Search extends Page.PageUtils {
 			if (this.div.find('#d_search_opt_regex').hasClass('selected')) args.regex = 1;
 		}
 		
-		var tag = this.div.find('#fe_s_tag').val();
-		if (tag) args.tag = tag;
+		var tags = this.div.find('#fe_s_tags').val();
+		if (tags.length) args.tags = tags.join(',');
 		
 		var result = this.div.find('#fe_s_result').val();
 		if (result) args.result = result;
@@ -386,7 +386,7 @@ Page.Search = class Search extends Page.PageUtils {
 	getSearchQuery(args) {
 		// construct actual unbase simple query syntax
 		var query = '';
-		if (args.tag) query += ' tags:' + args.tag;
+		if (args.tags) query += ' tags:' + args.tags.split(/\,\s*/).join(' ');
 		
 		switch (args.result) {
 			case 'success': query += ' tags:_success'; break;
@@ -624,7 +624,7 @@ Page.Search = class Search extends Page.PageUtils {
 		
 		var grid_args = {
 			resp: resp,
-			cols: ['Job ID', 'Event', 'Category', 'Server', 'Source', 'Completed', 'Elapsed', 'Result'],
+			cols: ['Job ID', 'Event', 'Category', 'Server', 'Source', 'Tags', 'Completed', 'Elapsed', 'Result'],
 			data_type: 'job',
 			offset: this.args.offset || 0,
 			limit: this.args.limit,
@@ -648,6 +648,7 @@ Page.Search = class Search extends Page.PageUtils {
 				self.getNiceCategory(job.category, true),
 				self.getNiceServer(job.server, true),
 				self.getNiceJobSource(job),
+				self.getNiceTagList( job.tags, false ),
 				self.getRelativeDateTime( job.completed, true ),
 				self.getNiceJobElapsedTime(job, true, false),
 				self.getNiceJobResult(job)
