@@ -346,7 +346,7 @@ For Docker containers, make sure that your local Docker has our images stored lo
 - **xyOps**: https://github.com/pixlcore/xyops/pkgs/container/xyops
 - **xySat**: https://github.com/pixlcore/xysat/pkgs/container/xysat
 
-# Key Rotation
+# Secret Key Rotation
 
 xyOps uses a single secret key on every master server. This key encrypts stored secrets, signs temporary UI tokens, and issues authentication tokens for worker servers (xySat). Rotating this key is fully automated and performed from the UI.
 

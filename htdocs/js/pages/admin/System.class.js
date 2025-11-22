@@ -131,7 +131,7 @@ Page.System = class System extends Page.Base {
 		// rotate secret key
 		html += '<div class="maint_unit">';
 			html += '<div class="button danger" onClick="$P().do_rotate_secret_key()"><i class="mdi mdi-key-wireless">&nbsp;</i>Rotate Secret Key...</div>';
-			html += '<div class="caption">Generate a new secret key and safely re-encrypt all secrets, servers and masters.  <a href="#Docs/hosting/key-rotation">Learn More</a></div>';
+			html += '<div class="caption">Generate a new secret key and safely re-encrypt all secrets, servers and masters.  <a href="#Docs/hosting/secret-key-rotation">Learn More</a></div>';
 		html += '</div>';
 		
 		html += '</div>'; // maint_grid

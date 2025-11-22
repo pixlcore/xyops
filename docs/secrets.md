@@ -33,7 +33,7 @@ xyOps uses authenticated encryption to protect secret values at rest:
 - AAD: The secret’s ID is bound as Additional Authenticated Data to prevent swapping between records.
 - Storage: The encrypted blob includes `alg`, `salt`, `iv`, `tag`, and `ct`.
 
-The encryption key is derived from [config.secret_key](config.md#secret_key). Keep this value strong and private in production.  See [Key Rotation](hosting.md#key-rotation) for instructions on rotating the secret key.
+The encryption key is derived from [config.secret_key](config.md#secret_key). Keep this value strong and private in production.  See [Secret Key Rotation](hosting.md#secret-key-rotation) for instructions on rotating the secret key.
 
 
 ## Assigning Access

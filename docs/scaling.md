@@ -68,7 +68,7 @@ Harden your web entry point and xyOps config before going live:
 - Bind address: If running behind a proxy, set [WebServer.bind_address](https://github.com/jhuckaby/pixl-server-web#bind_address) appropriately and configure [WebServer.public_ip_offset](https://github.com/jhuckaby/pixl-server-web#public_ip_offset) to select the correct client IP from proxy headers.
 - Headers/CSP: Use [WebServer.uri_response_headers](https://github.com/jhuckaby/pixl-server-web#uri_response_headers) to enforce CSP, HSTS, and other security headers for HTML routes. 
 - Access control: Use [WebServer.default_acl](https://github.com/jhuckaby/pixl-server-web#default_acl) for private handlers and verify API keys/SSO policies. Lock down admin endpoints behind SSO where applicable.
-- Rotate your secret key every few months.  See [Key Rotation](hosting.md#key-rotation) for details.
+- Rotate your secret key every few months.  See [Secret Key Rotation](hosting.md#secret-key-rotation) for details.
 
 ## Additional Tuning Ideas
 
