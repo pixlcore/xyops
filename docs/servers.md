@@ -36,7 +36,7 @@ You can add servers in three ways:
 
 Notes:
 
-- Server auth tokens do not expire. You can, however, rotate your secret key (which also regenerates all tokens) from the UI if needed.
+- Server auth tokens do not expire. You can, however, [rotate your secret key](hosting.md#secret-key-rotation) (which also regenerates all tokens) from the UI if needed.
 - Software upgrades for xySat are orchestrated from the UI and are designed to avoid interrupting running jobs.
 
 ## Groups and Auto‑Assignment
