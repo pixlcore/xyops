@@ -28,7 +28,7 @@ A few notes:
 - In this case xyOps will have a self-signed cert for TLS, which the worker will accept by default.  See [TLS](#tls) for more details.
 - Change the `TZ` environment variable to your local timezone, for proper midnight log rotation and daily stat resets.
 - If you plan on using the container long term, please make sure to [rotate the secret key](#secret-key-rotation).
-- The `/var/run/docker.sock` bind allows xyOps to launch its own containers (i.e. for the [Plugin Marketplace](marketplace.md)).
+- The `/var/run/docker.sock` bind is optional, and allows xyOps to launch its own containers (i.e. for the [Plugin Marketplace](marketplace.md)).
 
 As an aside, when you add worker servers via the UI, secret keys are not used (nor are they *ever* sent over the wire).  Instead, a special cryptographic token is used to authenticate new worker servers.  You can also add batches of servers in bulk via API Keys.  See [Adding Servers](servers.md#adding-servers) for more details.
 
@@ -73,6 +73,38 @@ Replace `v1.0.0` with the desired xyOps version from the [official release list]
 ## Command Line
 
 See our [Command Line Guide](cli.md) for controlling the xyOps service via command-line.
+
+## Adding Masters Manually
+
+When you manually install xyOps, it creates a cluster of one, and promotes itself to master.  To add additional servers, follow these instructions.
+
+First, for multi-master setups, **you must have an external storage backend**, such as NFS, S3, or S3-compatible (MinIO, etc.).  See [Storage Engines](https://github.com/jhuckaby/pixl-server-storage#engines) for details.
+
+Once you have storage setup and working, stop the xyOps service, and edit the `/opt/xyops/conf/masters.json` file:
+
+```json
+{
+	"masters": [
+		"xyops01.mycompany.com"
+	]
+}
+```
+
+Add the new server hostname to the `masters` array.  Remember, both servers need to be able to reach each other via their hostnames.
+
+Then, install the software onto the new server, and copy over the following files before starting the service:
+
+```
+/opt/xyops/conf/config.json
+/opt/xyops/conf/overrides.json
+/opt/xyops/conf/masters.json
+```
+
+Then finally, start the service on both servers.  They should self-negotiate and one will be promoted to master after 10 seconds (whichever hostname sorts first alphabetically).
+
+Note that master server hostnames **cannot change**.  If they do, you will need to update the `/opt/xyops/conf/masters.json` file on all servers and restart everything.
+
+For fully transparent auto-failover using a single user-facing hostname, see [Multi-Master with Nginx](#multi-master-with-nginx) below.
 
 ## Uninstall
 
@@ -144,7 +176,7 @@ For a load balanced multi-master setup with Nginx w/TLS, please read this sectio
 
 A few prerequisites for this setup:
 
-- For multi-master setups, **you must have an external storage backend**, such as NFS, S3, or S3-compatible (MinIO, etc.).
+- For multi-master setups, **you must have an external storage backend**, such as NFS, S3, or S3-compatible (MinIO, etc.).  See [Storage Engines](https://github.com/jhuckaby/pixl-server-storage#engines) for details.
 - You will need a custom domain configured and TLS certs created and ready to attach.
 - You have your xyOps configuration file customized and ready to go ([config.json](https://github.com/pixlcore/xyops/blob/main/sample_conf/config.json)) (see below).
 
