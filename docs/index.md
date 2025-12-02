@@ -27,7 +27,7 @@ Welcome to the xyOps documentation. xyOps is a job scheduler, workflow engine, a
 ## Monitoring & Operations
 
 - **[Servers](servers.md)**: Worker nodes (xySat) that execute jobs, stream metrics, and participate in failover.
-- **[Server Groups](groups.md)**: Logical sets of servers for targeting, default alert actions, and group‑level views.
+- **[Groups](groups.md)**: Logical sets of servers for targeting, default alert actions, and group‑level views.
 - **[Monitors](monitors.md)**: Minute‑level time‑series metrics defined by expressions, used for graphs and alerts.
 - **[Alerts](alerts.md)**: Evaluate live data per server and trigger actions when expressions match.
 - **[Snapshots](snapshots.md)**: Point‑in‑time captures of server or group state for forensics and comparisons.
