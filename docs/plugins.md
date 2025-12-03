@@ -1074,6 +1074,43 @@ The Test Plugin exists mainly to test xyOps, but it can also be useful for testi
 | **Generate Network Traffic** | Checkbox | If checked the Plugin will make continuous network requests downloading large binary data blobs (from GitHub). |
 | **Upload Sample File** | Checkbox | If checked the Plugin will produce a sample file and attach it to the job output. |
 
+### Docker Plugin
+
+The Docker Plugin allows you to run custom scripts inside a Docker container.  Similar to the [Shell Plugin](#shell-plugin), you can specify any custom code to run, and in any language, as long as it supports a [Shebang](https://en.wikipedia.org/wiki/Shebang_%28Unix%29) line.
+
+You can enter any Docker image to use, including remote ones.  By default, our own [xyOps Shell Image](https://github.com/pixlcore/xyops-shell-image) is selected, which is based in Debian 12, and comes preinstalled with a variety of popular software, as well as our [xyRun](https://github.com/pixlcore/xyrun) wrapper.  xyRun will track system resources *inside* the container, as well as handle file upload/download for your jobs.  This is optional, and you can use any Docker image you want, including your own custom ones.
+
+This is built on top of [docker run](https://docs.docker.com/reference/cli/docker/container/run/), so each job creates a new container, and can optionally delete it when the job is complete (which is the default behavior).
+
+The Docker Plugin uses the following parameters:
+
+| Plugin Parameter | Type | Description |
+|------------------|------|-------------|
+| **Image Name** | Text | The name of the Docker image to use, which can be local or remote. |
+| **Image Version** | Text | The version of the image to use, or `latest`. |
+| **Container Name** | Text | The name of the Docker container, which can use macros such as `{{id}}` to make it unique per job. |
+| **Max CPUs** | Number | The max number of CPU cores the container is allowed to use, or 0 for unlimited. |
+| **Max Memory** | Text | The max amount of memory to allow the container to use (default is unlimited). |
+| **Join Network** | Text | Optionally specify a Docker network name for the container to join. |
+| **Command Extras** | Text | Optionally add any extra command-line arguments to pass to `docker run` (for e.g. volume mounts). |
+| **Launch Command** | Text | The initial command to run as the container starts.  It is recommended to use [xyRun](https://github.com/pixlcore/xyrun) for this, so resources are monitored, and files are managed properly. |
+| **Run Mode** | Menu | Choose whether you want the entire job JSON data to be sent to STDIN, or only the script source (advanced). |
+| **Script Source** | Text | The code to run inside the container.  You can use any language that supports a shebang line. |
+| **Init Process Manager** | Checkbox | Run an "init" inside the container that forwards signals and reaps processes. |
+| **Ephemeral Container** | Checkbox | Automatically delete the container after the job completes (recommended). |
+| **Verbose Logging** | Checkbox | Enable verbose debug logging (raw docker command, etc.) |
+
+#### Custom Images
+
+Feel free to create your own custom Docker image for use in the Docker Plugin.  You can either build one on top of ours, or build your own from scratch.  Either way, we highly recommend you install [xyRun](https://github.com/pixlcore/xyrun) inside your image as a command wrapper, so xyOps can track system resource usage, and manage files for your jobs.
+
+If you use an image without xyRun, please note the following caveats:
+
+- Environment variables will not be set (i.e. `JOB_ID`, `JOB_NOW`, etc.).
+- Secrets will not be passed into the container.
+
+To use a pre-existing Docker image such as `ubuntu`, you can set the launch command to something like `sh`, and then set the "Run Mode" to "Script Source".  This will pipe in your script source directly to the STDIN of the launch process, e.g. `sh`, which will execute it inside the container.
+
 ## Plugin Marketplace
 
 xyOps has an integrated Plugin Marketplace, so you can expand the app's feature set by leveraging Plugins published both by PixlCore (the makers of xyOps), as well as the developer community.  For more on this, please see the [Marketplace Guide](marketplace.md).
