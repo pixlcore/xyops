@@ -852,6 +852,10 @@ User writable property for providing a visual label for the Job.  Should be spec
 
 This is set to `true` when the job was fired from an event test.  This is used to override the event enabled check, and add hints to the UI.
 
+## Job.secrets
+
+If any secrets were assigned to the job, this object will *temporarily* hold the decrypted key/value pairs for the job code to use.  They are **not** stored anywhere, and only passed to the Event Plugin running the job for immediate use.
+
 ## Job.workflow
 
 When the job is itself a workflow, or a sub-job inside a workflow, this object will contain additional information.  See [JobWorkflow](#jobworkflow) for details.
