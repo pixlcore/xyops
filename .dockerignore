@@ -20,3 +20,4 @@ htdocs/css/normalize.css
 htdocs/css/atom*
 htdocs/codemirror
 sample_conf/masters.json
+sample_conf/overrides.json
