@@ -6,6 +6,7 @@
 
 const fs = require('fs');
 const cp = require('child_process');
+const assert = require('node:assert/strict');
 const async = require('async');
 const PixlRequest = require("pixl-request");
 const Tools = require('pixl-tools');
@@ -92,10 +93,17 @@ module.exports = {
 	}, // setUp
 	
 	tests: [
-		function testSatellite(test) {
+		async function test_api_basic(test) {
+			// make sure web server and api are up
+			let { data } = await this.request.json( this.api_url + '/app/echo', { foo: 'bar' } );
+			assert.ok( !data.code, 'successful api response' );
+			assert.ok( !!data.params, 'found params in response' );
+			assert.ok( data.params.foo === 'bar', 'found our value in params' );
+		},
+		
+		async function testSatellite(test) {
 			// make sure satellite is connected
-			test.ok( !!this.xy.servers['satunit1'], "satunit1 in servers" );
-			test.done();
+			assert.ok( !!this.xy.servers['satunit1'], "satunit1 in servers" );
 		}
 	],
 	

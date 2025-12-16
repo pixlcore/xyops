@@ -179,7 +179,7 @@ exports.tests = [
         let data = {};
         try { data = JSON.parse(body); }
         catch (err) { assert.ok(false, 'invalid JSON response for upload_user_ticket_files'); }
-        test.ok( data.code === 0, 'successful api response', data );
+        assert.ok( data.code === 0, 'successful api response' );
         assert.ok( Array.isArray(data.files) && data.files.length >= 1, 'expected files array with an item' );
         const file = Tools.findObject( data.files, { filename: 'rgb-ramp.png' } );
         assert.ok( file && file.path, 'expected uploaded rgb-ramp.png file with path' );

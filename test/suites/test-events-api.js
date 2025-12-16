@@ -151,7 +151,7 @@ exports.tests = [
 
 	async function test_api_run_event_stub(test) {
 		// per request: do not exercise run_event here
-		test.ok(true, 'run_event test intentionally skipped (stub/no-op)');
+		assert.ok(true, 'run_event test intentionally skipped (stub/no-op)');
 	},
 
 	async function test_api_delete_event_missing_id(test) {
