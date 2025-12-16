@@ -5083,8 +5083,10 @@ Example request:
 Example response:
 
 ```json
-{ "code": 0, "api_key": { /* full APIKey object including auto fields */ } }
+{ "code": 0, "api_key": { /* metadata */ }, "plain_key": "API_KEY_HERE" }
 ```
+
+In addition to the [Standard Response Format](#standard-response-format), this includes an `api_key` object (see [APIKey](data.md#apikey)), as well as the actual API key value in a property named `plain_key`.  This is the **only** time the API key secret is ever sent over the wire, as it is stored in hashed format and cannot ever be fetched later.
 
 ### update_api_key
 
@@ -5092,7 +5094,7 @@ Example response:
 POST /api/app/update_api_key/v1
 ```
 
-Update an existing API Key by ID. Admin only. Send as HTTP POST with JSON. The request is shallow-merged into the existing key; `modified` and `revision` are updated automatically. The actual `key` value cannot be changed via this endpoint.
+Update an existing API Key by ID. Admin only. Send as HTTP POST with JSON. The request is shallow-merged into the existing key; `modified` and `revision` are updated automatically. The actual `key` value cannot be changed.
 
 Parameters:
 
