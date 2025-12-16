@@ -428,7 +428,7 @@ app.extend({
 				app.api.post( 'app/update_global_state', { 'scheduler.enabled': enabled }, function(resp) {
 					self.state.scheduler.enabled = enabled;
 					self.updateHeaderClock();
-					if (enabled) self.showMessage(enabled ? 'success' : 'warning', "Scheduler has been " + (enabled ? 'resumed.' : 'paused.'), 8);
+					self.showMessage('info', "Scheduler has been " + (enabled ? 'resumed.' : 'paused.'), 8);
 				} ); // api.post
 			} // callback
 		}); // popupQuickMenu
