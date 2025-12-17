@@ -5049,8 +5049,10 @@ Example request:
 Example response:
 
 ```json
-{ "code": 0 }
+{ "code": 0, "id": "imj97z8isl3bqvas" }
 ```
+
+In addition to the [Standard Response Format](#standard-response-format), this includes an `id` property, which is an internal job ID (the bulk logout happens asynchronously in the background).  To track the progress of the job, poll the [get_internal_jobs](#get_internal_jobs) API.
 
 ### get_api_keys
 
