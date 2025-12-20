@@ -2839,13 +2839,14 @@ Page.PageUtils = class PageUtils extends Page.Base {
 			this.setPointerCapture(native.pointerId);
 			
 			$this.on('pointermove.scroll', function(event) {
+				if (!self.active) return; // sanity
 				self.wfScroll.x = start_scroll.x - ((event.clientX - start_pt.x) / self.wfZoom);
 				self.wfScroll.y = start_scroll.y - ((event.clientY - start_pt.y) / self.wfZoom);
 				self.drawWorkflow();
 			});
 			
 			$this.on('pointerup.scroll', function(event) {
-				delete self.wfScroll.dragging;
+				if (self.wfScroll) delete self.wfScroll.dragging;
 				$this.css('cursor', '');
 				$this.off('.scroll');
 				$cont.removeClass('dragging');
