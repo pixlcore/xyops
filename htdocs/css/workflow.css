@@ -399,7 +399,7 @@ body.dark .wf_event_title {
 	transform: rotate(-45deg) scale(1.25);
 }
 
-.wf_container.job_preview .wf_entity, .wf_container.job_preview .wf_condition {
+.wf_container.job_preview .wf_entity, .wf_container.job_preview .wf_condition, .wf_container.job_preview .wf_note {
 	pointer-events: none;
 }
 
@@ -463,6 +463,30 @@ body.dark .wf_condition {
 	overflow: hidden;
 	text-overflow: ellipsis;
 }
+
+/* Note */
+
+.wf_node.wf_note {
+	z-index: 0;
+}
+.wf_note {
+	width: 275px;
+	height: auto;
+	background-color: var(--box-background-color);
+	font-size: 13px;
+}
+.wf_note.wf_wide {
+	width: 550px;
+}
+.wf_note.selected {
+	outline: 2px dashed var(--theme-color);
+}
+
+.wf_note .markdown-body {
+	padding: 10px;
+}
+
+/* Misc */
 
 .wf_grid_footer {
 	position: absolute;

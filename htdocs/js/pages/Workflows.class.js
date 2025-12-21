@@ -775,8 +775,11 @@ Page.Workflows = class Workflows extends Page.Events {
 		}
 		
 		if (num_sel == 1) {
+			var id = first_key(selection);
+			var node = find_object( workflow.nodes, { id } );
+			
 			$cont.find('#d_btn_wf_edit').show();
-			$cont.find('#d_btn_wf_test').toggle( !!this.event.id );
+			$cont.find('#d_btn_wf_test').toggle( !!this.event.id && (node.type != 'note') );
 		}
 		else {
 			$cont.find('#d_btn_wf_edit, #d_btn_wf_test').hide();
@@ -2194,6 +2197,121 @@ Page.Workflows = class Workflows extends Page.Events {
 		
 		$('#fe_wfd_type').on('change', do_change_type);
 		do_change_type();
+	}
+	
+	doEditNode_note(node) {
+		// edit note node
+		var self = this;
+		var workflow = this.workflow;
+		var $cont = this.wfGetContainer();
+		var do_create = !node;
+		
+		if (do_create) {
+			node = { 
+				id: gen_workflow_id('n'),
+				type: 'note', 
+				data: { body: '', wide: false, show: false } 
+			};
+		} // do_create
+		
+		var title = do_create ? config.ui.titles.wfdn_new : config.ui.titles.wfdn_edit;
+		var btn = do_create ? ['plus-circle', config.ui.buttons.wfd_add_note] : ['check-circle', config.ui.buttons.accept];
+		
+		if (!do_create) title += ` <div class="dialog_title_widget mobile_hide"><span class="monospace">${this.getNiceCopyableID(node.id)}</span></div>`;
+		
+		var html = '<div class="dialog_box_content scroll maximize">';
+		
+		// body
+		html += this.getFormRow({
+			id: 'd_wfd_body',
+			label: 'Note Content:',
+			content: this.getFormTextarea({
+				id: 'fe_wfd_body',
+				rows: 1,
+				value: node.data.body || '',
+				style: 'display:none'
+			}) + `<div class="button small secondary" onClick="$P().edit_wfd_body()"><i class="mdi mdi-note-edit-outline">&nbsp;</i>Edit Note Content...</div>`,
+			caption: 'Enter the note body text using [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/) syntax.'
+		});
+		
+		// wide
+		html += this.getFormRow({
+			id: 'd_wfd_wide',
+			label: 'Size:',
+			content: this.getFormCheckbox({
+				id: 'fe_wfd_wide',
+				label: 'Double-Wide',
+				checked: node.data.wide
+			}),
+			caption: 'Optionally give the note extra horizontal space.'
+		});
+		
+		// show
+		html += this.getFormRow({
+			id: 'd_wfd_show',
+			label: 'Visibility:',
+			content: this.getFormCheckbox({
+				id: 'fe_wfd_show',
+				label: 'Show During Job Runs',
+				checked: node.data.show
+			}),
+			caption: 'Optionally show the note during workflow job runs.'
+		});
+		
+		html += '</div>';
+		Dialog.confirm( title, html, btn, function(result) {
+			if (!result) return;
+			app.clearError();
+			
+			node.data.body = $('#fe_wfd_body').val().trim();
+			node.data.wide = $('#fe_wfd_wide').is(':checked');
+			node.data.show = $('#fe_wfd_show').is(':checked');
+			
+			Dialog.hide();
+			
+			if (do_create) {
+				// add new node
+				workflow.nodes.push(node);
+				
+				// estimate size
+				var node_width = node.data.wide ? 550 : 275;
+				var node_height = 64 + (node.data.body.split(/\n/).length * 30);
+				
+				// compute x/y for new node
+				if (self.wfPausedSolder) {
+					// resume paused solder
+					self.resumePausedSolder(node.id, node_width, node_height);
+				}
+				else {
+					// center new node in viewport
+					var $editor = $cont.find('#d_wf_editor');
+					node.x = (self.wfScroll.x + ($editor.width() / 2)) - (node_width / 2);
+					node.y = (self.wfScroll.y + ($editor.height() / 2)) - (node_height / 2);
+				}
+				
+				// select new node
+				self.wfSelection = {};
+				self.wfSelection[node.id] = 2;
+			} // do_create
+			
+			self.drawWorkflow(true);
+			self.afterDraw();
+			self.addState();
+		}); // Dialog.confirm
+		
+		Dialog.autoResize();
+	}
+	
+	edit_wfd_body() {
+		// popup markdown editor for note dialog
+		this.editCodeAuto({
+			title: "Edit Note Content", 
+			code: $('#fe_wfd_body').val(), 
+			format: 'gfm',
+			callback: function(new_value) {
+				$('#fe_wfd_body').val( new_value );
+			}
+		});
 	}
 	
 	openExpressionBuilder(elem) {

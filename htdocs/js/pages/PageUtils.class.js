@@ -3554,6 +3554,23 @@ Page.PageUtils = class PageUtils extends Page.Base {
 		return html;
 	}
 	
+	getWF_note(node, workflow) {
+		// get HTML for single workflow node of type note
+		var html = '';
+		var pos = this.getWFPos(node);
+		var classes = ['wf_node', 'wf_note'];
+		if (node.data.wide) classes.push('wf_wide');
+		
+		var text = strip_html( node.data.body.trim() || config.ui.messages.wf_note_empty );
+		var body = marked.parse(text, config.ui.marked_config);
+		
+		html += `<div id="d_wfn_${node.id}" class="${classes.join(' ')}" style="left:${pos.x}px; top:${pos.y}px;" aria-label="${config.ui.labels.wf_note}">
+			<div class="markdown-body">${body}</div>
+		</div>`;
+		
+		return html;
+	}
+	
 	renderWFConnections() {
 		// draw all lines connecting nodes
 		var self = this;

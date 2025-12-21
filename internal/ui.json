@@ -796,6 +796,9 @@
 		"wfdc_new": "New Controller",
 		"wfdc_edit": "Editing Controller",
 		
+		"wfdn_new": "New Note",
+		"wfdn_edit": "Editing Note",
+		
 		"wfd_exp_builder": "Expression Builder",
 		"wfd_data_importer": "Job Data Importer",
 		
@@ -826,6 +829,7 @@
 		"wfd_add_action": "Add Action",
 		"wfd_add_limit": "Add Limiter",
 		"wfd_add_controller": "Add Controller",
+		"wfd_add_note": "Add Note",
 		
 		"wf_edit_sel_node": "Edit...",
 		"wf_test_sel_node": "Test...",
@@ -887,6 +891,7 @@
 		"draft_restored": "Your previous unsaved edits were restored.  Click the 'Cancel' button to discard them.",
 		"wf_new_save": "The new workflow was created successfully.",
 		"wf_edit_save": "The workflow was saved successfully.",
+		"wf_note_empty": "Edit this node to customize the note content.",
 		"secret_decrypted": "The secret vault was successfully decrypted for editing."
 	},
 	
@@ -908,7 +913,8 @@
 	},
 	
 	"labels": {
-		"code_editor": "Code editor. Press escape to move to next element."
+		"code_editor": "Code editor. Press escape to move to next element.",
+		"wf_note": "Custom user note."
 	},
 	
 	"hot_keys": {
@@ -1150,7 +1156,8 @@
 		{ "id": "limit", "title": "Limiter", "icon": "gauge" },
 		{ "id": "trigger", "title": "Trigger", "icon": "rocket-launch-outline" },
 		{ "id": "action", "title": "Action", "icon": "gesture-tap" },
-		{ "id": "controller", "title": "Controller", "icon": "gamepad-variant-outline" }
+		{ "id": "controller", "title": "Controller", "icon": "gamepad-variant-outline" },
+		{ "id": "note", "title": "Note", "icon": "note-outline" }
 	],
 	
 	"workflow_new_node_menu": [
@@ -1159,7 +1166,8 @@
 		{ "id": "limit", "title": "New Limiter...", "icon": "gauge" },
 		{ "id": "trigger", "title": "New Trigger...", "icon": "rocket-launch-outline" },
 		{ "id": "action", "title": "New Action...", "icon": "gesture-tap" },
-		{ "id": "controller", "title": "New Controller...", "icon": "gamepad-variant-outline" }
+		{ "id": "controller", "title": "New Controller...", "icon": "gamepad-variant-outline" },
+		{ "id": "note", "title": "New Note...", "icon": "note-outline" }
 	],
 	
 	"workflow_controller_type_menu": [
