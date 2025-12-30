@@ -13,7 +13,7 @@
 		"boot": "pixl-boot install --script bin/control.sh",
 		"unboot": "pixl-boot uninstall",
 		"test": "pixl-unit test/test.js",
-		"changelog": "auto-changelog --commit-limit false --release-summary --issue-pattern DO_NOT_USE --hide-credit --ignore-commit-pattern CHANGELOG"
+		"changelog": "node bin/changelog.js"
 	},
 	"repository": {
 		"type": "git",
@@ -76,7 +76,6 @@
 		"zeroupload": "^1.0.0"
 	},
 	"devDependencies": {
-		"auto-changelog": "2.5.0",
 		"pixl-unit": "^2.0.0"
 	}
 }
