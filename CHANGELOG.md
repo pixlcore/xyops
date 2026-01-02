@@ -1,5 +1,14 @@
 # xyOps Changelog
 
+## Version v0.9.7
+
+> January 2, 2026
+
+- [340ff1b](https://github.com/pixlcore/xyops/commit/340ff1b51fa44d0e4cdceeacd49327074bc6a818): Version 0.9.7
+- [74ee1ec](https://github.com/pixlcore/xyops/commit/74ee1ec6af7118a1a59694df547e631a7be290b1): Rewrote Docker setup instructions for handling config files
+- [1afc5f1](https://github.com/pixlcore/xyops/commit/1afc5f1afd9aeeef56faf159b61d775ec46b3260): Automatically copy over sample config on launch, if needed (i.e. for bind mounted config dir)
+- [21a9378](https://github.com/pixlcore/xyops/commit/21a93784c14db1ca56dd9ded8d7a2c78a3ae1389): Change default secret key
+
 ## Version v0.9.6
 
 > January 1, 2026
