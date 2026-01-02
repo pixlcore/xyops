@@ -1745,6 +1745,7 @@ Page.Base = class Base extends Page {
 	
 	setupBoxButtonFloater(initially_visible) {
 		// float box buttons if original is offscreen
+		if (app.mobile) return;
 		this.boxButtons = this.div.find('.box_buttons').last();
 		
 		// add hover tooltips to mobile_collapse buttons
