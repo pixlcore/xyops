@@ -1,5 +1,16 @@
 # xyOps Changelog
 
+## Version v0.9.10
+
+> January 6, 2026
+
+- [1ed3301](https://github.com/pixlcore/xyops/commit/1ed330198af002f90f3c09554ab17522b4f16ab4): Trigger Plugin: Include STDOUT in level 9 debug log entry
+- [fa9ec91](https://github.com/pixlcore/xyops/commit/fa9ec911caa7d5b90cb420ddbf730eddf51bffd0): Version 0.9.10
+- [e21a2aa](https://github.com/pixlcore/xyops/commit/e21a2aa04a2212477e733de2fee0d2f14cf18b8c): Improve UX for updating or upgrading plugins.
+- [bdbbd92](https://github.com/pixlcore/xyops/commit/bdbbd9272744e77fe79826ff410b37b0545126f0): Fix bug where "negative" Cronicle list pages were not imported.
+- [fdf4a68](https://github.com/pixlcore/xyops/commit/fdf4a689036866f9b894fc77abfdd2faaf5ee073): Marketplace: Use exponential backoff for proxy request retries.
+- [8a5b718](https://github.com/pixlcore/xyops/commit/8a5b718780f7dc708f542b0a235ffc34b226fa98): Marketplace: Add retries to origin API proxy requests
+
 ## Version v0.9.9
 
 > January 5, 2026
