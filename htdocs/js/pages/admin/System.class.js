@@ -134,6 +134,12 @@ Page.System = class System extends Page.PageUtils {
 			html += '<div class="caption">Generate a new secret key and safely re-encrypt all secrets, servers and conductors.  <a href="#Docs/hosting/secret-key-rotation">Learn More</a></div>';
 		html += '</div>';
 		
+		// send test email
+		html += '<div class="maint_unit">';
+			html += '<div class="button secondary" onClick="$P().do_send_test_email()"><i class="mdi mdi-email-fast-outline">&nbsp;</i>Send Test Email...</div>';
+			html += '<div class="caption">Send a test email to make sure your server configuration is correct.</div>';
+		html += '</div>';
+		
 		html += '</div>'; // maint_grid
 		
 		this.div.html( html ).buttonize();
@@ -851,6 +857,59 @@ Page.System = class System extends Page.PageUtils {
 			// start the job
 			app.api.post( 'app/admin_rotate_secret_key', { password }, function(resp) {
 				app.showMessage('success', "The key rotation job has started in the background.");
+			}); // api.post
+		}); // confirm
+		
+		Dialog.autoResize();
+	}
+	
+	do_send_test_email() {
+		// prompt user for an email address to send a test mail to
+		var self = this;
+		var html = '';
+		
+		html += `<div class="dialog_intro">Use this to send a test email, to ensure your mail configuration is correct.  The result from the test will include the full mailer debug log, to help you troubleshoot issues.</div>`;
+		html += '<div class="dialog_box_content maximize scroll">';
+		
+		html += this.getFormRow({
+			label: 'Send Email To:',
+			content: this.getFormText({
+				type: 'text',
+				id: 'fe_sys_email',
+				spellcheck: 'false',
+				value: app.user.email
+			}),
+			caption: "Enter an email address to send the test message to."
+		});
+		
+		html += '</div>';
+		Dialog.confirm( "Send Test Email", html, ['email-fast-outline', "Send Now"], function(result) {
+			if (!result) return;
+			app.clearError();
+			
+			var to = $('#fe_sys_email').val().trim();
+			if (!to.length) return app.badField('#fe_sys_email', "Please enter an email address to send to.");
+			Dialog.hide();
+			Dialog.showProgress( 1.0, "Sending test email..." );
+			
+			// send it
+			app.api.post( 'app/admin_send_test_email', { to }, function(resp) {
+				// resp: { code, err, description, details }
+				Dialog.hide();
+				
+				var title = '';
+				var md = '';
+				
+				if (resp.err) {
+					title = '<span class="danger"><i class="mdi mdi-alert-decagram">&nbsp;</i>Failed To Send Email</span>';
+				}
+				else {
+					title = '<i class="mdi mdi-check-circle-outline">&nbsp;</i>Email Sent Successfully';
+				}
+				
+				md += "**Result:** " + resp.description + "\n\n" + resp.details;
+				
+				self.viewMarkdownAuto(title, md);
 			}); // api.post
 		}); // confirm
 		
