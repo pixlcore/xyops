@@ -1,5 +1,25 @@
 # xyOps Changelog
 
+## Version v0.9.17
+
+> January 10, 2026
+
+- [`4cca996`](https://github.com/pixlcore/xyops/commit/4cca996995a75e811e41054cb7d4c960cae891d4): Version 0.9.17
+- [`fb1973c`](https://github.com/pixlcore/xyops/commit/fb1973cb45738df1166f3d73e8df89493e05a07d): Plugin API: Two new APIs: test_monitor_plugin, and test_scheduler_plugin.
+- [`3d6b2f6`](https://github.com/pixlcore/xyops/commit/3d6b2f69cd7c29d058898e3de5cd09a292acddef): Run Event API Validation fixes...
+- [`0cfe00f`](https://github.com/pixlcore/xyops/commit/0cfe00f9000d212f192a6e97ae829580c98eddea): Server Connect: Initialize server.info.features if not passed in by remote server.
+- [`4479606`](https://github.com/pixlcore/xyops/commit/4479606971f715ad81eef8acf44e572977030948): Scheduler: Support for testing scheduler (trigger) plugins, and tweak env vars...
+- [`0177dc4`](https://github.com/pixlcore/xyops/commit/0177dc40d98b2d42ce92011188f6c6f34ece3f33): Socket Comm: Improve debug logging, support for new monitor plugin test
+- [`6470520`](https://github.com/pixlcore/xyops/commit/6470520711512be6fa9d72dc662f14a737909021): Action Plugins: Changes to env vars and output formatting...
+- [`74c2545`](https://github.com/pixlcore/xyops/commit/74c2545283e4c9df24d9dd2978e7e3bab9efaaeb): Sanitize HTML Config: Allow "class" attrib on pre and code tags
+- [`853badd`](https://github.com/pixlcore/xyops/commit/853baddb477ec4acf1784a5c238c8393fcc8a49b): Plugins: Big Change: New "Test" button, to test all 4 plugin types!
+- [`ae3637d`](https://github.com/pixlcore/xyops/commit/ae3637d94f8da3f49566fe6819c36de19a6ed671): Revision Dialogs: Fix icon spacing.
+- [`d79cd6f`](https://github.com/pixlcore/xyops/commit/d79cd6f97622827d380c34fd44a7bcc9dc7927c9): Job Detail: Add action popup, and a markdown style fix...
+- [`f772667`](https://github.com/pixlcore/xyops/commit/f77266706b7ac5a20538d9594c08622d0d6398d1): Event Revision Dialog: Fix icon spacing.
+- [`aee19f0`](https://github.com/pixlcore/xyops/commit/aee19f037880ade94966d8da268e81f535dd5dbb): Fix getNiceAPIKey, and changes to viewMarkdownAuto...
+- [`3e1653c`](https://github.com/pixlcore/xyops/commit/3e1653c57ce75e90ae51f857f8c964f146afe5d9): Allow CodeEditor to show progress dialogs on top of standard dialogs.
+- [`b01e5b8`](https://github.com/pixlcore/xyops/commit/b01e5b8f14232fc75445284bb3476ed22ac76157): style.css: Add new styles for using ex_tree for testing monitor plugins.
+
 ## Version v0.9.16
 
 > January 8, 2026
