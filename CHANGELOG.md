@@ -1,5 +1,12 @@
 # xyOps Changelog
 
+## Version v0.9.18
+
+> January 10, 2026
+
+- [`b13d9fb`](https://github.com/pixlcore/xyops/commit/b13d9fb29f152e1d269af38b3bb5d5f64a642b1c): Version 0.9.18
+- [`9f51b25`](https://github.com/pixlcore/xyops/commit/9f51b256aaf80d9f5523b46e77e20668b9ac4b4a): Fix: Move uv/uvx binaries to a standard PATH location
+
 ## Version v0.9.17
 
 > January 10, 2026
