@@ -313,8 +313,9 @@ Page.Plugins = class Plugins extends Page.PageUtils {
 			html += '<div class="button cancel mobile_collapse" onClick="$P().cancel_plugin_edit()"><i class="mdi mdi-close-circle-outline">&nbsp;</i><span>Close</span></div>';
 			html += '<div class="button danger mobile_collapse" onClick="$P().show_delete_plugin_dialog()"><i class="mdi mdi-trash-can-outline">&nbsp;</i><span>Delete...</span></div>';
 			html += '<div class="button secondary mobile_collapse" onClick="$P().do_clone()"><i class="mdi mdi-content-copy">&nbsp;</i><span>Clone...</span></div>';
-			html += '<div class="button secondary mobile_collapse" onClick="$P().do_export()"><i class="mdi mdi-cloud-download-outline">&nbsp;</i><span>Export...</span></div>';
-			html += '<div class="button secondary mobile_hide" onClick="$P().go_edit_history()"><i class="mdi mdi-history">&nbsp;</i><span>History...</span></div>';
+			html += '<div class="button secondary mobile_collapse" onClick="$P().do_test()"><i class="mdi mdi-test-tube">&nbsp;</i><span>Test...</span></div>';
+			html += '<div class="button secondary mobile_collapse mobile_hide" onClick="$P().do_export()"><i class="mdi mdi-cloud-download-outline">&nbsp;</i><span>Export...</span></div>';
+			html += '<div class="button secondary mobile_collapse mobile_hide" onClick="$P().go_edit_history()"><i class="mdi mdi-history">&nbsp;</i><span>History...</span></div>';
 			html += '<div class="button save phone_collapse" id="btn_save" onClick="$P().do_save_plugin()"><i class="mdi mdi-floppy">&nbsp;</i><span>Save Changes</span></div>';
 		html += '</div>'; // box_buttons
 		
@@ -331,6 +332,484 @@ Page.Plugins = class Plugins extends Page.PageUtils {
 		this.setupBoxButtonFloater();
 		this.renderParamEditor();
 		this.setupEditTriggers();
+	}
+	
+	do_test() {
+		// test plugin
+		if (this.div.find('.button.save').hasClass('primary')) return app.doError("Please save or revert your changes before testing.");
+		
+		app.clearError();
+		var plugin = this.get_plugin_form_json();
+		if (!plugin) return; // error
+		
+		switch (plugin.type) {
+			case 'event': this.do_test_event_plugin(plugin); break;
+			case 'action': this.do_test_action_plugin(plugin); break;
+			case 'monitor': this.do_test_monitor_plugin(plugin); break;
+			case 'scheduler': this.do_test_trigger_plugin(plugin); break;
+		}
+	}
+	
+	do_test_event_plugin(plugin) {
+		// test event plugin
+		var self = this;
+		var title = "Test Event Plugin";
+		var btn = ['open-in-new', 'Test Plugin'];
+		
+		// privilege check
+		if (!app.requirePrivilege('create_events')) return;
+		if (!app.requirePrivilege('run_jobs')) return;
+		
+		if (!app.categories.length) return app.doError("No categories found.  Please add a category before testing event plugins.");
+		var cat_def = find_object( app.categories, { id: 'general' } ) || app.categories[0];
+		
+		var html = '';
+		html += `<div class="dialog_intro">Use this form to test the current event plugin.  This is done by creating a temporary self-deleting event, which immediately runs an ad-hoc test job with your custom settings below.  The test will launch in a new browser tab in order to preserve the current context.</div>`;
+		html += '<div class="dialog_box_content scroll maximize">';
+		
+		// target
+		html += this.getFormRow({
+			label: 'Test Target:',
+			content: this.getFormMenuSingle({
+				id: 'fe_epd_target',
+				options: [].concat(
+					this.buildOptGroup(app.groups, config.ui.menu_bits.wf_targets_groups, 'server-network'),
+					this.buildServerOptGroup(config.ui.menu_bits.wf_targets_servers, 'router-network')
+				),
+				value: ''
+			}),
+			caption: "Select a server or group to run the plugin test."
+		});
+		
+		// custom input json
+		html += this.getFormRow({
+			label: 'Data Input:',
+			content: this.getFormTextarea({
+				id: 'fe_epd_input',
+				rows: 1,
+				value: JSON.stringify({ data: {}, files: [] }, null, "\t"),
+				style: 'display:none'
+			}) + `<div class="button small secondary" onClick="$P().edit_test_input()"><i class="mdi mdi-text-box-edit-outline">&nbsp;</i>${config.ui.buttons.wfd_edit_json}</div>`,
+			caption: 'Optionally customize the JSON input data for the test job.  This is used to simulate data being passed to it from a previous job.'
+		});
+		
+		// user files
+		html += this.getFormRow({
+			label: 'File Input:',
+			content: this.getDialogFileUploader(),
+			caption: 'Optionally upload and attach files to the test job as inputs.'
+		});
+		
+		// plugin params
+		html += this.getFormRow({
+			content: '<div id="d_epd_param_editor" class="plugin_param_editor_cont">' + this.getPluginParamEditor( plugin.id, {} ) + '</div>',
+			caption: plugin.params.length ? 'Enter test values for all the plugin parameters here.' : ''
+		});
+		
+		html += '</div>';
+		Dialog.confirm( title, html, btn, function(result) {
+			if (!result) return;
+			app.clearError();
+			
+			var target = $('#fe_epd_target').val();
+			if (!target) return app.badField('#fe_epd_target', "Please select a target server or group to run the test on.");
+			
+			var params = self.getPluginParamValues( plugin.id );
+			if (!params) return; // invalid
+			
+			var event = {
+				enabled: true,
+				title: "Test Event",
+				icon: 'test-tube',
+				category: cat_def.id,
+				targets: [ target ],
+				algo: 'random',
+				plugin: plugin.id,
+				params: params,
+				triggers: [
+					{ type: "manual", enabled: true }
+				],
+				actions: [
+					{ type: "delete", enabled: true, condition: "complete" }
+				],
+				limits: [],
+				fields: [],
+				tags: [],
+				notes: "For testing only."
+			};
+			
+			var job = deep_copy_object(event);
+			job.test = true;
+			job.test_actions = false;
+			job.test_limits = false;
+			job.label = "Test";
+			
+			// parse custom input json
+			var raw_json = $('#fe_epd_input').val();
+			if (raw_json) try {
+				job.input = JSON.parse( raw_json );
+			}
+			catch (err) {
+				return app.badField( '#fe_epd_input', "", { err } );
+			}
+			
+			// add files if user uploaded
+			if (self.dialogFiles && self.dialogFiles.length) {
+				if (!job.input) job.input = {};
+				if (!job.input.files) job.input.files = [];
+				job.input.files = job.input.files.concat( self.dialogFiles );
+				delete self.dialogFiles;
+			}
+			
+			// pre-open new window/tab for job details
+			var win = window.open('', '_blank');
+			
+			app.api.post( 'app/create_event', event, function(resp) {
+				// now run the job
+				if (!self.active) return; // sanity
+				job.event = resp.event.id;
+				
+				app.api.post( 'app/run_event', job, function(resp) {
+					// Dialog.hideProgress();
+					if (!self.active) return; // sanity
+					
+					// jump immediately to live details page in new window
+					win.location.href = '#Job?id=' + resp.id;
+				}, 
+				function(err) {
+					// capture error so we can close the window we just opened
+					win.close();
+					app.doError("API Error: " + err.description);
+				}); // run_event error
+			},
+			function(err) {
+				win.close();
+				app.doError("API Error: " + err.description);
+			} ); // create_event error
+			
+			Dialog.hide();
+		}); // Dialog.confirm
+		
+		Dialog.onDragDrop = function(files) {
+			// files dropped on dialog
+			ZeroUpload.upload( files, {}, {} );
+		};
+		
+		Dialog.onHide = function() {
+			// cleanup
+			// FUTURE: If self.dialogFiles still exists here, delete in background (user canceled job)
+			delete self.dialogFiles;
+		};
+		
+		SingleSelect.init( $('#fe_epd_target') );
+		Dialog.autoResize();
+	}
+	
+	edit_test_input() {
+		// popup json editor for test dialog
+		this.editCodeAuto({
+			title: "Edit Raw Input Data", 
+			code: $('#fe_epd_input').val(), 
+			format: 'json',
+			callback: function(new_value) {
+				$('#fe_epd_input').val( new_value );
+			}
+		});
+	}
+	
+	do_test_action_plugin(plugin) {
+		// test action plugin
+		var self = this;
+		var title = "Test Action Plugin";
+		var btn = ['open-in-new', 'Test Plugin'];
+		
+		// privilege check
+		if (!app.requirePrivilege('create_events')) return;
+		if (!app.requirePrivilege('run_jobs')) return;
+		
+		if (!app.categories.length) return app.doError("No categories found.  Please add a category before testing action plugins.");
+		var cat_def = find_object( app.categories, { id: 'general' } ) || app.categories[0];
+		
+		if (!app.groups.length) return app.doError("No server groups found.  Please add a server group before testing action plugins.");
+		var grp_def = find_object( app.groups, { id: 'maingrp' } ) || app.groups[0];
+		
+		if (!find_object( app.plugins, { id: 'testplug' } )) return app.doError("Cannot test action plugins without the 'Test Plugin' event plugin.");
+		
+		var html = '';
+		html += `<div class="dialog_intro">Use this form to test the current action plugin.  This is done by creating a temporary self-deleting event, which immediately runs an ad-hoc test job with your action plugin configured to fire at completion.  The test will launch in a new browser tab in order to preserve the current context.</div>`;
+		html += '<div class="dialog_box_content scroll maximize">';
+		
+		// result
+		html += this.getFormRow({
+			label: 'Simulate Result:',
+			content: this.getFormMenuSingle({
+				id: 'fe_epd_result',
+				options: [
+					{ id: 'success', title: 'Success', icon: 'check-circle-outline' },
+					{ id: 'error', title: 'Failure', icon: 'alert-decagram-outline' },
+					{ id: 'warning', title: 'Warning', icon: 'alert-outline' },
+					{ id: 'critical', title: 'Critical', icon: 'fire-alert' },
+					{ id: 'abort', title: 'Abort', icon: 'cancel' }
+				],
+				value: ''
+			}),
+			caption: "Select which job result to simulate for the action."
+		});
+		
+		// plugin params
+		html += this.getFormRow({
+			content: '<div id="d_epd_param_editor" class="plugin_param_editor_cont">' + this.getPluginParamEditor( plugin.id, {} ) + '</div>',
+			caption: plugin.params.length ? 'Enter test values for all the plugin parameters here.' : ''
+		});
+		
+		html += '</div>';
+		Dialog.confirm( title, html, btn, function(result) {
+			if (!result) return;
+			app.clearError();
+			
+			var result = $('#fe_epd_result').val();
+			if (!result) return app.badField('#fe_epd_result', "Please select a job result to simulate.");
+			
+			var params = self.getPluginParamValues( plugin.id );
+			if (!params) return; // invalid
+			
+			var event = {
+				enabled: true,
+				title: "Test Event",
+				icon: 'test-tube',
+				category: cat_def.id,
+				targets: [ grp_def.id ],
+				algo: 'random',
+				plugin: 'testplug',
+				params: { 
+					duration: 1,
+					action: ucfirst(result)
+				},
+				triggers: [
+					{ type: "manual", enabled: true }
+				],
+				actions: [
+					{ type: 'plugin', enabled: true, condition: "complete", plugin_id: plugin.id },
+					{ type: "delete", enabled: true, condition: "complete" }
+				],
+				limits: [],
+				fields: [],
+				tags: [],
+				notes: "For testing only."
+			};
+			
+			var job = deep_copy_object(event);
+			job.test = true;
+			job.test_actions = false;
+			job.test_limits = false;
+			job.label = "Test";
+			
+			// pre-open new window/tab for job details
+			var win = window.open('', '_blank');
+			
+			app.api.post( 'app/create_event', event, function(resp) {
+				// now run the job
+				if (!self.active) return; // sanity
+				job.event = resp.event.id;
+				
+				app.api.post( 'app/run_event', job, function(resp) {
+					// Dialog.hideProgress();
+					if (!self.active) return; // sanity
+					
+					// jump immediately to live details page in new window
+					win.location.href = '#Job?id=' + resp.id + '&action=1';
+				}, 
+				function(err) {
+					// capture error so we can close the window we just opened
+					win.close();
+					app.doError("API Error: " + err.description);
+				}); // run_event error
+			},
+			function(err) {
+				win.close();
+				app.doError("API Error: " + err.description);
+			} ); // create_event error
+			
+			Dialog.hide();
+		}); // Dialog.confirm
+		
+		SingleSelect.init( $('#fe_epd_result') );
+		Dialog.autoResize();
+	}
+	
+	do_test_monitor_plugin(plugin) {
+		// test monitor plugin
+		var self = this;
+		var html = '';
+		var title = 'Test Monitor Plugin';
+		
+		var servers = this.getCategorizedServers(true);
+		if (!servers.length) return app.doError(config.ui.errors.sde_no_servers);
+		
+		html += `<div class="dialog_intro">Test your monitor plugin on any server and view the raw result.</div>`;
+		html += '<div class="dialog_box_content maximize">';
+		
+		// server picker
+		html += this.getFormRow({
+			id: 'd_epd_server',
+			label: 'Select Test Server:',
+			content: this.getFormMenuSingle({
+				id: 'fe_epd_server',
+				options: servers,
+				value: '',
+				default_icon: 'router-network'
+			}),
+			caption: "Select a server to test your monitor plugin on."
+		});
+		
+		// json tree viewer
+		html += this.getFormRow({
+			id: 'd_epd_tree_viewer',
+			label: plugin.title + ' Result:',
+			content: '<div id="d_ex_tree"><div class="ex_tree_inner tree_static"><div class="loading_container"><div class="loading"></div></div></div></div>',
+			caption: "Your plugin's parsed JSON, XML or text result will appear above."
+		});
+		
+		html += '</div>'; // dialog_box_content
+		
+		var buttons_html = "";
+		buttons_html += `<div id="btn_epd_retry" class="button"><i class="mdi mdi-refresh">&nbsp;</i>${config.ui.buttons.retry}</div>`;
+		buttons_html += `<div class="button primary" onClick="Dialog.hide()"><i class="mdi mdi-close-circle-outline">&nbsp;</i>${config.ui.buttons.close}</div>`;
+		
+		Dialog.showSimpleDialog(title, html, buttons_html);
+		
+		SingleSelect.init('#fe_epd_server');
+		
+		$('#fe_epd_server').on('change', function() {
+			var server_id = $(this).val();
+			if (!server_id) return; // sanity
+			
+			$('#d_ex_tree > .ex_tree_inner').html('<div class="loading_container"><div class="loading"></div></div>');
+			
+			// now run the test
+			app.api.post( 'app/test_monitor_plugin', { id: plugin.id, server: server_id }, function(resp) {
+				// result may be plain text, or an object tree
+				if (resp.result && (typeof(resp.result) == 'object')) {
+					$('#d_ex_tree > .ex_tree_inner').html( self.getDataTree(resp.result) );
+				}
+				else {
+					$('#d_ex_tree > .ex_tree_inner').html( 
+						'<pre class="ex_tree_pre">' + encode_entities(resp.result || '(No output)') + '</pre>' 
+					);
+				}
+				
+				if (resp.stderr) {
+					$('#d_ex_tree > .ex_tree_inner').append(
+						'<pre class="ex_tree_pre"><b>STDERR:</b>' + "\n\n" + encode_entities(resp.stderr) + '</pre>' 
+					);
+				}
+			} ); // api.get
+		}); // on change
+		
+		$('#btn_epd_retry').on('click', function() {
+			// retry the op
+			$('#fe_epd_server').trigger('change');
+		});
+		
+		// trigger change to load first server
+		$('#fe_epd_server').trigger('change');
+	}
+	
+	do_test_trigger_plugin(plugin) {
+		// test trigger plugin
+		var self = this;
+		var html = '';
+		var title = 'Test Trigger Plugin';
+		var btn = ['open-in-new', 'Test Plugin'];
+		
+		html += `<div class="dialog_intro">Use this form to test the current trigger plugin, and view the results from a test scheduled job.  Trigger plugins always run on the primary conductor server.</div>`;
+		html += '<div class="dialog_box_content scroll maximize">';
+		
+		// if user's tz differs from server tz, pre-populate timezone menu with user's zone
+		var ropts = Intl.DateTimeFormat().resolvedOptions();
+		var user_tz = app.user.timezone || ropts.timeZone;
+		if (user_tz != app.config.tz) new_item.timezone = user_tz;
+		
+		// timezone
+		var zones = [
+			['', "Server Default (" + app.config.tz + ")"],
+			[user_tz, "My Timezone (" + user_tz + ")"]
+		].concat(app.config.intl.timezones);
+		
+		html += this.getFormRow({
+			id: 'd_epd_tz',
+			label: 'Test Timezone:',
+			content: this.getFormMenuSingle({
+				id: 'fe_epd_tz',
+				title: 'Select Timezone',
+				options: zones,
+				value: ''
+			}),
+			caption: 'Select the desired timezone for the trigger test.'
+		});
+		
+		// plugin params
+		html += this.getFormRow({
+			content: '<div id="d_epd_param_editor" class="plugin_param_editor_cont">' + this.getPluginParamEditor( plugin.id, {} ) + '</div>',
+			caption: plugin.params.length ? 'Enter test values for all the plugin parameters here.' : ''
+		});
+		
+		html += '</div>';
+		Dialog.confirm( title, html, btn, function(result) {
+			if (!result) return;
+			app.clearError();
+			
+			var timezone = $('#fe_epd_tz').val() || app.config.tz;
+			
+			var params = self.getPluginParamValues( plugin.id );
+			if (!params) return; // invalid
+			
+			CodeEditor.showProgress( 1.0, "Testing trigger plugin..." );
+			
+			app.api.post( 'app/test_scheduler_plugin', { id: plugin.id, timezone, params }, function(resp) {
+				// resp: { code, description? data?, stdout?, stderr?, child_cmd? }
+				CodeEditor.hideProgress();
+				
+				// show results as markdown in secondary dialog
+				var md = '';
+				var title = '';
+				
+				md += `- **Plugin ID**: \`${plugin.id}\`\n`;
+				md += `- **Plugin Title**: ${self.getNicePlugin(plugin.id, false)}\n`;
+				md += `- **Date/Time**: ${self.getNiceDateTime(app.epoch).replace(/\&nbsp\;/g, '')}\n`;
+				
+				if (resp.err) {
+					title = '<span class="danger"><i class="mdi mdi-alert-decagram">&nbsp;</i>Plugin Test Failed</span>';
+					md += `\n### Error:\n\n${resp.description}\n`;
+				}
+				else {
+					title = '<span style="color:var(--green)"><i class="mdi mdi-check-circle-outline">&nbsp;</i>Plugin Test Successful</span>';
+					md += `\n### Launch Result:\n\n`;
+					if (resp.data && resp.data.items && resp.data.items[0] && ((resp.data.items[0] === true) || resp.data.items[0].launch)) {
+						md += `- <i class="mdi mdi-check-circle-outline"></i>A job launch **was triggered**.\n`;
+					}
+					else {
+						md += `- <i class="mdi mdi-cancel"></i>A job launch was not triggered.\n`;
+					}
+				}
+				
+				if (resp.data) {
+					md += "\n### Output JSON:\n\n```\n" + JSON.stringify(resp.data, null, "\t") + "\n```\n";
+				}
+				else if (resp.stdout) {
+					md += "\n### Plugin STDOUT:\n\n```\n" + encode_entities(resp.stdout) + "\n```\n";
+				}
+				
+				if (resp.stderr) {
+					md += "\n### Plugin STDERR:\n\n```\n" + encode_entities(resp.stderr) + "\n```\n";
+				}
+				
+				self.viewMarkdownAuto(title, md);
+			}); // api.post
+		}); // Dialog.confirm
+		
+		SingleSelect.init( $('#fe_epd_tz') );
+		Dialog.autoResize();
 	}
 	
 	do_clone() {
