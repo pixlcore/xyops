@@ -287,12 +287,12 @@
 	},
 	
 	"workflow_controller_descriptions": {
-		"multiplex": "The **Multiplex** controller allows you to run an event job multiple times in series or parallel, across multiple servers.  Specifically, it will launch one job for each configured target server in the event.  Make sure your event targets multiple servers, otherwise this will only launch a single job.",
-		"wait": "The **Wait** controller waits for a specific amount of time before passing control to all the connected nodes.",
-		"repeat": "The **Repeat** controller will run a job multiple times in series or in parallel, based on the configured limits on the event.  You can specify the exact number of iterations below.  This is useful for running the same job a set number of times.",
-		"split": "The **Split** controller will run a job multiple times in series or in parallel, but it will split the input data into multiple chunks, and run each chunk in its own job.  This is useful for processing large datasets in parallel, such as splitting a large file into smaller parts.  Use the expression field to specify the input data to split, which should point to an array.",
-		"join": "The **Join** controller will wait for multiple input jobs to complete, and then pass control to the next node, combining the results of the jobs.  This is useful for aggregating data from multiple sources, such as combining the results of multiple API calls into a single response.",
-		"decision": "The **Decision** controller will evalulate a custom expression, and only pass control to the next node if the expression evaluates to true.  This is useful for conditional logic, such as only running a job if a certain condition is met."
+		"multiplex": "The **Multiplex** controller allows you to run an event job multiple times in series or parallel, across multiple servers.  Specifically, it will launch one job for each configured target server in the event.  Make sure your event targets multiple servers, otherwise this will only launch a single job.  [Learn More](#Docs/workflows/multiplex-controller)",
+		"wait": "The **Wait** controller waits for a specific amount of time before passing control to all the connected nodes.  [Learn More](#Docs/workflows/wait-controller)",
+		"repeat": "The **Repeat** controller will run a job multiple times in series or in parallel, based on the configured limits on the event.  You can specify the exact number of iterations below.  This is useful for running the same job a set number of times.  [Learn More](#Docs/workflows/repeat-controller)",
+		"split": "The **Split** controller will run a job multiple times in series or in parallel, but it will split the input data into multiple chunks, and run each chunk in its own job.  This is useful for processing large datasets in parallel, such as splitting a large file into smaller parts.  Use the expression field to specify the input data to split, which should point to an array.  [Learn More](#Docs/workflows/split-controller)",
+		"join": "The **Join** controller will wait for multiple input jobs to complete, and then pass control to the next node, combining the results of the jobs.  This is useful for aggregating data from multiple sources, such as combining the results of multiple API calls into a single response.  [Learn More](#Docs/workflows/join-controller)",
+		"decision": "The **Decision** controller will evalulate a custom expression, and only pass control to the next node if the expression evaluates to true.  This is useful for conditional logic, such as only running a job if a certain condition is met.  [Learn More](#Docs/workflows/decision-controller)"
 	},
 	
 	"dom": {
@@ -572,7 +572,7 @@
 			},
 			"d_wfd_if": {
 				"label": "Expression:",
-				"caption": "Enter the expression to evaluate using `dot.path.notation`.  If true, control will pass onto the next node."
+				"caption": "Enter the expression to evaluate using dot.path.notation, e.g. `data.random > 0.5`.  If true, control will pass onto the next node."
 			},
 			"d_wfd_title": {
 				"label": "Custom Title:",
