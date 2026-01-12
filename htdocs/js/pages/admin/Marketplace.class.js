@@ -74,8 +74,13 @@ Page.Marketplace = class Marketplace extends Page.PageUtils {
 								var def = config.ui.data_types[type];
 								if (def) return { id: type, title: toTitleCase(type), icon: def.icon };
 								else return type;
-							} ) ),
-							value: args.type || '',
+							} ) ).concat( [
+								{ id: 'p_action', title: 'Action Plugins', icon: 'gesture-tap', group: "Plugin Types" },
+								{ id: 'p_event', title: 'Event Plugins', icon: 'calendar-clock' },
+								{ id: 'p_monitor', title: 'Monitor Plugins', icon: 'console' },
+								{ id: 'p_scheduler', title: 'Trigger Plugins', icon: 'rocket-launch-outline' }
+							] ),
+							value: args.plugin_type ? `p_${args.plugin_type}` : (args.type || ''),
 							'data-shrinkwrap': 1
 						})
 					});
@@ -214,7 +219,14 @@ Page.Marketplace = class Marketplace extends Page.PageUtils {
 		if (lic) args.license = lic;
 		
 		var type = this.div.find('#fe_s_type').val();
-		if (type) args.type = type;
+		if (type) {
+			if (type.match(/^p_(\w+)$/)) {
+				var plugin_type = RegExp.$1;
+				args.type = 'plugin';
+				args.plugin_type = plugin_type;
+			}
+			else args.type = type;
+		}
 		
 		var sort = this.div.find('#fe_s_sort').val();
 		if (sort != 'title_asc') args.sort = sort;
@@ -321,7 +333,7 @@ Page.Marketplace = class Marketplace extends Page.PageUtils {
 				combo,
 				self.getNiceProductAuthor( product.author ),
 				self.getNiceProductLicense( product.license ),
-				self.getNiceProductType( product.type ),
+				self.getNiceProductType( product ),
 				self.getNiceProductDate( product.created ),
 				self.getNiceProductVersion( product.versions[0] )
 			];
@@ -335,10 +347,12 @@ Page.Marketplace = class Marketplace extends Page.PageUtils {
 		this.cleanupBoxButtonFloater();
 	}
 	
-	getNiceProductType(type) {
+	getNiceProductType(product) {
 		// { id: type, title: toTitleCase(type), icon: def.icon };
-		var def = config.ui.data_types[type];
-		if (def) return `<i class="mdi mdi-${def.icon}">&nbsp;</i>` + toTitleCase(type);
+		if (product.plugin_type) return this.getNicePluginType(product.plugin_type);
+		
+		var def = config.ui.data_types[product.type];
+		if (def) return `<i class="mdi mdi-${def.icon}">&nbsp;</i>` + toTitleCase(product.type);
 		else return type;
 	}
 	
@@ -438,7 +452,7 @@ Page.Marketplace = class Marketplace extends Page.PageUtils {
 					// type
 					html += '<div>';
 						html += '<div class="info_label">Type</div>';
-						html += '<div class="info_value">' + this.getNiceProductType(product.type) + '</div>';
+						html += '<div class="info_value">' + this.getNiceProductType(product) + '</div>';
 					html += '</div>';
 					
 					// status (installed / not)
