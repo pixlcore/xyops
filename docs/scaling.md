@@ -52,10 +52,64 @@ Multi-conductor requires external shared storage so all conductors see the same 
 
 **Tip**: Keep conductors in the same region/AZ as your storage to minimize cross-zone latency. For HTTP ingress, front conductors with Nginx that tracks the active primary.
 
-## Automated Critical Backups
+## Automated Backups
 
 - Use the nightly API export for critical data as described in [Self-Hosting: Daily Backups](hosting.md#daily-backups). Schedule via cron and store off-host.
 - SQLite engine: It can perform its own daily DB file backups during maintenance. Configure in `Storage.SQLite.backups` (defaults keep the most recent 7). Note backups lock the DB briefly while copying.
+
+## Critical Errors
+
+For critical errors (i.e. crashes and failed upgrades) you can configure a global [System Hook](syshooks.md) to send out an automated email for each one.  Set this in your `config.json` file, in the [hooks](config.md#hooks) object:
+
+```json
+"hooks": {
+	"critical": {
+		"email": "ops-oncall@yourcompany.com"
+	}
+}
+```
+
+Or you can configure the hook to create a ticket (which in turn will email all the assignees):
+
+```json
+"hooks": {
+	"critical": {
+		"ticket": {
+			"type": "issue",
+			"assignees": ["admin"]
+		}
+	}
+}
+```
+
+See [System Hooks](syshooks.md) for more details.
+
+## Monitoring Alert Emails
+
+For server monitor alerts, you may want to send out emails.  This can be set up at three different levels:
+
+- At the alert level: You can edit individual alert definitions, and configure an email action for the important ones (e.g. "Low Memory" is a good one).
+- At the server group level: You can set default alert actions for all alerts in specific server groups (e.g. "Production Databases").
+- At the global configuration level.  See below...
+
+You can add global "universal" alert actions in the [alert_universal_actions](config.md#alert_universal_actions) configuration object.  These will fire for **all** alerts.  Example:
+
+```json
+"alert_universal_actions": [
+	{
+		"enabled": true,
+		"hidden": true,
+		"condition": "alert_new",
+		"type": "snapshot"
+	},
+	{
+		"enabled": true,
+		"condition": "alert_new",
+		"type": "email",
+		"email": "oncall-pager@mycompany.com"
+	}
+]
+```
 
 ## Security Checklist
 
