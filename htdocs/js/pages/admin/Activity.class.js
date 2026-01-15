@@ -225,6 +225,7 @@ Page.ActivityLog = class ActivityLog extends Page.PageUtils {
 			for (var key in config.ui.activity_descriptions) {
 				if (key.match(re)) keys.push( key );
 			}
+			if (args.action == 'alerts') keys.push('alert_new', 'alert_cleared'); // special keys, not in activity_descriptions
 			if (keys.length) query += ' action:' + keys.join('|');
 		}
 		else if (args.action && args.action.match(/^(notice|warning|error|critical)$/)) {
@@ -544,6 +545,7 @@ Page.ActivityLog = class ActivityLog extends Page.PageUtils {
 		
 		// massage a title out of description template (ugh)
 		var title = item._type.label + ' Activity Details';
+		title += ` <div class="dialog_title_widget mobile_hide"><span class="monospace">${this.getNiceCopyableID(item.id)}</span></div>`;
 		// var title = template.replace(/\:\s+.+$/, '').replace(/\s+\(.+$/, '');
 		var md = '';
 		
