@@ -3138,7 +3138,7 @@ In addition to the [Standard Response Format](#standard-response-format), this w
 GET /api/app/search_tickets/v1
 ```
 
-Search tickets using the Unbase query syntax. Requires a valid user session or API Key. Results are automatically filtered by the caller's access rights.
+Search tickets using the Unbase query syntax. Requires a valid user session or API Key.
 
 Parameters:
 
