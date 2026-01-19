@@ -980,7 +980,9 @@
 			"do_confirm_run_again": { "keys": ["KeyR"], "title": "Run Job Again" },
 			"doAddToTicket": { "keys": ["KeyA"], "title": "Add Job to Ticket" },
 			"doCreateTicket": { "keys": ["KeyC"], "title": "Create Job Ticket" },
-			"do_delete_job": { "keys": ["Backspace"], "title": "Delete Job" }
+			"do_delete_job": { "keys": ["Backspace"], "title": "Delete Job" },
+			"prevSlide": { "keys": ["ArrowLeft"], "title": "Previous Media Slide" },
+			"nextSlide": { "keys": ["ArrowRight"], "title": "Next Media Slide" }
 		},
 		"Servers": {
 			"showEditServerDialog": { "sub": "view", "keys": ["KeyE"], "title": "Edit Server" },

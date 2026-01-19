@@ -473,6 +473,17 @@ Page.Job = class Job extends Page.PageUtils {
 			html += '</div>'; // box
 		}
 		
+		// media previews
+		if (job.final && job.files && job.files.length && this.getPreviewableMedia().length) {
+			html += '<div class="box toggle" id="d_job_media">';
+				html += '<div class="box_title">';
+					html += '<i></i><span>Media Previews</span>';
+				html += '</div>';
+				html += '<div class="box_content table">';
+				html += '</div>'; // box_content
+			html += '</div>'; // box
+		}
+		
 		// job data (input and output)
 		if (job.final) {
 			var has_input_data = !!(job.input && job.input.data && first_key(job.input.data));
@@ -561,6 +572,7 @@ Page.Job = class Job extends Page.PageUtils {
 			this.renderJobActions();
 			this.renderJobTags();
 			this.renderJobComments();
+			this.renderMediaSlideshow();
 		}
 		
 		this.setupCharts();
@@ -2969,8 +2981,85 @@ Page.Job = class Job extends Page.PageUtils {
 				
 				job.files.splice( idx, 1 );
 				self.div.find('#d_job_files > .box_content').html( self.getFileTable() );
+				self.renderMediaSlideshow();
 			} ); // api.post
 		} ); // confirm
+	}
+	
+	getPreviewableMedia() {
+		// get array of all previewable media in job files (images, audio, video)
+		return (this.job.files || []).filter( function(file) {
+			return !!String(file.filename).match(/\.(jpe?g|png|webp|gif|avif|jxl|svg|mp4|m4v|webm|mov|mp3|wav|ogg|m4a)$/i);
+		} );
+	}
+	
+	renderMediaSlideshow() {
+		// render media slideshow of all previewable files
+		this.slides = this.getPreviewableMedia();
+		this.slideIdx = 0;
+		
+		if (!this.slides.length) {
+			this.div.find('#d_job_media').hide();
+			return;
+		}
+		
+		this.renderCurrentSlide();
+	}
+	
+	renderCurrentSlide() {
+		// render current image or video slide, with next/prev nav links
+		var html = '';
+		var slide = this.slides[ this.slideIdx ];
+		var len = this.slides.length;
+		
+		// nav controls
+		html += '<div class="data_grid_pagination">';
+			html += '<div style="text-align:left"><button class="link ' + ((len == 1) ? 'disabled' : '') + '" onClick="$P().prevSlide()"><i class="mdi mdi-chevron-left"></i>&nbsp;Prev</button></div>';
+			html += `<div style="text-align:center">Slide ${this.slideIdx + 1} of ${len}</div>`;
+			html += '<div style="text-align:right"><button class="link ' + ((len == 1) ? 'disabled' : '') + '" onClick="$P().nextSlide()">Next&nbsp;<i class="mdi mdi-chevron-right"></i></button></div>';
+		html += '</div>';
+		
+		// main slide view
+		html += '<div class="job_slide_container">';
+			var url = '/' + slide.path;
+			if (slide.filename.match(/\.(mp4|m4v|webm|mov)$/i)) {
+				// video
+				html += '<video controls preload="metadata" src="' + url + '"></video>';
+			}
+			else if (slide.filename.match(/\.(mp3|wav|ogg|m4a)$/i)) {
+				// audio
+				html += '<audio controls preload="metadata" src="' + url + '"></audio>';
+			}
+			else {
+				// image
+				html += '<div style="background-image:url(' + url + ')"></div>';
+			}
+		html += '</div>';
+		
+		// caption
+		html += '<div class="job_slide_caption">' + this.getNiceFile(slide.filename, url) + '</div>';
+		
+		this.div.find('#d_job_media > .box_content').html(html);
+	}
+	
+	prevSlide() {
+		// jump to prev media slide
+		if (!this.slides.length) return;
+		
+		this.slideIdx--;
+		if (this.slideIdx < 0) this.slideIdx += this.slides.length;
+		
+		this.renderCurrentSlide();
+	}
+	
+	nextSlide() {
+		// jump to next media slide
+		if (!this.slides.length) return;
+		
+		this.slideIdx++;
+		if (this.slideIdx >= this.slides.length) this.slideIdx = 0;
+		
+		this.renderCurrentSlide();
 	}
 	
 	do_delete_job() {
@@ -3293,6 +3382,8 @@ Page.Job = class Job extends Page.PageUtils {
 		delete this.limits;
 		delete this.snapshots;
 		delete this.wfJobRows;
+		delete this.slides;
+		delete this.slideIdx;
 		
 		// destroy charts if applicable
 		if (this.charts) {
