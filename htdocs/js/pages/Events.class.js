@@ -266,20 +266,18 @@ Page.Events = class Events extends Page.PageUtils {
 		var html = '';
 		var hidden_cats = app.prefs.hidden_cats || {};
 		
-		// sort events based on category sort order, then alphabetically
-		var cat_map = obj_array_to_hash( app.categories, 'id' );
-		var last_cat_id = '';
+		// sort events based on category sort order, then alphabetically by title (lower-case)
+		this.events = [];
 		if (!resp.rows) resp.rows = [];
 		
-		this.events = deep_copy_object(resp.rows).sort( function(a, b) {
-			if (a.category == b.category) {
+		var cat_map = obj_array_to_hash( app.categories, 'id' );
+		var sorted_cats = sort_by( app.categories, 'sort_order', { type: 'number', dir: 1, copy: true } );
+		
+		sorted_cats.forEach( function(cat) {
+			var cat_events = find_objects( resp.rows, { category: cat.id } ).sort( function(a, b) {
 				return a.title.toLowerCase().localeCompare( b.title.toLowerCase() );
-			}
-			else {
-				var cat_a = cat_map[ a.category ] || { sort_order: 99999 };
-				var cat_b = cat_map[ b.category ] || { sort_order: 99999 };
-				return (cat_a.sort_order < cat_b.sort_order) ? -1 : 1;
-			}
+			} );
+			self.events = self.events.concat( cat_events );
 		} );
 		
 		// NOTE: Don't change these columns without also changing the responsive css column collapse rules in style.css
