@@ -1017,6 +1017,11 @@ body.dark div.box_unit {
 
 object { display: none; }
 
+button.link.disabled {
+	opacity: 0.5;
+	pointer-events: none;
+}
+
 div.header_title.error {
 	font-size: 27px;
 	color: var(--red);
@@ -1823,6 +1828,51 @@ body.dark .pxc_tt_content {
 
 #d_job_banner_tags > span.nowrap {
 	padding-left: 15px;
+}
+
+.job_slide_container {
+	margin-top: 12px;
+	aspect-ratio: 16 / 9;
+	overflow: hidden;
+	display: grid;
+	place-items: center;
+}
+
+.job_slide_container > :is(img, video, audio) {
+	aspect-ratio: 16 / 9;
+	width: 100%;
+	height: 100%;
+	object-fit: contain;
+	object-position: center;
+	display: block;
+}
+
+.job_slide_container > audio {
+	background-color: rgba(128, 128, 128, 0.075);
+	background-size: contain;
+	background-position: center;
+	background-repeat: no-repeat;
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='30'%3E🔊%3C/text%3E%3C/svg%3E");
+}
+
+.job_slide_container > div {
+	width: 100%;
+	height: 100%;
+	aspect-ratio: 16 / 9;
+	background-size: contain;
+	background-position: center;
+	background-repeat: no-repeat;
+}
+
+.job_slide_caption {
+	margin-top: 12px;
+	font-size: 13px;
+	font-weight: bold;
+	text-align: center;
+	color: var(--label-color);
+}
+.job_slide_caption i.mdi:before {
+	scale: 1.3;
 }
 
 /* Snapshots Page */
