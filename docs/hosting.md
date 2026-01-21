@@ -206,6 +206,36 @@ xyops-data-export-YYYY-MM-DD-UNIQUEID.txt.gz
 
 Please note that this example will only export **critical** data, and is not a full backup (notably absent is job history, alert history, snapshot history, server history, and activity log).  To backup *everything*, change the JSON in the curl request to: `{"lists":"all","indexes":"all","extras":"all"}`.  Note that this can take quite a while and produce a very large file depending on your xyOps database size.  To limit what exactly gets included in the backup, consult the [admin_export_data](api.md#admin_export_data) API docs.
 
+### SQLite Backups
+
+If you are using the stock storage configuration (SQLite + Filesystem), then xyOps will keep 7 days worth of compressed daily SQLite backups by default.  These are mainly for disaster recovery purposes.  You can configure or disable the backups in the [Storage.SQLite](config.md#storage-sqlite) configuration object:
+
+```json
+"SQLite": {
+	"base_dir": "data",
+	"filename": "sqlite.db",
+	"pragmas": {
+		"auto_vacuum": 0,
+		"cache_size": -100000,
+		"journal_mode": "WAL"
+	},
+	"cache": {
+		"enabled": true,
+		"maxItems": 100000,
+		"maxBytes": 104857600
+	},
+	"backups": {
+		"enabled": true,
+		"dir": "data/backups",
+		"filename": "backup-[yyyy]-[mm]-[dd]-[hh]-[mi]-[ss].db",
+		"compress": true,
+		"keep": 7
+	}
+}
+```
+
+Note that SQLite only stores data, not "files", under the default hybrid SQLite + Filesystem configuration.  So these backups are mainly for recovering from critical disaster situations like running out of disk space (where the DB may be corrupted).  They are not "complete" backups, as they do not contain job files, bucket files, ticket attachments, user uploads, etc.
+
 ## TLS
 
 The xyOps built-in web server ([pixl-server-web](https://github.com/jhuckaby/pixl-server-web)) supports TLS.  Please read the following guide for setup instructions:
