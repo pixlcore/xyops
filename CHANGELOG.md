@@ -1,5 +1,20 @@
 # xyOps Changelog
 
+## Version v0.9.36
+
+> January 22, 2026
+
+- [`9ca026c`](https://github.com/pixlcore/xyops/commit/9ca026ceb9c30e4d8b5e84065d252538febca699): Version 0.9.36
+- [`da6aad5`](https://github.com/pixlcore/xyops/commit/da6aad5c508280f3d0ecea17ac0dd054716b7c5b): Hosting Doc: Added section on external storage, recommending MinIO.
+- [`a57fa50`](https://github.com/pixlcore/xyops/commit/a57fa501df9123d84461637e16acc05ff2b783f9): Default Config: Set correct values in S3 cache (maxItems and maxBytes)
+- [`b1a3926`](https://github.com/pixlcore/xyops/commit/b1a3926a2fb41560863e8cbb4898adb870856448): Bug fix: Preserve Job.now value when re-running a job.
+- [`3e7b5ad`](https://github.com/pixlcore/xyops/commit/3e7b5adcdcf474aa538159c17742f1c74304daee): Workflows: Pass Job.now timestamp into sub-jobs by way of workflow.now sub-property.
+- [`a3fa541`](https://github.com/pixlcore/xyops/commit/a3fa541054ee5456275fc72ad75e084d9e313edc): Feature: Add optional "select" parameter to the search_jobs API, to select individual job properties to return.
+- [`2e59b09`](https://github.com/pixlcore/xyops/commit/2e59b09735f34bcd9ba765ce6b8eb62eb5ba6c75): Feature: Add new "Has Files" system tag to the UI and job searches.
+- [`14f61a6`](https://github.com/pixlcore/xyops/commit/14f61a6430a9d97fa534eb08c90c18972e1b090e): Feature: Add special `_files` system tag when a job completes and has output files attached.
+- [`6b07b7e`](https://github.com/pixlcore/xyops/commit/6b07b7e151d3df15def8243f25124962609664d3): Fix: Deleting files on the job detail screen was not working if the job also had input files displayed.  Fixes #67
+- [`9df2a6e`](https://github.com/pixlcore/xyops/commit/9df2a6e72aa65420153fa82b5b6cb681d6426fc4): Database Doc: Fix table formatting.
+
 ## Version v0.9.35
 
 > January 21, 2026
