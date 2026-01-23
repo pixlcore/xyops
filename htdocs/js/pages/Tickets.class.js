@@ -186,6 +186,7 @@ Page.Tickets = class Tickets extends Page.PageUtils {
 							placeholder: 'Any Tag',
 							options: app.tags,
 							values: args.tags ? args.tags.split(/\,\s*/) : [],
+							default_icon: 'tag-outline',
 							'data-shrinkwrap': 1
 						})
 					});

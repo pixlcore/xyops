@@ -133,6 +133,7 @@ Page.Search = class Search extends Page.PageUtils {
 								{ id: '_test', title: "Test Job", icon: 'test-tube' }
 							]),
 							values: args.tags ? args.tags.split(/\,\s*/) : [],
+							default_icon: 'tag-outline',
 							'data-shrinkwrap': 1
 						})
 					});

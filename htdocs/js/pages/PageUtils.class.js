@@ -1442,6 +1442,7 @@ Page.PageUtils = class PageUtils extends Page.Base {
 				placeholder: 'None',
 				options: app.tags,
 				values: limit.tags || [],
+				default_icon: 'tag-outline',
 				// 'data-shrinkwrap': 1
 			}),
 			caption: 'Select which tags should be applied to the job when the limit is triggered.'
@@ -2167,6 +2168,7 @@ Page.PageUtils = class PageUtils extends Page.Base {
 				placeholder: 'None',
 				options: app.tags,
 				values: action.tags || [],
+				default_icon: 'tag-outline',
 				// 'data-shrinkwrap': 1
 			}),
 			caption: 'Select one or more tags to apply.'

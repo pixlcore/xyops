@@ -1330,7 +1330,7 @@ Page.Job = class Job extends Page.PageUtils {
 		MultiSelect.popupQuickMenu({
 			elem: elem,
 			title: 'Update Job Tags',
-			items: app.tags,
+			items: app.tags.map( function(tag) { return { ...tag, icon: tag.icon || 'tag-outline' }; } ),
 			values: user_tags,
 			
 			callback: function(values) {
