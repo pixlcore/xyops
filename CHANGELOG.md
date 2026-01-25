@@ -1,5 +1,14 @@
 # xyOps Changelog
 
+## Version v0.9.39
+
+> January 24, 2026
+
+- [`1acce06`](https://github.com/pixlcore/xyops/commit/1acce0619508d7f79b4ed3d3ebc49fa72fa7ea0a): Version 0.9.39
+- [`269b339`](https://github.com/pixlcore/xyops/commit/269b33927c38948cfcf6354f93ad7763cc16a7e4): Bug Fix: A job triggering a limit with non-email actions cause a full crash.  Fixes #81
+- [`b32e260`](https://github.com/pixlcore/xyops/commit/b32e2601c45db9e9c31d768b0387cb45f2e488fe): Plugins Doc: Add section on input files for event plugins.  Also rename a few sections for TOC clarity.
+- [`359fd7d`](https://github.com/pixlcore/xyops/commit/359fd7db78ef37a11df4c9bd04cd25b53aacc7d1): Doc Viewer: Add table wrapper with scroll-x for mobile.
+
 ## Version v0.9.38
 
 > January 24, 2026
