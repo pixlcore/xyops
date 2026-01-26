@@ -59,7 +59,7 @@ if (!fs.existsSync(base_dir)) {
 	try { cp.execSync( "mkdir -p " + base_dir + " && chmod 775 " + base_dir ); }
 	catch (err) { die("Failed to create base directory: " + base_dir + ": " + err); }
 
-	try { cp.execSync( "mkdir -p " + log_dir + " && chmod 777 " + log_dir ); }
+	try { cp.execSync( "mkdir -p " + log_dir + " && chmod 775 " + log_dir ); }
 	catch (err) { die("Failed to create log directory: " + log_dir + ": " + err); }
 }
 
