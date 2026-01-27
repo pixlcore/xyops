@@ -119,6 +119,8 @@ cd /opt/xyops
 npm run boot
 ```
 
+**For Linux users:** Once you run `npm run boot`, which registers xyOps as a Systemd service, you should always start / stop it using the proper `systemctl` commands.  The service name is `xyops.service`.
+
 ### Command Line
 
 See our [Command Line Guide](cli.md) for controlling the xyOps service via command-line.

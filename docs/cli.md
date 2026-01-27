@@ -72,6 +72,8 @@ npm run boot
 
 This is done via the [pixl-boot](https://github.com/jhuckaby/pixl-boot) module, and it supports [Systemd](https://en.wikipedia.org/wiki/Systemd) if available, falling back to [Sysv Init](https://en.wikipedia.org/wiki/Init#SysV-style) or [launchd](https://support.apple.com/guide/terminal/script-management-with-launchd-apdc6c1077b-5d5d-4d35-9c19-60f2397b2369/mac) on macOS.
 
+**For Linux users:** Once you register xyOps as a Systemd service, you should always start / stop it using the proper `systemctl` commands.  The service name is `xyops.service`.
+
 If you change your mind or want to uninstall xyOps, you can deregister the startup service with this command:
 
 ```sh

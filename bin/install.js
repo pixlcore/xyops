@@ -12,7 +12,7 @@ var util = require('util');
 var os = require('os');
 var cp = require('child_process');
 
-var installer_version = '1.0';
+var installer_version = '1.1';
 var base_dir = '/opt/xyops';
 var log_dir = base_dir + '/logs';
 var log_file = '';
@@ -107,6 +107,22 @@ if (process.env['XYOPS_foreground']) {
 	is_container = true;
 }
 
+var stop_cmd = `${base_dir}/bin/control.sh stop`;
+var start_cmd = `${base_dir}/bin/control.sh start`;
+
+// sniff for systemd and our service file
+var use_systemd = !!(is_preinstalled && is_running && (process.platform == 'linux') && fs.existsSync('/bin/systemctl') && fs.existsSync('/etc/systemd/system/xyops.service'));
+if (use_systemd) {
+	stop_cmd = `/bin/systemctl stop xyops.service`;
+	start_cmd = `/bin/systemctl start xyops.service`;
+	
+	try { cp.execSync('/bin/systemctl is-active xyops.service'); }
+	catch (e) {
+		// service is registered but not active -- try to recover the situation by stopping manually, but starting using systemd
+		stop_cmd = `${base_dir}/bin/control.sh stop`;
+	}
+}
+
 print( "Fetching release list...\n");
 logonly( "Releases URL: " + gh_releases_url + "\n" );
 
@@ -149,8 +165,8 @@ cp.exec('curl -s ' + gh_releases_url, function (err, stdout, stderr) {
 	else print("Installing xyOps " + new_version + "...\n");
 	
 	if (is_running) {
-		print("\n");
-		try { cp.execSync( base_dir + "/bin/control.sh stop", { stdio: 'inherit' } ); }
+		print("\nStopping service: " + stop_cmd + "\n");
+		try { cp.execSync( stop_cmd, { stdio: 'inherit' } ); }
 		catch (err) { die("Failed to stop xyOps: " + err); }
 		print("\n");
 	}
@@ -209,7 +225,8 @@ cp.exec('curl -s ' + gh_releases_url, function (err, stdout, stderr) {
 						print("Upgrade complete.\n\n");
 						
 						if (is_running) {
-							try { cp.execSync( base_dir + "/bin/control.sh start", { stdio: 'inherit' } ); }
+							print( "Starting service: " + start_cmd + "\n" );
+							try { cp.execSync( start_cmd, { stdio: 'inherit' } ); }
 							catch (err) { die("Failed to start xyOps: " + err); }
 							print("\n");
 						}
