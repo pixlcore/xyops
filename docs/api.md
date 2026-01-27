@@ -3015,7 +3015,7 @@ Query examples for the `query` parameter:
 
 - `tags:_success`: All successful jobs. Successful jobs are tagged with the hidden `_success` system tag.
 - `tags:_error`: All failed jobs for any reason. Failed jobs are tagged with the hidden `_error` system tag.
-- `tags:_files`: All jobs that produced output files.
+- `tags:_files`: All jobs with input or output files.
 - `code:warning`: All jobs with a code of `warning`.
 - `code:critical`: All jobs with a code of `critical`.
 - `code:abort`: All aborted jobs.
