@@ -476,6 +476,11 @@ Page.ActivityLog = class ActivityLog extends Page.PageUtils {
 					actions.push(`<button class="link" onClick="${click}"><b>Details...</b></button>`);
 				break;
 				
+				case 'config_update':
+					click = `$P().showActionReport(${idx},'blarg')`;
+					actions.push(`<button class="link" onClick="${click}"><b>Details...</b></button>`);
+				break;
+				
 				// misc
 				case 'error':
 					desc = encode_entities( item.description );

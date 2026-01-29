@@ -6,10 +6,11 @@
 
 Page.PageUtils = class PageUtils extends Page.Base {
 	
-	setupEditTriggers() {
+	setupEditTriggers(elem) {
 		// rig all form elements to triger save button highlight
-		this.div.find('input, textarea, select').on('change', this.triggerEditChange.bind(this));
-		this.div.find('input, textarea').on('input', this.triggerEditChange.bind(this));
+		if (!elem) elem = this.div;
+		elem.find('input, textarea, select').on('change', this.triggerEditChange.bind(this));
+		elem.find('input, textarea').on('input', this.triggerEditChange.bind(this));
 		if (this.editor) this.editor.on('change', this.triggerEditChange.bind(this));
 		
 		// allow cancel button to be clicked via hot key initially

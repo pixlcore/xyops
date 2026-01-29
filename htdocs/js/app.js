@@ -144,6 +144,7 @@ app.extend({
 			{ ID: 'Users' },
 			{ ID: 'ActivityLog' },
 			{ ID: 'Conductors' },
+			{ ID: 'Config' },
 			{ ID: 'Servers' },
 			{ ID: 'ServerHist' },
 			{ ID: 'GroupHist' },
@@ -503,6 +504,7 @@ app.extend({
 			$('#tab_Users').removeClass('enabled').hide();
 			$('#tab_Roles').removeClass('enabled').hide();
 			$('#tab_Marketplace').removeClass('enabled').hide();
+			$('#tab_Config').removeClass('enabled').hide();
 		}
 		
 		// possibly hide entire admin section

@@ -924,6 +924,56 @@ body.dark .fr_caption code {
 	color: var(--theme-color);
 }
 
+/* Config Editor */
+
+.box_subtitle a {
+	color: var(--blue);
+}
+.box_subtitle a:hover {
+	color: var(--theme-color);
+}
+
+.config_editor {
+	margin-left: 220px;
+	margin-right: 220px;
+}
+
+.config_editor .form_row.cfg_item {
+	margin-bottom: 30px !important;
+	grid-row-gap: 10px !important;
+}
+.config_editor .form_row.cfg_group {
+	margin-bottom: 20px !important;
+}
+.config_editor .form_row .fr_label {
+	margin-bottom: 5px !important;
+}
+.config_editor .form_row .fr_caption {
+	margin-top: 5px !important;
+}
+
+.config_editor_group {
+	margin-top: 15px;
+	padding-bottom: 4px;
+	font-size: 16px;
+	font-weight: bold;
+	color: var(--theme-color);
+	
+	border-bottom: 1px solid var(--border-color);
+}
+
+.config_editor_none {
+	margin-top: 75px;
+	margin-bottom: 75px;
+	font-size: 13px;
+	text-align: center;
+	font-style: italic;
+	color: var(--label-color);
+}
+
+.cfg_hidden { display: none; }
+.cfg_visible { display: inherit; }
+
 /* Swatch / Table Row Colors */
 
 .clr_red, ul.clr_red > div { background-color: rgba(255, 0, 0, 0.1) !important; }
@@ -1137,11 +1187,11 @@ div.td_big {
 	overflow-y: auto;
 }
 
-.dialog_box_content.maximize .form_row {
+.maximize .form_row {
 	margin-bottom: 18px;
 }
 
-.dialog_box_content.maximize .form_row {
+.maximize .form_row {
 	grid-template-columns: 1fr !important;
 	
 	grid-template-areas:
@@ -1152,15 +1202,15 @@ div.td_big {
 	grid-column-gap: 20px;
 	grid-row-gap: 4px;
 }
-.dialog_box_content.maximize .form_row > div.fr_label {
+.maximize .form_row > div.fr_label {
 	justify-self: start;
 	margin-top: 3px;
 	margin-bottom: 2px;
 }
-.dialog_box_content.maximize .form_row > div.fr_suffix {
+.maximize .form_row > div.fr_suffix {
 	display: none;
 }
-.dialog_box_content.maximize .form_row > div.fr_caption {
+.maximize .form_row > div.fr_caption {
 	margin-top: 3px;
 }
 

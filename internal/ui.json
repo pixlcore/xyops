@@ -193,7 +193,8 @@
 		"peer_command": "Control command [commands] sent to conductor server: [host]",
 		
 		"state_update": "Internal state updated: [description]",
-		"internal_job": "Internal job completed: [job.title]"
+		"internal_job": "Internal job completed: [job.title]",
+		"config_update": "System configuration updated."
 	},
 	
 	"activity_search_map": {
@@ -215,7 +216,7 @@
 		"roles": "^(role_.+)$",
 		"servers": "^(server_.+)$",
 		"peers": "^(peer_.+|master_primary)$",
-		"system": "^(state_update|internal_job)$"
+		"system": "^(state_update|internal_job|config_update)$"
 	},
 	
 	"activity_types": {
@@ -256,7 +257,8 @@
 		"^queue": { "icon": "tray-full", "label": "Queue" },
 		
 		"^state": { "icon": "database-outline", "label": "State" },
-		"^internal": { "icon": "desktop-classic", "label": "System" }
+		"^internal": { "icon": "desktop-classic", "label": "System" },
+		"^config": { "icon": "cog", "label": "Config" }
 	},
 	
 	"data_types": {
