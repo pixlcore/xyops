@@ -1304,6 +1304,20 @@
 		]
 	},
 	
+	"log_files": [ "Action", "API", "Comm", "Debug", "Error", "Filesystem", "Hybrid", "Job", "Maint", "Monitor", "Multi", "S3", "Scheduler", "Secret", "SQLite", "Storage", "Ticket", "Transaction", "Unbase", "User", "WebServer", "xyOps" ],
+	
+	"log_column_titles": {
+		"hires_epoch": "Timestamp",
+		"date": "Server Time",
+		"hostname": "Hostname",
+		"pid": "PID",
+		"component": "Component",
+		"category": "Category",
+		"code": "Code",
+		"msg": "Message",
+		"data": "Data"
+	},
+	
 	"satellite_install_menu": [
 		{ "id": "standard", "title": "Linux", "icon": "penguin" },
 		{ "id": "macos", "title": "macOS", "icon": "apple" },
