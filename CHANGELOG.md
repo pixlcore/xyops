@@ -1,5 +1,16 @@
 # xyOps Changelog
 
+## Version v0.9.44
+
+> January 30, 2026
+
+- [`d708387`](https://github.com/pixlcore/xyops/commit/d7083871094616dc3ffbab50dc6cbc8573147787): Version 0.9.44
+- [`f5b5aad`](https://github.com/pixlcore/xyops/commit/f5b5aadaa4b676b0de342bc43937a8ab36d890ce): New Feature: Log Viewer in the UI!
+- [`adb6795`](https://github.com/pixlcore/xyops/commit/adb679579bdcbfbb1048e094c27ea6d4f319b6dc): Config API: Make sure reserved keys are omitted from the overrides object in admin_get_config.
+- [`2441ae7`](https://github.com/pixlcore/xyops/commit/2441ae74d89b425cb7b306faac12f9f3e90e767a): Search Jobs UI: Cleanup memory on page deactivate
+- [`1cf781b`](https://github.com/pixlcore/xyops/commit/1cf781bbbd1583366eda99dd64da5e2a5088fd5a): UI Fix: Remove "Any Tag" item from tags menu on job search page (not used for a multi-select menu).
+- [`bf021ec`](https://github.com/pixlcore/xyops/commit/bf021ec0316ce0cb6e1a51da0d6cc2044a241c5d): UI Bug Fix: Floating buttons on config page weren't showing up until user scrolled.
+
 ## Version v0.9.43
 
 > January 29, 2026
