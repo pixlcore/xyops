@@ -323,6 +323,7 @@ Page.Secrets = class Secrets extends Page.PageUtils {
 		if (!this.active) return; // sanity
 		
 		// exit from edit mode
+		this.secret.names = (this.fields || []).map( function(field) { return field.name; } );
 		delete this.fields;
 		this.renderSecretEditor();
 		
