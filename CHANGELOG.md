@@ -1,5 +1,12 @@
 # xyOps Changelog
 
+## Version v0.9.46
+
+> January 30, 2026
+
+- [`8e97839`](https://github.com/pixlcore/xyops/commit/8e97839c555c78c742d3c09f5a02067fd2a1a761): Version 0.9.46
+- [`3cc61ed`](https://github.com/pixlcore/xyops/commit/3cc61edb89c9377b2191d565ee2d24293e842684): New Feature: Programmatic bucket data access, via new API: write_bucket_data.
+
 ## Version v0.9.45
 
 > January 30, 2026
