@@ -1,5 +1,13 @@
 # xyOps Changelog
 
+## Version v0.9.47
+
+> January 31, 2026
+
+- [`d7dae73`](https://github.com/pixlcore/xyops/commit/d7dae73ecb6550cfc0a40d1116e86f9654bb3350): Version 0.9.47
+- [`c0905b5`](https://github.com/pixlcore/xyops/commit/c0905b5e9ab7363b45c938798aeb0f396d19ca22): Remove "password" text field variant type, as it gives a false sense of data security (use a secret vault instead).
+- [`110cf58`](https://github.com/pixlcore/xyops/commit/110cf58b029be8d39cf53d2425835ffb6853e94d): Add Powershell as an official syntax-highlighted language
+
 ## Version v0.9.46
 
 > January 30, 2026
