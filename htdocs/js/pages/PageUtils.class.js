@@ -4325,6 +4325,7 @@ Page.PageUtils = class PageUtils extends Page.Base {
 				id: 'fe_epa_value_text',
 				spellcheck: 'false',
 				autocomplete: 'off',
+				class: 'monospace',
 				value: param.value || ''
 			}),
 			caption: 'Enter the default value for the text field.'
@@ -4336,6 +4337,7 @@ Page.PageUtils = class PageUtils extends Page.Base {
 				id: 'fe_epa_value_textarea',
 				rows: 5,
 				spellcheck: 'false',
+				class: 'monospace',
 				value: (param.value || '').toString()
 			}),
 			caption: "Enter the default value for the text box."
@@ -4390,6 +4392,7 @@ Page.PageUtils = class PageUtils extends Page.Base {
 				id: 'fe_epa_value_hidden',
 				spellcheck: 'false',
 				autocomplete: 'off',
+				class: 'monospace',
 				value: param.value || ''
 			}),
 			caption: 'Enter the default value for the hidden field.'
