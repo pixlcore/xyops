@@ -1,5 +1,18 @@
 # xyOps Changelog
 
+## Version v0.9.49
+
+> January 31, 2026
+
+- [`fcee1d6`](https://github.com/pixlcore/xyops/commit/fcee1d6227e96f3781cdea56b54917101ca9948b): Version 0.9.49
+- [`c7e144a`](https://github.com/pixlcore/xyops/commit/c7e144ac68f74f8d113fe190d4208defe8c95740): API Doc: Add docs for new admin_search_logs, admin_get_config, and admin_update_config APIs.
+- [`74e6465`](https://github.com/pixlcore/xyops/commit/74e6465b8283743c4c32431f4ad06847c68133f7): Activity Log UI: Tweak action dialog display so that user is not shown as a link (looks off).
+- [`e517947`](https://github.com/pixlcore/xyops/commit/e5179470836dea8915dccc06a3dfd95bda67e1f8): UI: Copy Markdown to clipboard: Strip HTML so icons etc. are not included in the copied text.
+- [`9f4e97f`](https://github.com/pixlcore/xyops/commit/9f4e97fa9c6b97f4293d3131bb4fdb245d3a5294): UI Tweak: For defining text fields / text boxes for params, use monospace font for the default values.
+- [`84d7339`](https://github.com/pixlcore/xyops/commit/84d73399efdc2caea921bbe1a8c7d812c5762058): API Doc: Formatting tweaks.
+- [`78f23c3`](https://github.com/pixlcore/xyops/commit/78f23c3a94a47fa29227c96b5bbdcae1a1c2cb25): API Hardening: Ensure all HTTP file uploads are valid (i.e. have filenames and non-zero size).
+- [`6ac6bac`](https://github.com/pixlcore/xyops/commit/6ac6bac78f02a4076c43a27e1a1032e91b299db5): API Doc: Add "pretty" parameter to echo API.
+
 ## Version v0.9.48
 
 > January 31, 2026
