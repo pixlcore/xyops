@@ -933,7 +933,7 @@ Page.PageUtils = class PageUtils extends Page.Base {
 		var nice_date = this.formatDate(epoch, { year: 'numeric', month: 'short', day: 'numeric', weekday: 'short' });
 		
 		if (day && day.data && day.data.job_complete) {
-			var data = day.data;
+			var data = deep_copy_object( day.data );
 			var tooltip = nice_date + ": ";
 			var groups = [];
 			
