@@ -2462,7 +2462,7 @@ Page.PageUtils = class PageUtils extends Page.Base {
 				
 				case 'select':
 					elem_value = (param.id in params) ? params[param.id] : param.value.replace(/\,.*$/, '');
-					html += self.getFormMenu({ id: elem_id, value: elem_value, options: param.value.split(/\,\s*/), disabled: elem_dis });
+					html += self.getFormMenu({ id: elem_id, value: elem_value, options: self.csvToMenuItems(param.value), disabled: elem_dis });
 				break;
 				
 				case 'bucket':
@@ -2667,6 +2667,19 @@ Page.PageUtils = class PageUtils extends Page.Base {
 		}); // foreach param
 		
 		return is_valid ? params : false;
+	}
+	
+	csvToMenuItems(csv) {
+		// convert CSV to array of menu items, supporting inline [ids]
+		var re = /\s*\[([\w\-\.]+)\]\s*/;
+		
+		return (''+csv).split(/\,\s*/).map( function(item) {
+			if (item.match(re)) {
+				var id = RegExp.$1;
+				return { id, title: item.replace(re, '').trim() };
+			}
+			else return { id: item, title: item };
+		} );
 	}
 	
 	// Data Tree:
@@ -4377,10 +4390,12 @@ Page.PageUtils = class PageUtils extends Page.Base {
 		html += this.getFormRow({
 			id: 'd_epa_value_select',
 			label: 'Menu Items:',
-			content: this.getFormText({
+			content: this.getFormTextarea({
 				id: 'fe_epa_value_select',
+				rows: 3,
 				spellcheck: 'false',
 				autocomplete: 'off',
+				class: 'monospace',
 				value: param.value || ''
 			}),
 			caption: "Enter items for the menu, separated by commas.  The first will be selected by default."
@@ -4824,7 +4839,7 @@ Page.PageUtils = class PageUtils extends Page.Base {
 				
 				case 'select':
 					elem_value = (param.id in params) ? params[param.id] : param.value.replace(/\,.*$/, '');
-					html += self.getFormMenu({ id: elem_id, value: elem_value, options: param.value.split(/\,\s*/), disabled: elem_dis });
+					html += self.getFormMenu({ id: elem_id, value: elem_value, options: self.csvToMenuItems(param.value), disabled: elem_dis });
 				break;
 				
 				case 'bucket':

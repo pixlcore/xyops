@@ -844,7 +844,11 @@ This type is special in that the JSON is parsed and stored in the parameters as 
 
 ### Menu
 
-A "menu" is presented as a drop-down menu, with a configurable list of items.  The plugin declares these as a CSV list.
+A "menu" is presented as a drop-down menu, with a configurable list of items.  The plugin declares these as a CSV list.  Example:
+
+```
+Alpha, Beta, Gamma
+```
 
 This item has type `select` in the API, to match the HTML element of the same name.
 
@@ -853,6 +857,14 @@ To include an empty item at the top of the menu (allowing the user to select "no
 ```
 , Alpha, Beta, Gamma
 ```
+
+To set the item values and the labels separately, specify the values in square brackets like this:
+
+```
+Alpha [a1], Beta [b2], Gamma [c3]
+```
+
+This would show only the labels in the menu ("Alpha", "Beta", "Gamma"), but in the data the values would be specified instead (`a1`, `b2`, `c3`).  Note that the values may only contain alphanumerics, underscores, dashes and dots, and when this feature is used the visual labels are **not** passed into the data at all.
 
 ### Bucket Menu
 
