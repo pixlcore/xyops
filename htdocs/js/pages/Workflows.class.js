@@ -60,6 +60,8 @@ Page.Workflows = class Workflows extends Page.Events {
 		}
 		else {
 			this.event = deep_copy_object( app.config.new_event_template );
+			delete this.event.plugin;
+			delete this.event.targets;
 			
 			this.event.triggers = [];
 			this.event.workflow = this.workflow = {
@@ -86,27 +88,30 @@ Page.Workflows = class Workflows extends Page.Events {
             });
 			
 			var cat_id = '';
-			if (find_object(app.categories, { id: 'general' })) cat_id = 'general';
+			if (app.config.new_event_template.category) cat_id = app.config.new_event_template.category;
+			else if (find_object(app.categories, { id: 'general' })) cat_id = 'general';
 			else if (!app.categories.length) return this.doFullPageError(config.ui.errors.new_wf_no_cats);
 			else cat_id = app.categories[0].id;
 			
 			var plug_id = '';
-			if (find_object(app.plugins, { id: 'shellplug' })) plug_id = 'shellplug';
+			if (app.config.new_event_template.plugin) plug_id = app.config.new_event_template.plugin;
+			else if (find_object(app.plugins, { id: 'shellplug' })) plug_id = 'shellplug';
 			else if (!app.plugins.length) return this.doFullPageError(config.ui.errors.new_wf_no_plugins);
 			else plug_id = app.plugins[0].id;
 			
-			var group_id = '';
-			if (find_object(app.groups, { id: 'main' })) group_id = 'main';
+			var target_ids = [];
+			if (app.config.new_event_template.targets && app.config.new_event_template.targets.length) target_ids = [ ...app.config.new_event_template.targets ];
+			else if (find_object(app.groups, { id: 'main' })) target_ids = ['main'];
 			else if (!app.groups.length) return this.doFullPageError(config.ui.errors.new_wf_no_groups);
-			else group_id = app.groups[0].id;
+			else target_ids = [ app.groups[0].id ];
 			
 			this.event.workflow.nodes.push({
                 "id": job_node_id,
                 "type": "job",
                 "data": {
                     "params": {},
-                    "targets": [ group_id ],
-                    "algo": "random",
+                    "targets": target_ids,
+                    "algo": app.config.new_event_template.algo || "random",
                     "label": "",
                     "category": cat_id,
                     "plugin": plug_id,
@@ -127,9 +132,11 @@ Page.Workflows = class Workflows extends Page.Events {
 		this.limits = this.event.limits; // for res limit editor
 		this.actions = this.event.actions; // for job action editor
 		
-		if (find_object(app.categories, { id: 'general' })) this.event.category = 'general';
-		else if (!app.categories.length) return this.doFullPageError(config.ui.errors.new_wf_no_cats);
-		else this.event.category = app.categories[0].id;
+		if (!this.event.category) {
+			if (find_object(app.categories, { id: 'general' })) this.event.category = 'general';
+			else if (!app.categories.length) return this.doFullPageError(config.ui.errors.new_wf_no_cats);
+			else this.event.category = app.categories[0].id;
+		}
 		
 		// render form
 		html += this.get_wf_form_html();

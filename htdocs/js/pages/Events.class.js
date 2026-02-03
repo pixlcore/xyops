@@ -1855,13 +1855,23 @@ Page.Events = class Events extends Page.PageUtils {
 		else {
 			this.event = deep_copy_object( app.config.new_event_template );
 			
-			if (find_object(app.categories, { id: 'general' })) this.event.category = 'general';
-			else if (!app.categories.length) return this.doFullPageError("You must define at least one category to add events.");
-			else this.event.category = app.categories[0].id;
+			if (!this.event.category) {
+				if (find_object(app.categories, { id: 'general' })) this.event.category = 'general';
+				else if (!app.categories.length) return this.doFullPageError("You must define at least one category to add events.");
+				else this.event.category = app.categories[0].id;
+			}
 			
-			if (find_object(app.plugins, { id: 'shellplug' })) this.event.plugin = 'shellplug';
-			else if (!app.plugins.length) return this.doFullPageError("You must create at least one Plugin to add events.");
-			else this.event.plugin = app.plugins[0].id;
+			if (!this.event.plugin) {
+				if (find_object(app.plugins, { id: 'shellplug' })) this.event.plugin = 'shellplug';
+				else if (!app.plugins.length) return this.doFullPageError("You must create at least one Plugin to add events.");
+				else this.event.plugin = app.plugins[0].id;
+			}
+			
+			if (!this.event.targets || !this.event.targets.length) {
+				if (find_object(app.groups, { id: 'main' })) this.event.targets = ['main'];
+				else if (!app.groups.length) return this.doFullPageError(config.ui.errors.new_wf_no_groups);
+				else this.event.targets = [ app.groups[0].id ];
+			}
 		}
 		
 		this.params = this.event.fields; // for user form param editor
