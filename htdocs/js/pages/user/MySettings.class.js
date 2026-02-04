@@ -246,11 +246,12 @@ Page.MySettings = class MySettings extends Page.Base {
 			label: 'Privacy:',
 			content: this.getFormCheckbox({
 				id: 'fe_ms_privacy',
-				label: '<span data-private>Streamer Mode</span>',
+				label: 'Streamer Mode',
 				checked: !!user.privacy_mode,
 				onChange: '$P().previewPrivacyMode(this)'
 			}),
-			caption: 'Enable or disable streamer mode, which hides sensitive information such as IP addresses, hostnames, usernames, full names, and email addresses.'
+			caption: 'Enable or disable streamer mode, which hides sensitive information such as IP addresses, hostnames, usernames, full names, and email addresses.',
+			'data-private': ''
 		});
 		
 		html += '</div>'; // box_content
