@@ -1,5 +1,12 @@
 # xyOps Changelog
 
+## Version v0.9.54
+
+> February 4, 2026
+
+- [`7bc869c`](https://github.com/pixlcore/xyops/commit/7bc869c54cda6ae4ff4a8de7dba49b2f033b6c65): Version 0.9.54
+- [`f83d599`](https://github.com/pixlcore/xyops/commit/f83d5991577249cd6d48c5989468f84f18bab7f2): New Event Trigger: "Startup", automatically runs a job on xyOps startup, when certain conditions are met.  Similar to the crontab `@reboot` alias.
+
 ## Version v0.9.53
 
 > February 4, 2026
