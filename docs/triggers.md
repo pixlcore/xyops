@@ -222,6 +222,8 @@ Parameters:
 | `params` | Object | Optional | Optionally include parameter overrides for the event / plugin. |
 | `tags` | Array | Optional | Optionally include a set of [Tag.id](data.md#tag-id)s to add to the job as it starts. |
 
+Note that the startup trigger will not activate if the xyOps service was manually restarted due to a user-requested upgrade, restart or shutdown action from the UI.
+
 ### Catch-Up
 
 Catch-up mode is an optional feature designed to ensure that an event always runs on schedule, even when certain situations arise that may temporarily prevent its execution. This can include scenarios such as:
