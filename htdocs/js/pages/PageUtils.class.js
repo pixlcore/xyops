@@ -2600,6 +2600,9 @@ Page.PageUtils = class PageUtils extends Page.Base {
 			title: param.title, 
 			code: elem_value, 
 			format: (param.type == 'json') ? 'json' : '',
+			editor_config: {
+				lineNumbers: true
+			},
 			callback: function(new_value) {
 				$('#' + elem_id).val( new_value );
 				if (!Dialog.active) self.triggerEditChange();
@@ -4616,6 +4619,9 @@ Page.PageUtils = class PageUtils extends Page.Base {
 		this.editCodeAuto({
 			title: "Edit Default Code", 
 			code: $('#fe_epa_value_code').val(), 
+			editor_config: {
+				lineNumbers: true
+			},
 			callback: function(new_value) {
 				$('#fe_epa_value_code').val( new_value );
 			}
@@ -4885,6 +4891,9 @@ Page.PageUtils = class PageUtils extends Page.Base {
 			title: title, 
 			code: elem_value, 
 			format: format,
+			editor_config: {
+				lineNumbers: true
+			},
 			callback: function(new_value) {
 				$('#' + elem_id).val( new_value );
 				if (!Dialog.active) self.triggerEditChange();
