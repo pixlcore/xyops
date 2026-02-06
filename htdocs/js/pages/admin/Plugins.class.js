@@ -237,8 +237,8 @@ Page.Plugins = class Plugins extends Page.PageUtils {
 		// this.updateAddRemoveMe('#fe_ep_email');
 		$('#fe_ep_title').focus();
 		this.setPluginType();
-		this.setupBoxButtonFloater();
 		this.renderParamEditor();
+		this.setupBoxButtonFloater();
 	}
 	
 	cancel_plugin_edit() {
@@ -326,8 +326,8 @@ Page.Plugins = class Plugins extends Page.PageUtils {
 		MultiSelect.init( this.div.find('select[multiple]') );
 		// this.updateAddRemoveMe('#fe_ep_email');
 		this.setPluginType();
-		this.setupBoxButtonFloater();
 		this.renderParamEditor();
+		this.setupBoxButtonFloater();
 		this.setupEditTriggers();
 	}
 	
