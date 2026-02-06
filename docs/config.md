@@ -996,7 +996,7 @@ Rate limit for password reset requests per user per hour (default: `3`).
 Allow users to self-register without admin invitation (default: `false`).
 
 ### User.sort_global_users
-<!-- Title: Sort Global Uset List -->
+<!-- Title: Sort Global User List -->
 
 Sort global user lists (affects admin UI ordering, default: `false`).  Experimental.
 
