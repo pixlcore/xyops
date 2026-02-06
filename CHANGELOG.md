@@ -1,5 +1,15 @@
 # xyOps Changelog
 
+## Version v0.9.60
+
+> February 6, 2026
+
+- [`df026d3`](https://github.com/pixlcore/xyops/commit/df026d304684e54df0c1e4c6ddcd89e230d2e95e): Version 0.9.60
+- [`77f00da`](https://github.com/pixlcore/xyops/commit/77f00da445067de6ca704830e8e1c2415624feb4): Docs UI: Fix header nav link to scroll to top in a cleaner way.
+- [`d0211a3`](https://github.com/pixlcore/xyops/commit/d0211a3686a3f28d52a37ac1abee466f0d5084ee): Marketplace: Links to README sections should stay in app, not link out.  Fixes #121.
+- [`a91e859`](https://github.com/pixlcore/xyops/commit/a91e859e5ddb9b8de9e35c71da4410d3e51763ee): CSS: Fix custom nav link color.
+- [`2f44c51`](https://github.com/pixlcore/xyops/commit/2f44c5149c4096f4cdc641567fc6b053306abbf2): Cosmetic Bug Fix: Edit Plugins: Box button floater wasn't appearing by default for plugins with lots of params (pushing the buttons off the bottom of the page).  Fixes #120.
+
 ## Version v0.9.59
 
 > February 6, 2026
