@@ -1,5 +1,13 @@
 # xyOps Changelog
 
+## Version v0.9.59
+
+> February 6, 2026
+
+- [`8143639`](https://github.com/pixlcore/xyops/commit/8143639be9e5cff96ec62bcbdd9dc73d111f92cf): Version 0.9.59
+- [`6a20b93`](https://github.com/pixlcore/xyops/commit/6a20b937f3c74b0970bce64d3d5f0f74f1b8db7b): Bug Fix: Logout button not accepting clicks at all.  Regression from v0.9.43.  Fixes #117.
+- [`3c68b20`](https://github.com/pixlcore/xyops/commit/3c68b20629dbe29441240d895dc439d4ef6b7811): Config Doc: Typo fix in metadata.
+
 ## Version v0.9.58
 
 > February 5, 2026
