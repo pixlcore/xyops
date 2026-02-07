@@ -862,6 +862,7 @@ Page.PageUtils = class PageUtils extends Page.Base {
 		switch (job.type) {
 			case 'single': msg += '  Since this is a "Single Shot" trigger, it will simply be disabled.'; break;
 			case 'schedule': msg += '  Since this is a scheduled trigger, a new "Blackout" range will be added to disable it.'; break;
+			case 'interval': msg += '  Since this is an interval trigger, a new "Blackout" range will be added to disable it.'; break;
 		}
 		
 		Dialog.confirmDanger( 'Skip Upcoming Job', msg, ['alert-decagram', 'Skip Job'], function(result) {
@@ -869,17 +870,48 @@ Page.PageUtils = class PageUtils extends Page.Base {
 			app.clearError();
 			Dialog.showProgress( 1.0, "Skipping Job..." );
 			
+			var updates = { id: event.id };
+			
 			switch (job.type) {
 				case 'single':
 					delete_object( event.triggers, { type: 'single', enabled: true, epoch: job.epoch } );
 				break;
 				
 				case 'schedule':
-					event.triggers.push({ type: 'blackout', enabled: true, start: job.epoch, end: job.epoch }); // Note: end is inclusive!
+				case 'interval':
+					var trigger = { type: 'blackout', enabled: true, start: job.epoch, end: job.epoch }; // Note: end is inclusive!
+					
+					if (event.workflow) {
+						// need a matching node in the workflow map
+						var node = { id: gen_workflow_id('n'), type: 'trigger', x: 0, y: 0 };
+						trigger.id = node.id;
+						
+						// find schedule node to position ourselves next to
+						var adj_trig = find_object( event.triggers, { type: 'schedule' } ) 
+							|| find_object( event.triggers, { type: 'interval' } )
+							|| event.triggers[0];
+						
+						if (adj_trig) {
+							// find matching node for x/y
+							var adj_node = find_object( event.workflow.nodes, { id: adj_trig.id } );
+							if (adj_node) {
+								var { left, top } = self.wfFindSpaceNear({ workflow: event.workflow, node: adj_node, type: 'trigger' });
+								node.x = left;
+								node.y = top;
+							}
+						}
+						
+						event.workflow.nodes.push(node);
+					} // workflow
+					
+					event.triggers.push(trigger); 
 				break;
 			} // switch job.type
 			
-			app.api.post( 'app/update_event', { id: event.id, triggers: event.triggers }, function(resp) {
+			updates.triggers = event.triggers;
+			if (event.workflow) updates.workflow = event.workflow;
+			
+			app.api.post( 'app/update_event', updates, function(resp) {
 				Dialog.hideProgress();
 				app.showMessage('success', "The selected upcoming job will be skipped.");
 				
@@ -901,6 +933,70 @@ Page.PageUtils = class PageUtils extends Page.Base {
 		while (this.upcomingJobs.length && (this.upcomingJobs[0].epoch <= app.epoch)) {
 			this.upcomingJobs.shift();
 		}
+	}
+	
+	wfFindSpaceNear(opts) {
+		// find empty space near a wf node
+		// opts: { workflow, node, type }
+		var sizes = {
+			// these have built-in padding
+			trigger: { width: 85, height: 110 },
+			limit: { width: 85, height: 110 },
+			action: { width: 85, height: 110 },
+			controller: { width: 150, height: 95 },
+			event: { width: 300, height: 310 },
+			job: { width: 300, height: 310 }
+		};
+		
+		var adj_node_size = sizes[ opts.node.type ];
+		var cx = opts.node.x + (adj_node_size.width / 2);
+		var cy = opts.node.y + (adj_node_size.height / 2);
+		var angle = 0;
+		var distance = 50;
+		
+		var src_size = sizes[ opts.type ];
+		var src_rect = { left: opts.node.x, top: opts.node.y, right: opts.node.x + src_size.width, bottom: opts.node.y + src_size.height };
+		
+		var rects = opts.workflow.nodes.filter( function(node) { return node.type.match(/^(trigger|limit|action|controller|event|job)$/); } ).map( function(node) {
+			var size = sizes[ node.type ] || { width: 64, height: 64 };
+			return { left: node.x, top: node.y, right: node.x + size.width, bottom: node.y + size.height };
+		} );
+		
+		var rectInRect = function(a, b) {
+			return !(
+				a.right  <= b.left ||
+				a.left   >= b.right ||
+				a.bottom <= b.top ||
+				a.top    >= b.bottom
+			);
+		};
+		
+		var collidesWithAny = function() {
+			return rects.find( function(rect) {
+				return rectInRect(rect, src_rect);
+			} );
+		};
+		
+		var decToRad = function(dec) { return dec * Math.PI / 180.0; };
+		
+		while (collidesWithAny()) {
+			angle += 10;
+			if (angle >= 360) { angle -= 360; distance += 20; }
+			
+			// these functions are not accurate at certain angles, hence the trickery:
+			var temp_cos = ((angle == 90) || (angle == 270)) ? 0 : Math.cos( decToRad(angle) );
+			var temp_sin = ((angle == 0) || (angle == 180)) ? 0 : Math.sin( decToRad(angle) );
+			
+			var x = Math.floor( cx + (temp_cos * distance) );
+			var y = Math.floor( cy - (temp_sin * distance) );
+			
+			src_rect.left = x - Math.floor(src_size.width / 2);
+			src_rect.top = y - Math.floor(src_size.height / 2);
+			src_rect.right = src_rect.left + src_size.width;
+			src_rect.bottom = src_rect.top + src_size.height;
+		}
+		
+		return src_rect;
 	}
 	
 	// Job History Day Graph
@@ -5024,7 +5120,7 @@ Page.PageUtils = class PageUtils extends Page.Base {
 				nice_icon = '<i class="mdi mdi-cog-outline"></i>';
 				nice_type = 'Modifier';
 				alt_type = 'Range';
-				short_desc = (item.start && item.end) ? get_text_from_seconds( item.end - item.start, true, true ) : this.summarizeTimingRange(item);
+				short_desc = (item.start && item.end && (item.end > item.start)) ? get_text_from_seconds( item.end - item.start, true, true ) : this.summarizeTimingRange(item);
 				nice_desc = '<i class="mdi mdi-calendar-range-outline">&nbsp;</i><b>Range:</b> ' + this.summarizeTimingRange(item);
 			break;
 			
@@ -5032,7 +5128,7 @@ Page.PageUtils = class PageUtils extends Page.Base {
 				nice_icon = '<i class="mdi mdi-cog-outline"></i>';
 				nice_type = 'Modifier';
 				alt_type = 'Blackout';
-				short_desc = (item.start && item.end) ? get_text_from_seconds( item.end - item.start, true, true ) : this.summarizeTimingRange(item);
+				short_desc = (item.start && item.end && (item.end > item.start)) ? get_text_from_seconds( item.end - item.start, true, true ) : this.summarizeTimingRange(item);
 				nice_desc = '<i class="mdi mdi-circle">&nbsp;</i><b>Blackout:</b> ' + this.summarizeTimingRange(item);
 			break;
 			
