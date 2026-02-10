@@ -860,7 +860,7 @@
 		"wf_test_sel_node": "Test...",
 		"wf_dupe_sel": "Duplicate",
 		"wf_detach_sel": "Detach",
-		"wf_delete_sel": "Delete",
+		"wf_delete_sel": "Remove",
 		"wf_add_node": "Add Node..."
 	},
 	
@@ -874,7 +874,7 @@
 		"wf_test_sel_node": "Test selected node",
 		"wf_dupe_sel": "Duplicate selection",
 		"wf_detach_sel": "Detach selection",
-		"wf_delete_sel": "Delete selection",
+		"wf_delete_sel": "Remove selection",
 		"wf_undo": "Undo",
 		"wf_redo": "Redo",
 		"wf_zoom_auto": "Zoom to fit",
