@@ -1,6 +1,6 @@
 {
 	"name": "xyops",
-	"version": "0.9.61",
+	"version": "0.9.62",
 	"private": true,
 	"description": "A complete workflow automation and server monitoring system.",
 	"author": "Joseph Huckaby <jhuckaby@pixlcore.com>",
