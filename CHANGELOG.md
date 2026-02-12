@@ -1,5 +1,14 @@
 # xyOps Changelog
 
+## Version v0.9.63
+
+> February 12, 2026
+
+- [`c27e2db`](https://github.com/pixlcore/xyops/commit/c27e2db1670b03a29c05b2a983f1a1dd5a37fe75): Version 0.9.63
+- [`5543923`](https://github.com/pixlcore/xyops/commit/5543923111d85cfd8e3abeea7fe1372169872a6d): Events / Workflows: Improve multi-user concurrent editing UX: Auto-refresh on edit if no conflicts, otherwise show notification.  Server: check revision number on save to prevent clobbering.  Fixes #136.
+- [`017ba36`](https://github.com/pixlcore/xyops/commit/017ba36aba78baf3fa1f5e67105506ff98c2447a): New API: send_mail: Send custom email with optional attachments on xyOps HTML stationary.  Fixes #135.
+- [`e7b8426`](https://github.com/pixlcore/xyops/commit/e7b84265c25881a3d19facd9ba5c1ba4b22a15f4): Support optional "link", "inline" and "none" email logo formats.  Change default mode to "inline".  Fixes #133.
+
 ## Version v0.9.62
 
 > February 10, 2026
