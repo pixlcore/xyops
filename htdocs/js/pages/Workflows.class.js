@@ -54,7 +54,7 @@ Page.Workflows = class Workflows extends Page.Events {
 		else {
 			this.event = deep_copy_object( app.config.new_event_template );
 			delete this.event.plugin;
-			delete this.event.targets;
+			this.event.targets = [];
 			
 			this.event.triggers = [];
 			this.event.workflow = this.workflow = {

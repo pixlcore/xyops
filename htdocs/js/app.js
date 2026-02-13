@@ -848,6 +848,7 @@ app.extend({
 		
 		for (var idx = 0, len = this.events.length; idx < len; idx++) {
 			var item = this.events[idx];
+			if (!item.targets) item.targets = [];
 			if (this.hasCategoryAccess(item.category) && this.hasGroupAccessAll(item.targets)) {
 				new_items.push(item);
 			}
