@@ -1,5 +1,13 @@
 # xyOps Changelog
 
+## Version v0.9.65
+
+> February 13, 2026
+
+- [`e99dbf8`](https://github.com/pixlcore/xyops/commit/e99dbf8943fb9fd1752a8f90b1902625c1b186f0): Version 0.9.65
+- [`d8df06d`](https://github.com/pixlcore/xyops/commit/d8df06de268c9eeca2cc4e1104a027efb1d69be2): Bug Fix (Regression): Workflows were getting created without a targets array, which was breaking the UI.
+- [`397bb94`](https://github.com/pixlcore/xyops/commit/397bb94994b8ab8695a7bd9cadcd9eb2aebca710): Move sortable table utility functions to base
+
 ## Version v0.9.64
 
 > February 12, 2026
