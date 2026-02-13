@@ -4044,10 +4044,41 @@ Page.Events = class Events extends Page.PageUtils {
 				if ((this.event.revision != item.revision) && !this.saving) {
 					if ($('.button.save').hasClass('primary')) {
 						// worst case scenario -- we have made local changes but someone ELSE just saved
-						app.showMessage('suspended', "This " + (this.workflow ? 'workflow' : 'event') + " has just been updated by another user.  You will not be able to save your changes until you refresh.");
+						app.showMessage('suspended', "This " + (this.workflow ? 'workflow' : 'event') + " has just been updated by another user, creating a conflict.  You will not be able to save your changes until you refresh.");
 					}
 					else {
-						// ah, no local changes, so update with remote changes silently
+						// ah, no local changes, so update with remote changes
+						app.showMessage('info', "This " + (this.workflow ? 'workflow' : 'event') + " has just been updated by another user.  The changes have been merged into your copy.");
+						
+						// we might have to interrupt a dialog, solder or drag
+						// Note: This will reset the user's scroll / zoom / selection, so it's a bit disruptive
+						if (CodeEditor.active || Dialog.active || Popover.enabled) {
+							Popover.detach();
+							CodeEditor.hide();
+							Dialog.hide();
+						}
+						else if (this.wfSoldering) {
+							this.cancelSolder();
+						}
+						
+						delete this.event;
+						delete this.workflow;
+						delete this.wfScroll;
+						delete this.wfZoom;
+						delete this.wfEdit;
+						delete this.wfSelection;
+						delete this.wfSnapshots;
+						delete this.wfSnapIdx;
+						delete this.wfDragging;
+						delete this.wfSoldering;
+						delete this.wfPausedSolder;
+						delete this.wfTool;
+						delete this.wfDrawSelection;
+						delete this.saving;
+						delete this.params;
+						delete this.limits;
+						delete this.actions;
+						
 						delete this.args.rollback; // just in case
 						this.gosub_edit(this.args);
 					}
@@ -4072,6 +4103,10 @@ Page.Events = class Events extends Page.PageUtils {
 		delete this.revisionOffset;
 		delete this.revisions;
 		delete this.queuedJobs;
+		
+		delete this.params;
+		delete this.limits;
+		delete this.actions;
 		
 		delete this.workflow;
 		delete this.wfScroll;

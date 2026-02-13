@@ -2870,6 +2870,10 @@ Page.Workflows = class Workflows extends Page.Events {
 		delete this.wfDrawSelection;
 		delete this.saving;
 		
+		delete this.params;
+		delete this.limits;
+		delete this.actions;
+		
 		this.div.html('');
 		return true;
 	}
