@@ -5879,9 +5879,9 @@ app.receiveConfig({ code: 0, /* other data */ });
 POST /api/app/send_email/v1
 ```
 
-Send a custom email on demand with optional attachments. Requires the [send_emails](privileges.md#send_emails) privilege, plus a valid user session or API Key.
+Send a custom email on demand with optional attachments. Requires a valid user session or API Key with the [send_emails](privileges.md#send_emails) privilege.
 
-When the global [email_format](config.md#email_format) configuration property is set to `html` (the default), this sends an email using the official xyOps HTML stationary (with header, logo image, title, button, footer, copyright, version, border).  In this case the `body` text you specify should be in [GitHub-flavored Markdown](https://github.github.com/gfm/) format, and is rendered into HTML inside the main stationary presentation box.  However, when [email_format](config.md#email_format) is set to `text`, your body text is sent verbatim (with a one-line text footer containing the version, copyright, etc.).
+When the global [email_format](config.md#email_format) configuration property is set to `html` (the default), this sends an email using the official xyOps HTML stationary (with header, logo image, title, button, footer, copyright, version, border).  In this case the `body` text you specify should be either [GitHub-flavored Markdown](https://github.github.com/gfm/) or HTML format, and is rendered inside the main stationary presentation box.  However, when [email_format](config.md#email_format) is set to `text`, your body should be plain text and is sent verbatim (with a one-line text footer containing the version, copyright, etc.).
 
 Emails are always sent from the [email_from](config.md#email_from) global configuration property.
 
@@ -5896,7 +5896,7 @@ Emails are always sent from the [email_from](config.md#email_from) global config
 |---------------|------|-------------|
 | `to` | String | **(Required)** The email addresses to send to, comma-separated. |
 | `subject` | String | **(Required)** The email subject line. |
-| `body` | String | **(Required)** The email body text, in markdown format. |
+| `body` | String | **(Required)** The email body text, in markdown or HTML format. |
 | `cc` | String | Optional `Cc` carbon-copy address list, comma-separated. |
 | `bcc` | String | Optional `Bcc` blind-carbon-copy address list, comma-separated. |
 | `title` | String | Optional "title" shown in large bold font next to the logo (HTML emails only). |
