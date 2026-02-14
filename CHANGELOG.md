@@ -1,5 +1,14 @@
 # xyOps Changelog
 
+## Version v0.9.68
+
+> February 14, 2026
+
+- [`b61f402`](https://github.com/pixlcore/xyops/commit/b61f4022dd26f37d15a8b188beb3810027c2e716): Version 0.9.68
+- [`b37b2a2`](https://github.com/pixlcore/xyops/commit/b37b2a2c7380a07fcdc807301ae78e11c93065d3): Data Structures Doc: Add Job "starting" state.
+- [`f5ce25c`](https://github.com/pixlcore/xyops/commit/f5ce25c5f576245346ef25ec5654a369732b00e4): Job Concurrency: Fix issue where jobs stuck in "starting" state could cause queue limits to be bypassed.
+- [`9696a40`](https://github.com/pixlcore/xyops/commit/9696a406a3c32c0e73e867f23e7ccf9ad0bf0960): API Doc: Add more MIME header examples for importance.
+
 ## Version v0.9.67
 
 > February 14, 2026
