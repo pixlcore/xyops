@@ -5901,7 +5901,7 @@ Emails are always sent from the [email_from](config.md#email_from) global config
 | `bcc` | String | Optional `Bcc` blind-carbon-copy address list, comma-separated. |
 | `title` | String | Optional "title" shown in large bold font next to the logo (HTML emails only). |
 | `button` | String | Optional clickable button shown in the top-right corner (HTML emails only). |
-| `headers` | Object | Optional MIME headers to send along with the email, e.g. `{ "Importance": "High" }`. |
+| `headers` | Object | Optional MIME headers to send along with the email, e.g. `{ "Importance": "High", "X-Priority": "1", "X-MSMail-Priority": "High" }`. |
 
 For the optional `button` parameter please use this syntax: `LABEL | URL`.  So for example: `Visit Disney | https://disney.com`.
 
