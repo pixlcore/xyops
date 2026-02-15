@@ -34,10 +34,10 @@
 		display: none;
 	}
 	
-	/* 'Enabled', 'Event Title', 'Category', 'Tags', 'Plugin', 'Target', 'Trigger', 'Status', 'Actions' */
-	.data_grid.event_grid { grid-template-columns: 40px auto auto auto 0px 0px auto auto auto !important; }
+	/* 'Event Title', 'Category', 'Tags', 'Plugin', 'Target', 'Trigger', 'Status', 'Actions' */
+	.data_grid.event_grid { grid-template-columns: auto auto auto 0px 0px auto auto auto !important; }
+	.data_grid.event_grid > ul > div:nth-child(4) { visibility: hidden; }
 	.data_grid.event_grid > ul > div:nth-child(5) { visibility: hidden; }
-	.data_grid.event_grid > ul > div:nth-child(6) { visibility: hidden; }
 }
 
 @media only screen and (min-width: 1281px) and (max-width: 1450px) {
@@ -84,10 +84,10 @@
 	.data_grid.c_param_grid { grid-template-columns: 40px auto 0px auto auto auto !important; }
 	.data_grid.c_param_grid > ul > div:nth-child(3) { visibility: hidden; }
 	
-	/* 'Enabled', 'Event Title', 'Category', 'Tags', 'Plugin', 'Target', 'Trigger', 'Status', 'Actions' */
-	.data_grid.event_grid { grid-template-columns: 40px auto auto auto 0px 0px auto auto auto !important; }
+	/* 'Event Title', 'Category', 'Tags', 'Plugin', 'Target', 'Trigger', 'Status', 'Actions' */
+	.data_grid.event_grid { grid-template-columns: auto auto auto 0px 0px auto auto auto !important; }
+	.data_grid.event_grid > ul > div:nth-child(4) { visibility: hidden; }
 	.data_grid.event_grid > ul > div:nth-child(5) { visibility: hidden; }
-	.data_grid.event_grid > ul > div:nth-child(6) { visibility: hidden; }
 	
 	/* 'Sort', 'Group Title', 'Group ID', 'Servers', 'Hostname Pattern', 'Author', 'Created', 'Actions' */
 	.data_grid.group_grid { grid-template-columns: min-content auto 0px auto auto auto auto auto !important; }
@@ -197,11 +197,11 @@
 		gap: 4px;
 	}
 	
-	/* 'Enabled', 'Event Title', 'Category', 'Tags', 'Plugin', 'Target', 'Trigger', 'Status', 'Actions' */
-	.data_grid.event_grid { grid-template-columns: 40px auto auto auto 0px 0px 0px auto auto !important; }
+	/* 'Event Title', 'Category', 'Tags', 'Plugin', 'Target', 'Trigger', 'Status', 'Actions' */
+	.data_grid.event_grid { grid-template-columns: auto auto auto 0px 0px 0px auto auto !important; }
+	.data_grid.event_grid > ul > div:nth-child(4) { visibility: hidden; }
 	.data_grid.event_grid > ul > div:nth-child(5) { visibility: hidden; }
 	.data_grid.event_grid > ul > div:nth-child(6) { visibility: hidden; }
-	.data_grid.event_grid > ul > div:nth-child(7) { visibility: hidden; }
 	
 	/* 'Sort', 'Category Title', 'Category ID', 'Events', 'Author', 'Created', 'Actions' */
 	.data_grid.category_grid { grid-template-columns: min-content auto 0px auto auto auto auto !important; }
@@ -594,12 +594,12 @@
 		margin: 20px 10px 10px 10px;
 	}
 	
-	/* 'Enabled', 'Event Title', 'Category', 'Tags', 'Plugin', 'Target', 'Trigger', 'Status', 'Actions' */
-	.data_grid.event_grid { grid-template-columns: 40px auto auto 0px 0px 0px 0px auto auto !important; }
+	/* 'Event Title', 'Category', 'Tags', 'Plugin', 'Target', 'Trigger', 'Status', 'Actions' */
+	.data_grid.event_grid { grid-template-columns: auto auto 0px 0px 0px 0px auto auto !important; }
+	.data_grid.event_grid > ul > div:nth-child(3) { visibility: hidden; }
 	.data_grid.event_grid > ul > div:nth-child(4) { visibility: hidden; }
 	.data_grid.event_grid > ul > div:nth-child(5) { visibility: hidden; }
 	.data_grid.event_grid > ul > div:nth-child(6) { visibility: hidden; }
-	.data_grid.event_grid > ul > div:nth-child(7) { visibility: hidden; }
 	
 	/* 'Sort', 'Category Title', 'Category ID', 'Events', 'Author', 'Created', 'Actions' */
 	.data_grid.category_grid { grid-template-columns: min-content auto 0px auto 0px auto auto !important; }
@@ -1155,13 +1155,13 @@
 		margin: 20px 0px 0px 0px;
 	}
 	
-	/* 'Enabled', 'Event Title', 'Category', 'Tags', 'Plugin', 'Target', 'Trigger', 'Status', 'Actions' */
-	.data_grid.event_grid { grid-template-columns: 40px auto auto 0px 0px 0px 0px auto 0px !important; }
+	/* 'Event Title', 'Category', 'Tags', 'Plugin', 'Target', 'Trigger', 'Status', 'Actions' */
+	.data_grid.event_grid { grid-template-columns: auto auto 0px 0px 0px 0px auto 0px !important; }
+	.data_grid.event_grid > ul > div:nth-child(3) { visibility: hidden; }
 	.data_grid.event_grid > ul > div:nth-child(4) { visibility: hidden; }
 	.data_grid.event_grid > ul > div:nth-child(5) { visibility: hidden; }
 	.data_grid.event_grid > ul > div:nth-child(6) { visibility: hidden; }
-	.data_grid.event_grid > ul > div:nth-child(7) { visibility: hidden; }
-	.data_grid.event_grid > ul > div:nth-child(9) { visibility: hidden; }
+	.data_grid.event_grid > ul > div:nth-child(8) { visibility: hidden; }
 	
 	/* 'Sort', 'Category Title', 'Category ID', 'Events', 'Author', 'Created', 'Actions' */
 	.data_grid.category_grid { grid-template-columns: min-content auto 0px auto 0px 0px auto !important; }
@@ -1611,15 +1611,14 @@
 		grid-template-columns: 1fr 1fr;
 	}
 	
-	/* 'Enabled', 'Event Title', 'Category', 'Tags', 'Plugin', 'Target', 'Trigger', 'Status', 'Actions' */
-	.data_grid.event_grid { grid-template-columns: 0px auto auto 0px 0px 0px 0px 0px 0px !important; }
-	.data_grid.event_grid > ul > div:nth-child(1) { visibility: hidden; }
+	/* 'Event Title', 'Category', 'Tags', 'Plugin', 'Target', 'Trigger', 'Status', 'Actions' */
+	.data_grid.event_grid { grid-template-columns: auto auto 0px 0px 0px 0px 0px 0px !important; }
+	.data_grid.event_grid > ul > div:nth-child(3) { visibility: hidden; }
 	.data_grid.event_grid > ul > div:nth-child(4) { visibility: hidden; }
 	.data_grid.event_grid > ul > div:nth-child(5) { visibility: hidden; }
 	.data_grid.event_grid > ul > div:nth-child(6) { visibility: hidden; }
 	.data_grid.event_grid > ul > div:nth-child(7) { visibility: hidden; }
 	.data_grid.event_grid > ul > div:nth-child(8) { visibility: hidden; }
-	.data_grid.event_grid > ul > div:nth-child(9) { visibility: hidden; }
 	
 	/* 'Sort', 'Category Title', 'Category ID', 'Events', 'Author', 'Created', 'Actions' */
 	.data_grid.category_grid { grid-template-columns: 0px auto 0px 0px 0px 0px auto !important; }

@@ -267,24 +267,35 @@ Page.Events = class Events extends Page.PageUtils {
 		var self = this;
 		var args = this.args;
 		var html = '';
-		var hidden_cats = app.prefs.hidden_cats || {};
 		
-		// sort events based on category sort order, then alphabetically by title (lower-case)
-		this.events = [];
-		if (!resp.rows) resp.rows = [];
-		
+		// create our own copy with the sortable bits we need for the table
 		var cat_map = obj_array_to_hash( app.categories, 'id' );
-		var sorted_cats = sort_by( app.categories, 'sort_order', { type: 'number', dir: 1, copy: true } );
+		var plug_map = obj_array_to_hash( app.plugins, 'id' );
+		var grp_map = obj_array_to_hash( app.groups, 'id' );
 		
-		sorted_cats.forEach( function(cat) {
-			var cat_events = find_objects( resp.rows, { category: cat.id } ).sort( function(a, b) {
-				return a.title.toLowerCase().localeCompare( b.title.toLowerCase() );
-			} );
-			self.events = self.events.concat( cat_events );
+		var getNiceTargetListText = function(targets) {
+			// just the text, ma'am
+			return (targets || []).map( function(target) {
+				if (target in grp_map) return grp_map[target].title;
+				if (target in app.servers) return app.servers[target].title || app.formatHostname(app.servers[target].hostname);
+				return target;
+			} ).join(', ') || 'zzzzzzzz';
+		};
+		
+		this.events = (resp.rows || []).map( function(event) {
+			var category = cat_map[ event.category ] || { sort_order: 0 };
+			var plugin = plug_map[ event.plugin ] || { title: event.plugin };
+			
+			return {
+				...event,
+				cat_sort: category.sort_order,
+				tag_sort: self.getNiceTagListText(event.tags || []),
+				plug_sort: (event.plugin == '_workflow') ? 'zzzzzzzz' : plugin.title,
+				target_sort: getNiceTargetListText(event.targets || []),
+				timing_sort: summarize_event_timings(event),
+				status_sort: self.getNiceEventStatusText(event)
+			};
 		} );
-		
-		// NOTE: Don't change these columns without also changing the responsive css column collapse rules in style.css
-		var cols = ['<i class="mdi mdi-checkbox-marked-outline"></i>', 'Event Title', 'Category', 'Tags', 'Plugin', 'Target', 'Trigger', 'Status', 'Actions'];
 		
 		html += '<div class="box" id="d_el_results">';
 		html += '<div class="box_title">';
@@ -292,36 +303,33 @@ Page.Events = class Events extends Page.PageUtils {
 		html += '</div>';
 		html += '<div class="box_content table">';
 		
-		var grid_opts = {
-			rows: this.events,
-			cols: cols,
-			data_type: 'event',
-			grid_template_columns: '40px' + ' auto'.repeat( cols.length - 1 ),
-			below: '<ul class="grid_row_empty" id="ul_el_none_found" style="display:none"><div style="grid-column: 1 / -1;">No events found matching your filters.</div></ul>'
+		// NOTE: Don't change these columns without also changing the responsive css column collapse rules in style.css
+		var table_opts = {
+			id: 't_events',
+			item_name: 'event',
+			sort_by: 'title',
+			sort_dir: 1,
+			filter: this.isRowVisible.bind(this),
+			column_ids: ['title', 'cat_sort', 'tag_sort', 'plug_sort', 'target_sort', 'timing_sort', 'status_sort', '' ],
+			column_labels: ['Event Title', 'Category', 'Tags', 'Plugin', 'Target', 'Trigger', 'Status', 'Actions']
 		};
 		
-		html += this.getBasicGrid( grid_opts, function(item, idx) {
+		html += this.getSortableTable( this.events, table_opts, function(item, idx) {
 			var classes = [];
 			var cat = cat_map[ item.category ] || { title: item.category };
 			
 			var actions = [];
 			actions.push( '<button class="link" onClick="$P().do_run_event_from_list('+idx+')"><b>Run</b></button>' );
 			actions.push( '<button class="link" onClick="$P().edit_event('+idx+')"><b>Edit</b></button>' );
-			// actions.push( '<button class="link" onClick="$P().do_clone_from_list('+idx+')"><b>Clone</b></button>' );
 			actions.push( '<button class="link" onClick="$P().go_hist_from_list('+idx+')"><b>History</b></button>' );
-			// actions.push( '<button class="link danger" onClick="$P().delete_event('+idx+')"><b>Delete</b></button>' );
 			
 			var tds = [
-				'<div class="td_drag_handle" style="cursor:default">' + self.getFormCheckbox({
-					checked: item.enabled,
-					onChange: '$P().toggle_event_enabled(this,' + idx + ')'
-				}) + '</div>',
 				'<span style="font-weight:bold">' + self.getNiceEvent(item, true) + '</span>',
 				self.getNiceCategory(item.category, true),
 				self.getNiceTagList(item.tags || [], true, ', '),
 				(item.plugin == '_workflow') ? '(Workflow)' : self.getNicePlugin(item.plugin, true),
 				self.getNiceTargetList(item.targets, true),
-				summarize_event_timings(item),
+				item.timing_sort,
 				
 				'<div id="d_el_jt_status_' + item.id + '">' + self.getNiceEventStatus(item) + '</div>',
 				
@@ -332,7 +340,7 @@ Page.Events = class Events extends Page.PageUtils {
 			if (cat.color) classes.push( 'clr_' + cat.color );
 			if (classes.length) tds.className = classes.join(' ');
 			return tds;
-		} ); // getBasicGrid
+		}); // getSortableTable
 		
 		html += '</div>'; // box_content
 		
@@ -411,14 +419,33 @@ Page.Events = class Events extends Page.PageUtils {
 		return nice_status;
 	}
 	
+	getNiceEventStatusText(event) {
+		// get text event status (active jobs or last result)
+		var num_jobs = 0;
+		var last_job_id = '';
+		for (var job_id in app.activeJobs) {
+			var job = app.activeJobs[job_id];
+			if (job.event == event.id) { num_jobs++; last_job_id = job.id; }
+		}
+		var nice_status = 'Idle';
+		var event_state = get_path( app.state, 'events/' + event.id );
+		
+		if (num_jobs) {
+			nice_status = '' + num_jobs + ' Active';
+		}
+		else if (!num_jobs && event_state && event_state.last_job) {
+			var jargs = this.getJobResultArgs({ id: event_state.last_job, code: event_state.last_code, final: true });
+			nice_status = jargs.text;
+		}
+		
+		return nice_status;
+	}
+	
 	applyTableFilters(reset_max) {
 		// filters and/or search query changed -- re-filter table
 		var self = this;
 		var args = this.args;
-		var num_visible = 0, num_hidden = 0, num_paged = 0, num_filters = 0;
-		
-		// optionally reset the event max (dynamic paging)
-		if (reset_max) this.eventsPerPage = config.events_per_page;
+		var num_filters = 0;
 		
 		// single-selects
 		['search', 'status', 'category', 'target', 'plugin', 'tag', 'trigger', 'username', 'action'].forEach( function(key) {
@@ -429,36 +456,8 @@ Page.Events = class Events extends Page.PageUtils {
 		
 		var is_filtered = (num_filters > 0);
 		
-		this.div.find('#d_search_results .box_content.table ul.grid_row').each( function(idx) {
-			var $this = $(this);
-			var row = self.events[idx];
-			if (self.isRowVisible(row)) {
-				if (num_visible < self.eventsPerPage) { $this.show(); num_visible++; }
-				else { $this.hide(); num_paged++; }
-			}
-			else { $this.hide(); num_hidden++; }
-		} );
-		
-		// if any events were paged out, set a flag for onScrollDelay to sniff
-		this.moreEventsAvail = !!(num_paged > 0);
-		
-		// if any search/filter is applied, hide all category rows
-		if (is_filtered) this.div.find('ul.tr_event_category').hide();
-		else this.div.find('ul.tr_event_category').show();
-		
-		// if ALL items are hidden due to search/filter, show some kind of message
-		if (!num_visible && is_filtered && this.events.length) this.div.find('#ul_el_none_found').show();
-		else this.div.find('#ul_el_none_found').hide();
-		
+		this.updateTableRows('t_events');
 		this.updateBoxButtonFloaterState();
-		
-		// update pagination row count
-		var total_non_hidden = num_visible + num_paged;
-		var total_items = total_non_hidden + num_hidden;
-		var nice_total = "";
-		if (is_filtered && num_hidden) nice_total = "" + commify(total_non_hidden) + " of " + commify(total_items) + " events";
-		else nice_total = "" + commify(total_items) + " " + pluralize("event", total_items);
-		this.div.find('#d_search_results .box_content.table .data_grid_pagination > div').first().html( nice_total );
 		
 		// show or hide reset button
 		if (is_filtered) this.div.find('#btn_el_reset').show();
@@ -483,21 +482,6 @@ Page.Events = class Events extends Page.PageUtils {
 	resetFilters() {
 		// reset all filters to default and re-search
 		Nav.go( this.selfNav({}) );
-	}
-	
-	handleScrollList() {
-		// user scrolled on list view -- see if we need to load more events
-		var self = this;
-		if (!this.boxButtons || !this.boxFloater) return;
-		
-		var box = this.boxButtons[0].getBoundingClientRect();
-		var isVisible = this.isRectVisible(box);
-		
-		if (isVisible && this.moreEventsAvail) {
-			Debug.trace("Loading " + config.events_per_page + " more events");
-			this.eventsPerPage += config.events_per_page;
-			this.applyTableFilters();
-		}
 	}
 	
 	isRowVisible(item) {
@@ -577,51 +561,6 @@ Page.Events = class Events extends Page.PageUtils {
 		}
 		
 		return true; // show
-	}
-	
-	toggle_category_collapse(elem) {
-		// toggle category open/closed
-		var $ul = $(elem).parent();
-		var cat_id = $ul.data('cat');
-		if (!app.prefs.hidden_cats) app.prefs.hidden_cats = {};
-		
-		if ($ul.hasClass('collapsed')) {
-			// expand
-			$ul.removeClass('collapsed');
-			$ul.find('i').removeClass().addClass('mdi mdi-folder-open-outline');
-			delete app.prefs.hidden_cats[ cat_id ];
-		}
-		else {
-			// collapse
-			$ul.addClass('collapsed');
-			$ul.find('i').removeClass().addClass('mdi mdi-folder-outline');
-			app.prefs.hidden_cats[ cat_id ] = 1;
-		}
-		
-		this.applyTableFilters();
-		app.savePrefs();
-	}
-	
-	toggle_event_enabled(elem, idx) {
-		// toggle event checkbox, actually do the enable/disable here, update row
-		var self = this;
-		var item = this.events[idx];
-		
-		if (config.alt_to_toggle && !app.lastClick.altKey) {
-			$(elem).prop('checked', !$(elem).is(':checked'));
-			return app.showMessage('warning', "Accidental Click Protection: Please hold the Alt/Opt key to toggle this checkbox.", 8);
-		}
-		
-		item.enabled = !!$(elem).is(':checked');
-		
-		app.api.post( 'app/update_event', { id: item.id, enabled: item.enabled }, function(resp) {
-			if (!self.active) return; // sanity
-			
-			if (item.enabled) $(elem).closest('ul').removeClass('disabled');
-			else $(elem).closest('ul').addClass('disabled');
-			
-			app.showMessage('success', item.title + " was " + (item.enabled ? 'enabled' : 'disabled') + " successfully.");
-		} );
 	}
 	
 	do_run_event_from_list(idx) {
@@ -4005,13 +3944,6 @@ Page.Events = class Events extends Page.PageUtils {
 		}
 		
 		return event;
-	}
-	
-	onScrollDelay() {
-		// called when user scrolls, with debounce
-		switch (this.args.sub) {
-			case 'list': this.handleScrollList(); break;
-		}
 	}
 	
 	onStatusUpdate(data) {
