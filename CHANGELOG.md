@@ -1,5 +1,16 @@
 # xyOps Changelog
 
+## Version v0.9.69
+
+> February 15, 2026
+
+- [`a6efd22`](https://github.com/pixlcore/xyops/commit/a6efd22393ac09614722bee71805523a1a3298af): Version 0.9.69
+- [`989f622`](https://github.com/pixlcore/xyops/commit/989f622adee66a1986c30bea10bdadf4c166cbb3): Feature: Make event table sortable by column.  Remove checkboxes for more room.
+- [`09625d7`](https://github.com/pixlcore/xyops/commit/09625d77dd60403fb2890eeeb57e1d4b1c802ed2): Workflow Editor UI: Change icon for "remove selection" so it isn't a trash can.
+- [`79363ce`](https://github.com/pixlcore/xyops/commit/79363ce1812e2c44b08ccc068a1e9404256ed1dd): Ticket UI: FIx duplicate DOM ID in button
+- [`d845ed6`](https://github.com/pixlcore/xyops/commit/d845ed69c9ac57f74a184ef84c7a52fae7d1f68f): Hosting Doc: Add note about MinIO open-source repo getting archived, and added new section on RustFS.
+- [`daed1e5`](https://github.com/pixlcore/xyops/commit/daed1e5e7cc26981f536f0ef66f3ee65388fa899): Bug Fix: Secrets UI: Make change without decrypting, save changes, secret key labels disappear (cosmetic only).
+
 ## Version v0.9.68
 
 > February 14, 2026
