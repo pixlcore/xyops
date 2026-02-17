@@ -1,5 +1,14 @@
 # xyOps Changelog
 
+## Version v1.0.1
+
+> February 17, 2026
+
+- [`bdfeb23`](https://github.com/pixlcore/xyops/commit/bdfeb2375eab452abdc485712b0efb6f06b8c47a): Version 1.0.1
+	- Bump pixl-server-web to v3.0.4 for new URI auth feature.
+- [`7dd58d7`](https://github.com/pixlcore/xyops/commit/7dd58d75b679932882450e969ab8e0d79b171985): Feature: Sortable tables remember the sort column and sort direction in localStorage prefs.
+- [`db3dd37`](https://github.com/pixlcore/xyops/commit/db3dd37fde8a472a4c41094ce2e51ba132830bb7): Event List: Fix table sorting bug with inline links.  Fixes #144.
+
 ## Version v1.0.0
 
 > February 15, 2026
