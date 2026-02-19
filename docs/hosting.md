@@ -197,7 +197,7 @@ Here is how you can generate daily backups of critical xyOps data, regardless of
 ```sh
 curl -X POST "https://xyops.yourcompany.com/api/app/admin_export_data" \
 	-H "X-API-Key: YOUR_API_KEY_HERE" -H "Content-Type: application/json" \
-	-d '{"lists":"all",indexes:["tickets"]}' -O -J
+	-d '{"lists":"all","indexes":["tickets"]}' -O -J
 ```
 
 This will save the backup as a `.txt.gz` file in the current directory named using this filename pattern:
