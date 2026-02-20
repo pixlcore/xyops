@@ -1080,6 +1080,7 @@
 			"col", "colgroup", "table", "tbody", "td", "tfoot", "th", "thead", "tr" 
 		],
 		"allowedAttributes": {
+			"*": [ "style" ],
 			"a": [ "href", "target" ],
 			"div": [ "class" ],
 			"pre": [ "class" ],
