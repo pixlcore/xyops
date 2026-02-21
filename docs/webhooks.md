@@ -171,6 +171,27 @@ If you use Slack's newer Bot Token + chat.postMessage, set `Authorization: Beare
 token={{ encode(secrets.PUSHOVER_APP_KEY) }}&user={{ encode(secrets.PUSHOVER_API_KEY) }}&message={{ encode(text) }}
 ```
 
+### ntfy.sh
+
+- Choose a private topic name. On `ntfy.sh`, topic names are public and guessable topic names may be discovered by others.
+- Optional but recommended for protected topics: create an access token and store it as a secret like `NTFY_TOKEN`.
+- Hook settings:
+  - method: `POST`
+  - url: `https://ntfy.sh/YOUR_TOPIC`
+  - headers: 
+  	- `Content-Type: text/plain; charset=utf-8`, 
+	- `Title: xyOps: {{event.title}}`, 
+	- `Priority: high`, 
+	- `Tags: warning`, 
+	- `Authorization: Bearer {{ secrets.NTFY_TOKEN }}`
+  - body:
+
+```
+{{text}}
+```
+
+If your topic allows anonymous writes, omit the `Authorization` header. For self-hosted ntfy, replace `https://ntfy.sh` with your server URL.
+
 ### Generic Bearer API
 
 - Hook settings:
