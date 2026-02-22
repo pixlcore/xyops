@@ -422,6 +422,7 @@ When Action Plugins are invoked, they are passed a JSON document on STDIN (compr
 | `type` | String | The [Plugin.type](data.md#plugin-type), which will be set to `action`. |
 | `condition` | String | The [Action.condition](data.md#action-condition) which activated the Plugin. |
 | `params` | Object | If the Plugin defines any parameters, their values will be here. |
+| `secrets` | Object | If the Plugin is assigned any [Secrets](secrets.md), they are included here (as well as in environment variables). |
 | (Other) | Various | Based on context; see below. |
 
 If the Action Plugin is being invoked in job-related context (i.e. on job start, job complete, or other job actions) the contents of [JobHookData](data.md#jobhookdata) will also be merged in at the top-level.  Similarly, if the plugin is being invoked in an alert-related context (alert fired or cleared), then the contents of [AlertHookData](data.md#alerthookdata) will be merged in.
@@ -435,6 +436,10 @@ Here is an example JSON document sent to an Action Plugin's STDIN as part of a j
 	"condition": "success",
 	"params": {
 		"foo": "Baz"
+	},
+	"secrets": {
+		"DB_USER": "dev",
+		"DB_PASS": "1234"
 	},
 	"job": {
 		"id": "jmhzaot10tm",
@@ -612,11 +617,14 @@ When your trigger plugin is invoked, it will be passed an array of all the event
 				"notes": ""
 			}
 		}
-	]
+	],
+	"secrets": {}
 }
 ```
 
-As with all xyOps STDIO communication, the JSON will always have a top-level `xy` property set to `1` (the [xyOps Wire Protocol](xywp.md) version), and a `type` property set to `trigger`.  Also present is an `items` array, which will contain an element for each event that has the plugin assigned as a trigger.  It is up to your plugin code to decide if each event should launch a job or not.  You are also provided some other information about the events:
+As with all xyOps STDIO communication, the JSON will always have a top-level `xy` property set to `1` (the [xyOps Wire Protocol](xywp.md) version), and a `type` property set to `trigger`.  If your plugin was assigned any secrets, they will be available in the top-level `secrets` object (and also as environment variables).
+
+Also present is an `items` array, which will contain an element for each event that has the plugin assigned as a trigger.  It is up to your plugin code to decide if each event should launch a job or not.  You are also provided some other information about the events:
 
 | Property Name | Type | Description |
 |---------------|------|-------------|
