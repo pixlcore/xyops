@@ -1,5 +1,13 @@
 # xyOps Changelog
 
+## Version v1.0.5
+
+> February 22, 2026
+
+- [`28615bf`](https://github.com/pixlcore/xyops/commit/28615bf272eb6149ea6278850f789a06ad707fec): Version 1.0.5
+- [`51edb92`](https://github.com/pixlcore/xyops/commit/51edb9260f8aac3cfda31dbeb337f94941d6e032): Bug Fix: Crasher when trying to use the "Notify Me" button inside running jobs.  Fixes #156.
+- [`cfc1130`](https://github.com/pixlcore/xyops/commit/cfc113091091018d0ff7839e7fe674ebfc9b8bf6): Web Hooks Doc: Add section for nfty.sh
+
 ## Version v1.0.4
 
 > February 21, 2026
