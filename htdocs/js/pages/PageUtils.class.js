@@ -3624,7 +3624,7 @@ Page.PageUtils = class PageUtils extends Page.Base {
 			switch (param.type) {
 				case 'text':
 				case 'textarea':
-					if (elem_value.toString().length) {
+					if (elem_value != null && elem_value.toString().length) {
 						html += '<i class="mdi mdi-' + elem_icon + '">&nbsp;</i>';
 						html += strip_html( elem_value );
 					}
@@ -3632,7 +3632,7 @@ Page.PageUtils = class PageUtils extends Page.Base {
 				break;
 				
 				case 'code':
-					if (elem_value.toString().length) {
+					if (elem_value != null && elem_value.toString().length) {
 						html += '<i class="mdi mdi-' + elem_icon + '">&nbsp;</i>';
 						html += '<span class="monospace">' + strip_html(elem_value) + '</span>';
 					}
@@ -3654,11 +3654,11 @@ Page.PageUtils = class PageUtils extends Page.Base {
 				
 				case 'select':
 					html += '<i class="mdi mdi-' + elem_icon + '">&nbsp;</i>';
-					html += strip_html( elem_value.toString().replace(/\,.*$/, '').replace(/^.+\[([\w\-\.]+)\]\s*$/, '$1') );
+					html += strip_html( (elem_value != null ? elem_value.toString() : '').replace(/\,.*$/, '').replace(/^.+\[([\w\-\.]+)\]\s*$/, '$1') );
 				break;
 				
 				case 'bucket':
-					if (elem_value.toString().length) {
+					if (elem_value != null && elem_value.toString().length) {
 						html += '<i class="mdi mdi-' + elem_icon + '">&nbsp;</i>';
 						html += strip_html( elem_value );
 					}
@@ -5090,10 +5090,13 @@ Page.PageUtils = class PageUtils extends Page.Base {
 					}
 				}
 				else if (param.variant == 'number') {
-					params[ param.id ] = parseFloat( params[ param.id ] );
-					if (isNaN(params[ param.id ])) {
-						app.badField('#fe_uf_' + CSS.escape(param.id), "The &ldquo;" + param.title + "&rdquo; field is invalid.");
-						is_valid = false;
+					if (!param.required && params[ param.id ] === '') params[ param.id ] = null;
+					else {
+						params[ param.id ] = parseFloat( params[ param.id ] );
+						if (isNaN(params[ param.id ])) {
+							app.badField('#fe_uf_' + CSS.escape(param.id), "The &ldquo;" + param.title + "&rdquo; field is invalid.");
+							is_valid = false;
+						}
 					}
 				}
 			}
