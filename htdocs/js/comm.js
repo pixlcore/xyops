@@ -329,7 +329,7 @@ app.comm = {
 			var id = app.page_manager.current_page_id;
 			var page = app.page_manager.find(id);
 			if (page && page.onDataUpdate) {
-				page.onDataUpdate( data.list, app[data.list], data.item );
+				page.onDataUpdate( data.list, app[data.list], !data.delete ? data.item : undefined );
 			}
 		}
 	},
