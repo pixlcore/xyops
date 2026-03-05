@@ -1,5 +1,12 @@
 # xyOps Changelog
 
+## Version v1.0.17
+
+> March 4, 2026
+
+- [`6dc5f11`](https://github.com/pixlcore/xyops/commit/6dc5f112e22a82048a960ad1110c43bb7737457f): Version 1.0.17
+- [`38b5d16`](https://github.com/pixlcore/xyops/commit/38b5d16c98cb591515b3321c79d91e6543fa3960): Health Check API: Remove ACL requirement (was accidentally added).
+
 ## Version v1.0.16
 
 > March 3, 2026
