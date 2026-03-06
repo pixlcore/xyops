@@ -1,5 +1,12 @@
 # xyOps Changelog
 
+## Version v1.0.18
+
+> March 5, 2026
+
+- [`c59eeec`](https://github.com/pixlcore/xyops/commit/c59eeecafda0ec1b6f20e5313dd283549dfb0d34): Version 1.0.18
+- [`6b38027`](https://github.com/pixlcore/xyops/commit/6b380273e8b427fee88a2b130ffbf00bfc3c42b0): Fix issue with optional number params / fields with default values, getting reset if set to empty.
+
 ## Version v1.0.17
 
 > March 4, 2026
