@@ -40,7 +40,7 @@ For the client-side, the xyOps web application is built on the [pixl-xyapp](http
 
 ## Installing Dev Tools
 
-xyOps contains some compiled binary dependencies (namely [sqlite3](https://npmjs.com/package/sqlite3)), so if a precompiled binary cannot be found by for your exact arch, it may need to be compiled from source.  To that end, you may need:
+xyOps contains some compiled binary dependencies (namely [better-sqlite3](https://npmjs.com/package/better-sqlite3)), so if a precompiled binary cannot be found by for your exact arch, it may need to be compiled from source.  To that end, you may need:
 
 For Debian (Ubuntu) OSes:
 

@@ -12,6 +12,7 @@ We stand on the shoulders of giants.  xyOps was built using these awesome open s
 | [ansi_up](https://www.npmjs.com/package/ansi_up) | Convert ANSI sequences in text to colorful HTML. | MIT |
 | [async](https://www.npmjs.com/package/async) | Higher-order functions and common patterns for asynchronous code. | MIT |
 | [bcrypt-node](https://www.npmjs.com/package/bcrypt-node) | Native JavaScript implementation of BCrypt for Node.js. | BSD-3-Clause |
+| [better-sqlite3](https://www.npmjs.com/package/better-sqlite3) | The fastest and simplest library for SQLite in Node.js. | MIT |
 | [canvas-confetti](https://www.npmjs.com/package/canvas-confetti) | Performant confetti animation in the browser. | ISC |
 | [codemirror](https://www.npmjs.com/package/codemirror) | Full-featured in-browser code editor. | MIT |
 | [diff](https://www.npmjs.com/package/diff) | JavaScript text diff implementation. | BSD-3-Clause |
@@ -24,7 +25,6 @@ We stand on the shoulders of giants.  xyOps was built using these awesome open s
 | [node-pty](https://www.npmjs.com/package/node-pty) | Fork pseudoterminals in Node.js | MIT |
 | [sanitize-html](https://www.npmjs.com/package/sanitize-html) | Sanitize user-submitted HTML while preserving allowed elements and attributes. | MIT |
 | [shell-quote](https://www.npmjs.com/package/shell-quote) | Parse and quote shell commands. | MIT |
-| [sqlite3](https://www.npmjs.com/package/sqlite3) | Asynchronous, non-blocking SQLite3 bindings. | BSD-3-Clause |
 | [systeminformation](https://www.npmjs.com/package/systeminformation) | System and OS information library for Node.js | MIT |
 | [uglify-js](https://www.npmjs.com/package/uglify-js) | JavaScript parser, mangler/compressor and beautifier toolkit. | BSD-2-Clause |
 | [useragent-ng](https://www.npmjs.com/package/useragent-ng) | Fast and efficient user agent string parser. | MIT |
