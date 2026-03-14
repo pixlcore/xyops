@@ -26,6 +26,7 @@
 	"debug_level": 5,
 	"tick_precision_ms": 50,
 	"maintenance": "04:00",
+	"exit_on_shutdown": true,
 	"ttl": 300,
 	
 	"file_expiration": "5 years",
