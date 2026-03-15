@@ -417,6 +417,7 @@ Page.Marketplace = class Marketplace extends Page.PageUtils {
 				if (installed) {
 					html += '<div class="button right secondary phone_collapse" title="Clone for editing..." onClick="$P().do_clone()"><i class="mdi mdi-file-edit-outline">&nbsp;</i><span>Clone...</span></div>';
 				}
+				html += '<div class="button right danger phone_collapse" title="Report..." onClick="$P().doReport()"><i class="mdi mdi-alert-octagon-outline">&nbsp;</i><span>Report...</span></div>';
 				html += '<div class="clear"></div>';
 			html += '</div>'; // title
 			
@@ -545,6 +546,23 @@ Page.Marketplace = class Marketplace extends Page.PageUtils {
 		// future-proofing, default to github for v1
 		var repo_base_url = this.product.repo_url || `https://github.com/${this.product.id}`;
 		window.open( repo_base_url );
+	}
+	
+	doReport() {
+		// open a github issue for starting a report
+		// future-proofing, default to github for v1
+		var repo_base_url = this.product.repo_url || `https://github.com/${this.product.id}`;
+		
+		var url = "https://github.com/pixlcore/xyops-marketplace/issues/new" + compose_query_string({
+			title: `Report Plugin: ${this.product.title} (${this.product.id})`,
+			body: `I'd like to report the following marketplace plugin:\n\n` + 
+				`- **Name**: ${this.product.title}\n` + 
+				`- **ID**: \`${this.product.id}\`\n` + 
+				`- **Repo**: ${repo_base_url}\n\n` + 
+				`### Reason for Reporting:\n\n`
+		});
+		
+		window.open(url);
 	}
 	
 	findInstalledProduct(product) {
