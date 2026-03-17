@@ -1,5 +1,12 @@
 # xyOps Changelog
 
+## Version v1.0.32
+
+> March 17, 2026
+
+- [`75e11a2`](https://github.com/pixlcore/xyops/commit/75e11a26993628aec5c079aa69322e4f4bdd523a): Version 1.0.32
+- [`416931f`](https://github.com/pixlcore/xyops/commit/416931fae0acb3ef2c2ef8fd4dd30386a70bdfc9): Bug Fix: Crasher if a server group is deleted with active servers that match only said group.
+
 ## Version v1.0.31
 
 > March 17, 2026
