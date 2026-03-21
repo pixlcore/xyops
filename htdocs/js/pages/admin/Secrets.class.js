@@ -635,6 +635,9 @@ Page.Secrets = class Secrets extends Page.PageUtils {
 			if (!variable.name.match(/^[A-Za-z_]\w*$/)) {
 				return app.badField('fe_sev_name', "Please enter a valid variable name (must follow POSIX environment variable rules).");
 			}
+			if (variable.name.match(app.MATCH_BAD_KEY)) {
+				return app.badField('fe_sev_name', "Please enter a valid variable name (illegal key).");
+			}
 			
 			// if user enters a new dupe name, just silently replace existing
 			if (idx == -1) idx = find_object_idx( self.fields, { name: variable.name } );
