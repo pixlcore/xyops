@@ -512,9 +512,11 @@ app.extend({
 		
 		// apply user preferences for sidebar sections
 		var user_sections = app.user.sidebar || config.ui.sidebar_sections.map( section => section.id );
+		var hidden_sections = config.hide_sidebar_sections || [];
+		
 		config.ui.sidebar_sections.forEach( function(section) {
 			var $sect = $('.sidebar .sbs_' + section.id);
-			if (user_sections.includes(section.id)) $sect.show();
+			if (user_sections.includes(section.id) && !hidden_sections.includes(section.id)) $sect.show();
 			else $sect.removeClass('enabled').hide();
 		} );
 		

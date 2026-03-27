@@ -603,6 +603,11 @@ This string is displayed as part of the copyright message at the bottom-left cor
 
 This path string points to the logo used in the UI header/sidebar and in emails (default: `images/logotype.png`).
 
+### client.hide_sidebar_sections
+<!-- Title: Hide Sidebar Sections -->
+
+This array allows you to globally hide specific sidebar sections for all users, regardless of their preferences.
+
 ### client.items_per_page
 <!-- Title: List Items Per Page -->
 

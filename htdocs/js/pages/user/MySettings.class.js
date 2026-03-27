@@ -158,14 +158,18 @@ Page.MySettings = class MySettings extends Page.Base {
 		html += '<div class="box_content" style="margin-bottom:30px">';
 		
 		// sidebar sections
+		var sidebar_sections = config.ui.sidebar_sections.filter( function(section) {
+			if (!config.hide_sidebar_sections) return true;
+			return !config.hide_sidebar_sections.includes(section.id);
+		} );
 		html += this.getFormRow({
 			label: 'Sidebar:',
 			content: this.getFormMenuMulti({
 				id: 'fe_ms_sidebar',
 				title: 'Show sidebar sections',
 				placeholder: 'Select sidebar sections to show...',
-				options: config.ui.sidebar_sections,
-				values: user.sidebar || config.ui.sidebar_sections.map( section => section.id ),
+				options: sidebar_sections,
+				values: user.sidebar || sidebar_sections.map( section => section.id ),
 				onChange: '$P().saveChanges()',
 				'data-hold': 1,
 				'data-select-all': 1
