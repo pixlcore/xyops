@@ -737,10 +737,9 @@ Page.Base = class Base extends Page {
 		return '<i class="mdi mdi-harddisk">&nbsp;</i>' + os.distro + ' ' + os.release;
 	}
 	
-	getNiceVirtualization(virt) {
-		// get nice virtualization summary
+	getNiceVirtText(virt) {
+		// get plain text virtualization summary
 		if (!virt || !virt.vendor) return 'None';
-		var icon = virt.cloud ? 'cloud-outline' : 'layers-outline';
 		var html = virt.vendor;
 		if (virt.type || virt.location) {
 			html += '(';
@@ -749,6 +748,14 @@ Page.Base = class Base extends Page {
 			if (virt.location) items.push( virt.location );
 			html += items.join(', ') + ')';
 		}
+		return html;
+	}
+	
+	getNiceVirtualization(virt) {
+		// get nice virtualization summary
+		if (!virt || !virt.vendor) return 'None';
+		var icon = virt.cloud ? 'cloud-outline' : 'layers-outline';
+		var html = this.getNiceVirtText(virt);
 		return '<i class="mdi mdi-' + icon + '">&nbsp;</i>' + html;
 	}
 	
@@ -2707,7 +2714,7 @@ Page.Base = class Base extends Page {
 		
 		var buttons_html = "";
 		if (btn) buttons_html += btn;
-		else buttons_html += '<div class="button" title="Copy to Clipboard" onClick="$P().copyMarkdownToClipboard()"><i class="mdi mdi-clipboard-text-outline">&nbsp;</i>Copy</div>';
+		else buttons_html += '<div class="button" title="Copy to Clipboard" onClick="$P().copyMarkdownToClipboard()"><i class="mdi mdi-clipboard-text-outline">&nbsp;</i>Copy to Clipboard</div>';
 		buttons_html += '<div class="button primary" onClick="CodeEditor.hide()"><i class="mdi mdi-close-circle-outline">&nbsp;</i>Close</div>';
 		
 		CodeEditor.showSimpleDialog(title, html, buttons_html);

@@ -140,6 +140,12 @@ Page.System = class System extends Page.PageUtils {
 			html += '<div class="caption">Send a test email to make sure your server configuration is correct.</div>';
 		html += '</div>';
 		
+		// diag report
+		html += '<div class="maint_unit">';
+			html += '<div class="button secondary" onClick="$P().do_diag_report()"><i class="mdi mdi-microscope">&nbsp;</i>Diagnostic Report...</div>';
+			html += '<div class="caption">Generate a markdown-formatted diagnostic report, for copying &amp; pasting into an issue tracker.</div>';
+		html += '</div>';
+		
 		html += '</div>'; // maint_grid
 		
 		this.div.html( html ).buttonize();
@@ -935,6 +941,191 @@ Page.System = class System extends Page.PageUtils {
 		}); // confirm
 		
 		Dialog.autoResize();
+	}
+	
+	do_diag_report() {
+		// show diagnostic report for copying into issue tracker
+		var self = this;
+		var redacts = app.users.map( user => user.username );
+		var md = '';
+		md += `# xyOps Diagnostics Report\n`;
+		
+		var user = app.user;
+		var ropts = Intl.DateTimeFormat().resolvedOptions();
+		var lang = ropts.locale.match(/\-/) ? ropts.locale.split(/\-/).shift() : ropts.locale.toLowerCase();
+		var reg = ropts.locale.match(/\-/) ? ropts.locale.split(/\-/).pop() : ropts.locale.toUpperCase();
+		
+		md += `\n`;
+		md += `- **Date/Time:** ` + this.getNiceDateTimeText(time_now()) + `\n`;
+		md += `- **Timezone:** ` + (app.user.timezone || config.tz) + `\n`;
+		md += `- **Language:** ` + (user.language || lang) + `\n`;
+		md += `- **Region:** ` + (user.region || reg) + `\n`;
+		md += `- **Conductors:** ` + commify(num_keys(app.masters)) + `\n`;
+		md += `- **Servers:** ` + commify(num_keys(app.servers)) + `\n`;
+		
+		// conductors
+		md += `\n## Conductors\n`;
+		
+		Object.values(app.masters).forEach( function(item, idx) {
+			var num = idx + 1;
+			var stats = item.stats;
+			var os = stats.os || {};
+			
+			md += `\n### Conductor #${num}`;
+			if (item.master) md += ` (Primary)`;
+			md += `\n`;
+			
+			md += `\n`;
+			md += `- **Host ID:** \`` + item.id.substring(0, 4) + `...\` (Redacted)\n`;
+			if (!item.master) {
+				md += `- **Online:** ` + (item.online ? 'Yes' : 'No') + `\n`;
+				md += `- **Ping:** ` + item.ping + `ms\n`;
+			}
+			md += `- **xyOps Version:** ` + (stats.xyops || '(Unknown)') + `\n`;
+			md += `- **Node.js Version:** ` + (stats.node || '(Unknown)') + `\n`;
+			md += `- **Run Mode:** ` + (stats.foreground ? 'Foreground' : 'Daemon') + `\n`;
+			md += `- **Memory Usage:** ` + get_text_from_bytes(stats.mem) + `\n`;
+			
+			md += `- **OS Platform:** ` + (os.platform || '(Unknown)') + `\n`;
+			md += `- **OS Release:** ` + (os.release || '(Unknown)') + `\n`;
+			md += `- **OS Arch:** ` + (os.arch || '(Unknown)') + `\n`;
+			
+			md += `- **CPU Cores:** ` + commify(os.cpus || 0) + `\n`;
+			md += `- **Total Memory:** ` + get_text_from_bytes(os.totalmem || 0) + `\n`;
+			md += `- **Free Memory:** ` + get_text_from_bytes(os.freemem || 0) + `\n`;
+			md += `- **Load Averages:** ` + (os.loadavg || ['0']).map( avg => short_float(avg) ).join(' ') + `\n`;
+			
+			redacts.push( item.id );
+		} ); // foreach master
+		
+		// servers
+		md += `\n## Servers\n`;
+		
+		Object.values(app.servers).forEach( function(item, idx) {
+			var num = idx + 1;
+			var info = item.info;
+			var os = info.os;
+			if (!info.process) info.process = {};
+			
+			md += `\n### Server #${num}\n`;
+			
+			md += `\n`;
+			md += `- **Server ID:** \`` + item.id + `\`\n`;
+			md += `- **Hostname:** \`` + item.hostname.substring(0, 4) + `...\` (Redacted)\n`;
+			md += `- **xySat Version:** ` + (info.satellite || '(Unknown)') + `\n`;
+			md += `- **Node.js Version:** ` + (info.node || '(Unknown)') + `\n`;
+			md += `- **Virtualization:** ` + self.getNiceVirtText(info.virt) + `\n`;
+			md += `- **Memory Usage:** ` + get_text_from_bytes(info.process.mem || 0) + `\n`;
+			
+			md += `- **OS Platform:** ` + (os.platform || '(Unknown)') + `\n`;
+			md += `- **OS Release:** ` + (os.release || '(Unknown)') + `\n`;
+			md += `- **OS Arch:** ` + (os.arch || '(Unknown)') + `\n`;
+			
+			md += `- **CPU Cores:** ` + commify(info.cpu.cores || 0) + `\n`;
+			md += `- **Total Memory:** ` + get_text_from_bytes(info.memory.total || 0) + `\n`;
+			md += `- **Free Memory:** ` + get_text_from_bytes(info.memory.free || 0) + `\n`;
+			md += `- **Load Average:** ` + (info.cpu.avgLoad || '(Unknown)') + `\n`;
+			
+			redacts.push( item.hostname );
+			redacts.push( item.ip );
+		}); // foreach server
+		
+		// storage config
+		var data = this.data;
+		var stats = app.stats;
+		
+		md += `\n## Storage\n`;
+		
+		md += `\n`;
+		md += `- **Storage Engine:** ` + data.storage_engine + `\n`;
+		if (data.storage_engine == 'Hybrid') {
+			md += `- **Hybrid Config:** ` + data.hybrid_config.docEngine + ' / ' + data.hybrid_config.binaryEngine + `\n`;
+		}
+		
+		if (data.db.sqlite) {
+			md += `- **DB Memory Usage:** ` + get_text_from_bytes(stats.memoryUsage.external || 0) + `\n`;
+			md += `- **DB Disk Size:** ` + get_text_from_bytes(data.db.sqlite) + `\n`;
+		}
+		
+		if (data.cache) {
+			md += `- **Cache Memory:** ` + get_text_from_bytes(data.cache.bytes) + `\n`;
+			md += `- **Cache Objects:** ` + commify(data.cache.count) + `\n`;
+			md += `- **Cache Utilization:** ` + data.cache.full + `\n`;
+		}
+		
+		md += `- **Jobs DB Rows:** ` + commify(data.db.records.jobs || 0) + `\n`;
+		
+		// fetch warnings / errors / critical from activity
+		Dialog.showProgress( 1.0, "Generating report..." );
+		
+		var dargs = this.getDateArgsTZ( time_now() );
+		var cur_month = this.parseDateTZ( dargs.year + '-' + dargs.month + '-01 00:00:00' ); // get epoch of midnight on first month day
+		var opts = {
+			query: 'action:critical|error|warning date:>=' + cur_month,
+			offset: 0,
+			limit: 50
+		};
+		
+		app.api.get( 'app/search_activity', opts, function(resp) {
+			if (!resp.rows) resp.rows = [];
+			Dialog.hide();
+			
+			// summary table
+			md += `\n## Recent Activity\n`;
+			
+			if (resp.rows.length) {
+				md += `\n`;
+				md += `| Date/Time | Severity | Description |\n`;
+				md += `|-----------|----------|-------------|\n`;
+				
+				resp.rows.forEach( function(item) {
+					var cols = [
+						self.getShortDateTimeText(item.epoch),
+						ucfirst( item.action ),
+						item.description || '(No description provided)'
+					];
+					md += "| " + cols.join(' | ') + " |\n";
+				} );
+			}
+			else {
+				md += `\n(None found)\n`;
+			}
+			
+			// crash reports
+			md += `\n## Critical Reports\n`;
+			
+			var crits = resp.rows.filter( row => row.action == 'critical' && row.details );
+			if (crits.length) {
+				crits.forEach( function(item, idx) {
+					var num = idx + 1;
+					md += `\n### Report #${num}\n`;
+					
+					md += `\n`;
+					md += `- **Report ID:** \`` + item.id + `\`\n`;
+					md += `- **Date/Time:** ` + self.getNiceDateTimeText(item.epoch) + `\n`;
+					md += `- **Description:** ` + item.description + `\n`;
+					
+					md += `\n`;
+					md += item.details.trim() + `\n`;
+				} );
+			}
+			else {
+				md += `\n(None found)\n`;
+			}
+			
+			md += `\n(End of Report)\n`;
+			
+			md += `\n**Note to User:** Please redact any sensitive information before copying and pasting into a public forum or issue tracker.\n`;
+			
+			// apply reacts to regexp
+			try { 
+				var re = new RegExp( '(' + redacts.map( str => escape_regexp(str) ).join('|') + ')', 'ig' );
+				md = md.replace( re, '(Redacted)' );
+			}
+			catch (e) {;}
+			
+			self.viewMarkdownAuto('View Report', md);
+		} ); // api.get
 	}
 	
 	do_master_cmd(cmds) {
