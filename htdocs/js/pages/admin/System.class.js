@@ -1027,11 +1027,13 @@ Page.System = class System extends Page.PageUtils {
 			md += `- **CPU Cores:** ` + commify(info.cpu.cores || 0) + `\n`;
 			md += `- **Total Memory:** ` + get_text_from_bytes(info.memory.total || 0) + `\n`;
 			md += `- **Free Memory:** ` + get_text_from_bytes(info.memory.free || 0) + `\n`;
-			md += `- **Load Average:** ` + (info.cpu.avgLoad || '(Unknown)') + `\n`;
+			md += `- **Load Average:** ` + (info.cpu.avgLoad ? short_float(info.cpu.avgLoad) : '(Unknown)') + `\n`;
 			
 			redacts.push( item.hostname );
 			redacts.push( item.ip );
 		}); // foreach server
+		
+		if (!num_keys(app.servers)) md += `\n(No servers are online.)\n`;
 		
 		// storage config
 		var data = this.data;
