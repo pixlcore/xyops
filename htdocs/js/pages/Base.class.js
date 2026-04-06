@@ -2688,7 +2688,7 @@ Page.Base = class Base extends Page {
 		html += '</div>';
 		
 		var buttons_html = "";
-		buttons_html += '<div class="button" title="Copy to Clipboard" onClick="$P().copyCodeToClipboard()"><i class="mdi mdi-clipboard-text-outline">&nbsp;</i>Copy</div>';
+		buttons_html += '<div class="button" title="Copy to Clipboard" onClick="$P().copyCodeToClipboard()"><i class="mdi mdi-clipboard-text-outline">&nbsp;</i>Copy to Clipboard</div>';
 		buttons_html += '<div class="button primary" onClick="CodeEditor.hide()"><i class="mdi mdi-close-circle-outline">&nbsp;</i>Close</div>';
 		
 		CodeEditor.showSimpleDialog(title, html, buttons_html);
