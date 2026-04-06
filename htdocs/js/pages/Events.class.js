@@ -2758,7 +2758,7 @@ Page.Events = class Events extends Page.PageUtils {
 		html += this.getFormRow({
 			label: 'Resource Limits:',
 			content: '<div id="d_ee_reslim_table">' + this.getResLimitTable() + '</div>',
-			caption: 'Optionally select resource limits to assign to jobs.  These will override limits set at the category level.'
+			caption: 'Optionally select resource limits to assign to jobs for the event.  These are added to any limits set at the category and/or universal level.'
 		});
 		
 		// actions
@@ -2766,7 +2766,7 @@ Page.Events = class Events extends Page.PageUtils {
 		html += this.getFormRow({
 			label: 'Job Actions:',
 			content: '<div id="d_ee_jobact_table">' + this.getJobActionTable() + '</div>',
-			caption: 'Optionally select custom actions to perform for each job.  Actions may also be added at the category level.'
+			caption: 'Optionally select custom actions to perform for each job.  These are added to any actions set at the category and/or universal level.'
 		});
 		
 		// notes

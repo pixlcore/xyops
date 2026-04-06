@@ -455,12 +455,12 @@
 				"caption": "Optionally define custom parameters to be collected when a user runs your workflow manually."
 			},
 			"d_wf_res_limits": {
-				"label": "Resource Limits:",
-				"caption": "Optionally select resource limits to assign to jobs.  These will override limits set at the category level."
+				"label": "Workflow Limits:",
+				"caption": "Optionally select resource limits to assign to the workflow.  These apply only to the workflow itself (not sub-jobs within), and they are added to any limits set at the category and/or universal level."
 			},
 			"d_wf_job_actions": {
-				"label": "Job Actions:",
-				"caption": "Optionally select custom actions to perform for each job.  Actions may also be added at the category level."
+				"label": "Workflow Actions:",
+				"caption": "Optionally select custom actions to perform for each workflow.  These apply only to the workflow itself (not sub-jobs within), and they are added to any actions set at the category and/or universal level."
 			},
 			"d_wf_notes": {
 				"label": "Notes:",
