@@ -574,6 +574,10 @@ An internal revision number for the group, incremented with each change.
 
 An integer value representing the sort order of the group.  Lower values are sorted first.
 
+### Group.max_jobs_per_server
+
+An optional default job concurrency limit to place on each server in the group.  Set to `0` for infinite.  Individual servers may override this via [Server.maxJobs](#server-maxjobs).
+
 ## Job
 
 A job is a running (or previously ran) instance of an event.  The job structure has nearly all the same properties as [Event](#event) with these differences:

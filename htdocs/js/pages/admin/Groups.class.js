@@ -471,6 +471,19 @@ Page.Groups = class Groups extends Page.ServerUtils {
 			caption: 'Optionally enter a regular expression match to auto-include hostnames in the group.<br/>To match <b>all servers</b>, set this to <code>.+</code>'
 		});
 		
+		// max jobs per server
+		html += this.getFormRow({
+			label: 'Max Server Jobs:',
+			content: this.getFormText({
+				id: 'fe_eg_max_jobs_per_server',
+				type: 'number',
+				min: '0',
+				step: '1',
+				value: group.max_jobs_per_server || '0'
+			}),
+			caption: 'Optionally set a default for max concurrent jobs allowed to run on each server in the group.  Set to `0` for unlimited.  Note that individual servers may override this.'
+		});
+		
 		// actions
 		// (requires this.actions to be populated)
 		html += this.getFormRow({
@@ -500,6 +513,7 @@ Page.Groups = class Groups extends Page.ServerUtils {
 		group.title = $('#fe_eg_title').val().trim();
 		group.icon = $('#fe_eg_icon').val();
 		group.hostname_match = $('#fe_eg_match').val();
+		group.max_jobs_per_server = parseInt( $('#fe_eg_max_jobs_per_server').val() ) || 0;
 		group.notes = $('#fe_eg_notes').val();
 		
 		if (!group.title.length) {

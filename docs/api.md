@@ -1620,6 +1620,7 @@ Parameters (required fields):
 |---------------|------|-------------|
 | `title` | String | **(Required)** Visual name for the group. |
 | `hostname_match` | String | **(Required)** A regular expression string used to auto-match servers to the group. |
+| (Other) | Various | Any other [Group](data.md#group) fields (e.g. `title`, `hostname_match`, `icon`, `notes`, `alert_actions`). |
 
 Example request:
 
@@ -3983,6 +3984,7 @@ Parameters:
 | `icon` | String | Optional icon ID for the server, displayed in the UI. Icons are sourced from [Material Design Icons](https://materialdesignicons.com/).
 | `groups` | Array | Optional set of [Group.id](data.md#group-id)s for the server.  Only applicable if `autoGroup` is `false`. |
 | `autoGroup` | Boolean | Optionally set the auto-group flag for the server (see below).
+| `maxJobs` | Integer | Optionally limit the number of concurrent jobs allowed to run on the server. |
 | (Other) | Various | Any other updatable [Server](data.md#server) fields. |
 
 Special behavior:
