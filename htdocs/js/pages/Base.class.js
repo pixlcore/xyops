@@ -170,7 +170,7 @@ Page.Base = class Base extends Page {
 	getNiceSnapshotID(item, link) {
 		// get formatted snap id
 		var html = '<span class="nowrap">';
-		var icon = '<i class="mdi mdi-monitor-screenshot"></i>';
+		var icon = '<i class="mdi mdi-' + ((item.type == 'group') ? 'monitor-multiple' : 'monitor-screenshot') + '"></i>';
 		if (link) {
 			html += '<a href="#Snapshots?sub=view&id=' + item.id + '">';
 			html += icon + '<span>' + item.id + '</span></a>';
