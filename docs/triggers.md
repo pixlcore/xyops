@@ -427,7 +427,7 @@ The "Quiet" modifier allows you to configure jobs to run silently (i.e. complete
 A few notes about behaviors:
 
 - Invisible mode affects running jobs, queued jobs, as well as upcoming jobs, in the UI.
-	- You can still access running invisible jobs via the API (i.e. [get_job](api.md#get_job), [get_jobs](api.md#get_job)).
+	- You can still access running invisible jobs via the API (i.e. [get_job](api.md#get_job), [get_jobs](api.md#get_jobs)).
 	- As soon as jobs complete, they will become visible again (unless `ephemeral` is also set).
 - Ephemeral mode will automatically disable itself if the job produces output files, or has a non-zero code (i.e. job failed).
 - Both invisible and ephemeral modes are passed down to child sub-jobs if set on a workflow.
