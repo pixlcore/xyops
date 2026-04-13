@@ -1,5 +1,17 @@
 # xyOps Changelog
 
+## Version v1.0.47
+
+> April 13, 2026
+
+- [`e59f9e8`](https://github.com/pixlcore/xyops/commit/e59f9e888344b70e157a9491117c0efa6839781b): Version 1.0.47
+- [`b5e810d`](https://github.com/pixlcore/xyops/commit/b5e810d1b95da62a6ccd7785378e14d5ef4ff0db): Events Doc: Add sections on new custom job weight, group priority sorting, and priority job queuing features.
+- [`31f60fc`](https://github.com/pixlcore/xyops/commit/31f60fc310402a0fe615bf350e96dff279a7d972): Servers Doc: Add section on new max jobs per server feature.
+- [`dd9275f`](https://github.com/pixlcore/xyops/commit/dd9275f3ce3c57e83e4c287c293ef613256c69d4): UI Bug Fix: getNiceJobSourceList was missing alert, magic, and startup definitions.  Also added a catch-all.  Fixes #255.
+- [`a438ee7`](https://github.com/pixlcore/xyops/commit/a438ee70132195aef66558a80c50278ee9b3cbde): Feature: Events can now define a job "weight" in the max jobs limiter, which is used in server max jobs calculations.
+- [`40098d1`](https://github.com/pixlcore/xyops/commit/40098d1dccea84311d3c79abf0dcc4c115e3ef39): Feature: Custom QuickMon Plugins and graphs.
+- [`44e115e`](https://github.com/pixlcore/xyops/commit/44e115e24041bb378b980f07f9433fce70b1fbf3): Snapshot Icons: Differentiate between single server and group snapshots.
+
 ## Version v1.0.46
 
 > April 10, 2026
