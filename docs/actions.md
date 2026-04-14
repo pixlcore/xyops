@@ -485,6 +485,8 @@ Example (job success):
 }
 ```
 
+**Note:** The job has to explicitly output data and/or files before the Store Bucket action can see them.  See [Output Data](plugins.md#output-data) and [Output Files](plugins.md#output-files) for details.
+
 See [Buckets](buckets.md) for more details on storage buckets.
 
 ### Fetch Bucket

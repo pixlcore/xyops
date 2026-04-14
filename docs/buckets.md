@@ -93,6 +93,8 @@ Parameters used by both actions:
 
 See [Store Bucket](actions.md#store-bucket) and [Fetch Bucket](actions.md#fetch-bucket) for full action semantics and notes.
 
+**Note:** The job has to explicitly output data and/or files before the Store Bucket action can see them.  See [Output Data](plugins.md#output-data) and [Output Files](plugins.md#output-files) for details.
+
 ## Workflows And Buckets
 
 Buckets are commonly used in workflows to pass artifacts and state between nodes without a direct connection between them. Attach Fetch/Store actions to the relevant workflow nodes:
