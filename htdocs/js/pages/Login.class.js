@@ -141,8 +141,8 @@ Page.Login = class Login extends Page.Base {
 		html += '<form action="post">';
 		
 		html += '<div class="dialog inline">';
-			html += '<div class="dialog_title"><span class="danger">Change Password</span></div>';
-			html += '<div class="dialog_intro">Please change your account password to something more secure.</div>';
+			html += '<div class="dialog_title"><span class="danger">Change Initial Password</span></div>';
+			html += '<div class="dialog_intro">Please change your temporary account password to something more secure.</div>';
 			html += '<div class="dialog_content">';
 			html += '<div class="box_content">';
 			
@@ -179,6 +179,22 @@ Page.Login = class Login extends Page.Base {
 					suffix: app.get_password_toggle_html(),
 					caption: "Enter a new password for your account here."
 				});
+				
+				// verify password
+				html += this.getFormRow({
+					label: 'Verify Password:',
+					content: this.getFormText({
+						type: 'password',
+						id: 'fe_login_verify_password',
+						class: 'monospace',
+						spellcheck: 'false',
+						autocomplete: 'off',
+						maxlength: 256,
+						value: ''
+					}),
+					suffix: app.get_password_toggle_html(),
+					caption: "Please enter the new password one more time for verification."
+				});
 			
 			html += '</div>';
 			
@@ -195,7 +211,7 @@ Page.Login = class Login extends Page.Base {
 		
 		setTimeout( function() {
 			$('#fe_login_new_password').focus();
-			$('#fe_login_new_password').keypress( function(event) {
+			$('#fe_login_new_password, #fe_login_verify_password').keypress( function(event) {
 				if (event.keyCode == '13') { // enter key
 					event.preventDefault();
 					$P().doChangePassword();
@@ -212,12 +228,16 @@ Page.Login = class Login extends Page.Base {
 		
 		var old_password = $('#fe_login_old_password').val();
 		var new_password = $('#fe_login_new_password').val();
+		var verify_password = $('#fe_login_verify_password').val();
 		
 		if (!old_password.length) {
 			return app.badField('#fe_login_old_password', "Please enter your current account password.");
 		}
 		if (!new_password.length) {
 			return app.badField('#fe_login_new_password', "Please enter a new password for your account.");
+		}
+		if (new_password !== verify_password) {
+			return app.badField('#fe_login_verify_password', "Your new passwords do not match.");
 		}
 		
 		updates.old_password = old_password;
