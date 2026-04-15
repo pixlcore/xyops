@@ -800,15 +800,18 @@ app.extend({
 		lang = user.language || lang;
 		reg = user.region || reg;
 		
-		if (!opts.locale) opts.locale = lang + '-' + reg;
-		if (!opts.timeZone) opts.timeZone = user.timezone || ropts.timeZone;
-		if (!opts.numberingSystem) opts.numberingSystem = user.num_format || ropts.numberingSystem;
-		if (!opts.hourCycle) opts.hourCycle = user.hour_cycle;
-		
 		if (opts.locale === false) delete opts.locale;
+		else if (!opts.locale) opts.locale = lang + '-' + reg;
+		
 		if (opts.timeZone === false) delete opts.timeZone;
+		else if (!opts.timeZone) opts.timeZone = user.timezone || ropts.timeZone;
+		
 		if (opts.numberingSystem === false) delete opts.numberingSystem;
+		else if (!opts.numberingSystem) opts.numberingSystem = user.num_format || ropts.numberingSystem;
+		
 		if (opts.hourCycle === false) delete opts.hourCycle;
+		else if (!opts.hourCycle) opts.hourCycle = user.hour_cycle;
+		
 		if (!opts.second) delete opts.second;
 		else {
 			// has seconds -- does user want milliseconds too?
