@@ -789,11 +789,11 @@ Page.Servers = class Servers extends Page.ServerUtils {
 		
 		app.setHeaderNav([
 			{ icon: 'server', loc: '#Servers?sub=list', title: 'Servers' },
-			{ icon: server_icon, title: server.title || server.hostname },
+			{ icon: server_icon, title: server.title || app.formatHostname(server.hostname) },
 			{ type: 'badge', color: badge_color, icon: badge_icon, title: badge_title }
 		]);
 		
-		app.setWindowTitle( "Viewing Server: " + (server.title || server.hostname) + "" );
+		app.setWindowTitle( "Viewing Server: " + (server.title || app.formatHostname(server.hostname)) + "" );
 	}
 	
 	getWatchButton() {
