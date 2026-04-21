@@ -38,6 +38,11 @@
 	.data_grid.event_grid { grid-template-columns: auto auto auto 0px 0px auto auto auto !important; }
 	.data_grid.event_grid > ul > div:nth-child(4) { visibility: hidden; }
 	.data_grid.event_grid > ul > div:nth-child(5) { visibility: hidden; }
+	
+	/* 'Container Name', 'ID', 'Server', 'CPU', 'Mem Usage', 'Mem Total', 'Net In', 'Net Out', 'Disk Read', 'Disk Write', 'Actions' */
+	.data_grid.grp_cont_grid { grid-template-columns: auto auto auto auto auto auto auto auto 0px 0px auto !important; }
+	.data_grid.grp_cont_grid > ul > div:nth-child(9) { visibility: hidden; }
+	.data_grid.grp_cont_grid > ul > div:nth-child(10) { visibility: hidden; }
 }
 
 @media only screen and (min-width: 1281px) and (max-width: 1450px) {
@@ -101,6 +106,18 @@
 	/* 'Job ID', 'Event', 'Category', 'Server', 'State', 'Elapsed', 'Progress', 'Remaining', 'Actions' */
 	.data_grid.dash_active_grid { grid-template-columns: auto auto auto auto auto 0px auto auto auto !important; }
 	.data_grid.dash_active_grid > ul > div:nth-child(6) { visibility: hidden; }
+	
+	/* 'Container Name', 'ID', 'CPU', 'Mem Usage', 'Mem Total', 'Net In', 'Net Out', 'Disk Read', 'Disk Write', 'Actions' */
+	.data_grid.container_grid { grid-template-columns: auto auto auto auto auto auto auto 0px 0px auto !important; }
+	.data_grid.container_grid > ul > div:nth-child(8) { visibility: hidden; }
+	.data_grid.container_grid > ul > div:nth-child(9) { visibility: hidden; }
+	
+	/* 'Container Name', 'ID', 'Server', 'CPU', 'Mem Usage', 'Mem Total', 'Net In', 'Net Out', 'Disk Read', 'Disk Write', 'Actions' */
+	.data_grid.grp_cont_grid { grid-template-columns: auto auto auto auto auto auto 0px 0px 0px 0px auto !important; }
+	.data_grid.grp_cont_grid > ul > div:nth-child(7) { visibility: hidden; }
+	.data_grid.grp_cont_grid > ul > div:nth-child(8) { visibility: hidden; }
+	.data_grid.grp_cont_grid > ul > div:nth-child(9) { visibility: hidden; }
+	.data_grid.grp_cont_grid > ul > div:nth-child(10) { visibility: hidden; }
 }
 
 @media only screen and (min-width: 1025px) and (max-width: 1280px) {
@@ -412,6 +429,21 @@
 	/* 'Title / Description', 'Author', 'License', 'Type', 'Modified', 'Version' */
 	.data_grid.product_grid { grid-template-columns: auto auto 0px auto auto auto !important; }
 	.data_grid.product_grid > ul > div:nth-child(3) { visibility: hidden; }
+	
+	/* 'Container Name', 'ID', 'CPU', 'Mem Usage', 'Mem Total', 'Net In', 'Net Out', 'Disk Read', 'Disk Write', 'Actions' */
+	.data_grid.container_grid { grid-template-columns: auto auto auto auto auto 0px 0px 0px 0px auto !important; }
+	.data_grid.container_grid > ul > div:nth-child(6) { visibility: hidden; }
+	.data_grid.container_grid > ul > div:nth-child(7) { visibility: hidden; }
+	.data_grid.container_grid > ul > div:nth-child(8) { visibility: hidden; }
+	.data_grid.container_grid > ul > div:nth-child(9) { visibility: hidden; }
+	
+	/* 'Container Name', 'ID', 'Server', 'CPU', 'Mem Usage', 'Mem Total', 'Net In', 'Net Out', 'Disk Read', 'Disk Write', 'Actions' */
+	.data_grid.grp_cont_grid { grid-template-columns: auto auto auto auto auto 0px 0px 0px 0px 0px auto !important; }
+	.data_grid.grp_cont_grid > ul > div:nth-child(6) { visibility: hidden; }
+	.data_grid.grp_cont_grid > ul > div:nth-child(7) { visibility: hidden; }
+	.data_grid.grp_cont_grid > ul > div:nth-child(8) { visibility: hidden; }
+	.data_grid.grp_cont_grid > ul > div:nth-child(9) { visibility: hidden; }
+	.data_grid.grp_cont_grid > ul > div:nth-child(10) { visibility: hidden; }
 }
 
 /* Tablets */
@@ -881,6 +913,23 @@
 	.data_grid.product_grid { grid-template-columns: auto auto 0px 0px auto auto !important; }
 	.data_grid.product_grid > ul > div:nth-child(3) { visibility: hidden; }
 	.data_grid.product_grid > ul > div:nth-child(4) { visibility: hidden; }
+	
+	/* 'Container Name', 'ID', 'CPU', 'Mem Usage', 'Mem Total', 'Net In', 'Net Out', 'Disk Read', 'Disk Write', 'Actions' */
+	.data_grid.container_grid { grid-template-columns: auto auto auto auto 0px 0px 0px 0px 0px auto !important; }
+	.data_grid.container_grid > ul > div:nth-child(5) { visibility: hidden; }
+	.data_grid.container_grid > ul > div:nth-child(6) { visibility: hidden; }
+	.data_grid.container_grid > ul > div:nth-child(7) { visibility: hidden; }
+	.data_grid.container_grid > ul > div:nth-child(8) { visibility: hidden; }
+	.data_grid.container_grid > ul > div:nth-child(9) { visibility: hidden; }
+	
+	/* 'Container Name', 'ID', 'Server', 'CPU', 'Mem Usage', 'Mem Total', 'Net In', 'Net Out', 'Disk Read', 'Disk Write', 'Actions' */
+	.data_grid.grp_cont_grid { grid-template-columns: auto 0px auto auto auto 0px 0px 0px 0px 0px auto !important; }
+	.data_grid.grp_cont_grid > ul > div:nth-child(2) { visibility: hidden; }
+	.data_grid.grp_cont_grid > ul > div:nth-child(6) { visibility: hidden; }
+	.data_grid.grp_cont_grid > ul > div:nth-child(7) { visibility: hidden; }
+	.data_grid.grp_cont_grid > ul > div:nth-child(8) { visibility: hidden; }
+	.data_grid.grp_cont_grid > ul > div:nth-child(9) { visibility: hidden; }
+	.data_grid.grp_cont_grid > ul > div:nth-child(10) { visibility: hidden; }
 }
 
 /* Phones */
@@ -1510,6 +1559,26 @@
 	.data_grid.product_grid > ul > div:nth-child(3) { visibility: hidden; }
 	.data_grid.product_grid > ul > div:nth-child(4) { visibility: hidden; }
 	.data_grid.product_grid > ul > div:nth-child(5) { visibility: hidden; }
+	
+	/* 'Container Name', 'ID', 'CPU', 'Mem Usage', 'Mem Total', 'Net In', 'Net Out', 'Disk Read', 'Disk Write', 'Actions' */
+	.data_grid.container_grid { grid-template-columns: auto 0px auto auto 0px 0px 0px 0px 0px 0px !important; }
+	.data_grid.container_grid > ul > div:nth-child(2) { visibility: hidden; }
+	.data_grid.container_grid > ul > div:nth-child(5) { visibility: hidden; }
+	.data_grid.container_grid > ul > div:nth-child(6) { visibility: hidden; }
+	.data_grid.container_grid > ul > div:nth-child(7) { visibility: hidden; }
+	.data_grid.container_grid > ul > div:nth-child(8) { visibility: hidden; }
+	.data_grid.container_grid > ul > div:nth-child(9) { visibility: hidden; }
+	.data_grid.container_grid > ul > div:nth-child(10) { visibility: hidden; }
+	
+	/* 'Container Name', 'ID', 'Server', 'CPU', 'Mem Usage', 'Mem Total', 'Net In', 'Net Out', 'Disk Read', 'Disk Write', 'Actions' */
+	.data_grid.grp_cont_grid { grid-template-columns: auto 0px auto auto auto 0px 0px 0px 0px 0px 0px !important; }
+	.data_grid.grp_cont_grid > ul > div:nth-child(2) { visibility: hidden; }
+	.data_grid.grp_cont_grid > ul > div:nth-child(6) { visibility: hidden; }
+	.data_grid.grp_cont_grid > ul > div:nth-child(7) { visibility: hidden; }
+	.data_grid.grp_cont_grid > ul > div:nth-child(8) { visibility: hidden; }
+	.data_grid.grp_cont_grid > ul > div:nth-child(9) { visibility: hidden; }
+	.data_grid.grp_cont_grid > ul > div:nth-child(10) { visibility: hidden; }
+	.data_grid.grp_cont_grid > ul > div:nth-child(11) { visibility: hidden; }
 }
 
 /* Smaller Phones */
@@ -2023,4 +2092,26 @@
 	.data_grid.product_grid > ul > div:nth-child(4) { visibility: hidden; }
 	.data_grid.product_grid > ul > div:nth-child(5) { visibility: hidden; }
 	.data_grid.product_grid > ul > div:nth-child(6) { visibility: hidden; }
+	
+	/* 'Container Name', 'ID', 'CPU', 'Mem Usage', 'Mem Total', 'Net In', 'Net Out', 'Disk Read', 'Disk Write', 'Actions' */
+	.data_grid.container_grid { grid-template-columns: auto 0px auto auto 0px 0px 0px 0px 0px 0px !important; }
+	.data_grid.container_grid > ul > div:nth-child(2) { visibility: hidden; }
+	.data_grid.container_grid > ul > div:nth-child(5) { visibility: hidden; }
+	.data_grid.container_grid > ul > div:nth-child(6) { visibility: hidden; }
+	.data_grid.container_grid > ul > div:nth-child(7) { visibility: hidden; }
+	.data_grid.container_grid > ul > div:nth-child(8) { visibility: hidden; }
+	.data_grid.container_grid > ul > div:nth-child(9) { visibility: hidden; }
+	.data_grid.container_grid > ul > div:nth-child(10) { visibility: hidden; }
+	
+	/* 'Container Name', 'ID', 'Server', 'CPU', 'Mem Usage', 'Mem Total', 'Net In', 'Net Out', 'Disk Read', 'Disk Write', 'Actions' */
+	.data_grid.grp_cont_grid { grid-template-columns: auto 0px auto 0px 0px 0px 0px 0px 0px 0px 0px !important; }
+	.data_grid.grp_cont_grid > ul > div:nth-child(2) { visibility: hidden; }
+	.data_grid.grp_cont_grid > ul > div:nth-child(4) { visibility: hidden; }
+	.data_grid.grp_cont_grid > ul > div:nth-child(5) { visibility: hidden; }
+	.data_grid.grp_cont_grid > ul > div:nth-child(6) { visibility: hidden; }
+	.data_grid.grp_cont_grid > ul > div:nth-child(7) { visibility: hidden; }
+	.data_grid.grp_cont_grid > ul > div:nth-child(8) { visibility: hidden; }
+	.data_grid.grp_cont_grid > ul > div:nth-child(9) { visibility: hidden; }
+	.data_grid.grp_cont_grid > ul > div:nth-child(10) { visibility: hidden; }
+	.data_grid.grp_cont_grid > ul > div:nth-child(11) { visibility: hidden; }
 }

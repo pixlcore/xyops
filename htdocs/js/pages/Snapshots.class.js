@@ -12,6 +12,7 @@ Page.Snapshots = class Snapshots extends Page.ServerUtils {
 		
 		// debounce for group snaps
 		this.applyServerTableFiltersDebounce = debounce( this.applyServerTableFilters.bind(this), 250 );
+		this.renderContainerTableDebounce = debounce( this.renderGroupContainerTable.bind(this), 1000 );
 		this.renderProcessTableDebounce = debounce( this.renderGroupProcessTable.bind(this), 1000 );
 		this.renderConnectionTableDebounce = debounce( this.renderGroupConnectionTable.bind(this), 1000 );
 	}
@@ -554,11 +555,24 @@ Page.Snapshots = class Snapshots extends Page.ServerUtils {
 			html += '</div>'; // box_content
 		html += '</div>'; // box
 		
+		// containers
+		if (snapshot.data && snapshot.data.docker) {
+			html += '<div class="box" id="d_vs_conts">';
+				html += '<div class="box_title">';
+					html += '<div class="box_title_widget" style="overflow:visible; margin-left:0;"><i class="mdi mdi-magnify" onClick="$(this).next().focus()">&nbsp;</i><input type="text" placeholder="Filter" value="" data-id="t_snap_conts" onInput="$P().applyTableFilter(this)"></div>';
+					html += 'Containers';
+				html += '</div>';
+				html += '<div class="box_content table">';
+					html += this.getContainerTable(snapshot);
+				html += '</div>'; // box_content
+			html += '</div>'; // box
+		}
+		
 		// processes
 		html += '<div class="box" id="d_vs_procs">';
 			html += '<div class="box_title">';
 				html += '<div class="box_title_widget" style="overflow:visible; margin-left:0;"><i class="mdi mdi-magnify" onClick="$(this).next().focus()">&nbsp;</i><input type="text" placeholder="Filter" value="" data-id="t_snap_procs" onInput="$P().applyTableFilter(this)"></div>';
-				html += 'Active Processes';
+				html += 'Processes';
 			html += '</div>';
 			html += '<div class="box_content table">';
 				html += this.getProcessTable(snapshot);
@@ -1000,6 +1014,17 @@ Page.Snapshots = class Snapshots extends Page.ServerUtils {
 			html += '</div>'; // box_content
 		html += '</div>'; // box
 		
+		// containers
+		html += '<div class="box" id="d_vg_conts" style="display:none">';
+			html += '<div class="box_title">';
+				html += '<div class="box_title_widget" style="overflow:visible; margin-left:0;"><i class="mdi mdi-magnify" onClick="$(this).next().focus()">&nbsp;</i><input type="text" placeholder="Filter" value="" data-id="t_grp_conts" onInput="$P().applyTableFilter(this)"></div>';
+				html += 'Group Containers &mdash; Snapshot <span class="s_grp_filtered"></span>';
+			html += '</div>';
+			html += '<div class="box_content table">';
+				html += '<div class="loading_container"><div class="loading"></div></div>';
+			html += '</div>'; // box_content
+		html += '</div>'; // box
+		
 		// processes
 		html += '<div class="box" id="d_vg_procs">';
 			html += '<div class="box_title">';
@@ -1083,6 +1108,7 @@ Page.Snapshots = class Snapshots extends Page.ServerUtils {
 		// render all sections that are affected by visibleServerIDs
 		this.renderSnapshotJobs();
 		this.renderSnapshotAlerts();
+		this.renderGroupContainerTable();
 		this.renderGroupProcessTable();
 		this.renderGroupConnectionTable();
 		this.updateDonutDashUnits();
@@ -1284,6 +1310,7 @@ Page.Snapshots = class Snapshots extends Page.ServerUtils {
 			}); // foreach mon
 			
 			// call debounced update on process and connection tables
+			self.renderContainerTableDebounce();
 			self.renderProcessTableDebounce();
 			self.renderConnectionTableDebounce();
 			

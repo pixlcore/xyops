@@ -1030,11 +1030,22 @@ Page.Servers = class Servers extends Page.ServerUtils {
 			html += '</div>'; // box_content
 		html += '</div>'; // box
 		
+		// containers
+		html += '<div class="box" id="d_vs_conts" style="display:none">';
+			html += '<div class="box_title">';
+				html += '<div class="box_title_widget" style="overflow:visible; margin-left:0;"><i class="mdi mdi-magnify" onClick="$(this).next().focus()">&nbsp;</i><input type="text" placeholder="Filter" value="" data-id="t_snap_conts" onInput="$P().applyTableFilter(this)"></div>';
+				html += 'Server Containers';
+			html += '</div>';
+			html += '<div class="box_content table">';
+				// html += this.getContainerTable(snapshot);
+			html += '</div>'; // box_content
+		html += '</div>'; // box
+		
 		// processes
 		html += '<div class="box" id="d_vs_procs">';
 			html += '<div class="box_title">';
 				html += '<div class="box_title_widget" style="overflow:visible; margin-left:0;"><i class="mdi mdi-magnify" onClick="$(this).next().focus()">&nbsp;</i><input type="text" placeholder="Filter" value="" data-id="t_snap_procs" onInput="$P().applyTableFilter(this)"></div>';
-				html += 'Active Processes';
+				html += 'Server Processes';
 			html += '</div>';
 			html += '<div class="box_content table">';
 				html += this.getProcessTable(snapshot);
@@ -1102,6 +1113,7 @@ Page.Servers = class Servers extends Page.ServerUtils {
 		this.renderMonitorGrid();
 		this.renderMemDetails();
 		this.renderCPUDetails();
+		this.renderContainers();
 		this.setupMonitors();
 		this.setupUpcomingJobs();
 		this.setupAlertHistoryDayGraph();
@@ -1120,6 +1132,17 @@ Page.Servers = class Servers extends Page.ServerUtils {
 		}
 		
 		// SingleSelect.init( this.div.find('#fe_vs_mode, #fe_vs_year') );
+	}
+	
+	renderContainers() {
+		// show containers if server is a docker host
+		if (!this.snapshot || !this.snapshot.data || !this.snapshot.data.docker) {
+			this.div.find('#d_vs_conts').hide();
+			return;
+		}
+		
+		this.div.find('#d_vs_conts > .box_content').html( this.getContainerTable(this.snapshot) );
+		this.div.find('#d_vs_conts').show();
 	}
 	
 	checkSatelliteVersion() {
@@ -1914,6 +1937,9 @@ Page.Servers = class Servers extends Page.ServerUtils {
 		this.div.find('#d_vs_conns > div.box_content').html( this.getConnectionTable(snapshot) );
 		this.div.find('#d_vs_ifaces > div.box_content').html( this.getInterfaceTable(snapshot) );
 		this.div.find('#d_vs_fs > div.box_content').html( this.getMountTable(snapshot) );
+		
+		// update containers
+		this.renderContainers();
 		
 		// update pixl-charts
 		this.appendSampleToChart();

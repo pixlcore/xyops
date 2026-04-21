@@ -632,6 +632,147 @@ Page.ServerUtils = class ServerUtils extends Page.PageUtils {
 		this.div.find('#d_vs_jobs').show();
 	}
 	
+	getContainerTable(snapshot) {
+		// get initial html for sortable container table
+		var self = this;
+		var containers = get_path(snapshot, 'data.docker.containers') || [];
+		
+		var cont_opts = {
+			id: 't_snap_conts',
+			item_name: 'container',
+			sort_by: 'cpu',
+			sort_dir: -1,
+			filter: '',
+			column_ids: ['name', 'id', 'cpu', 'mem_usage', 'mem_total', 'net_read', 'net_write', 'disk_read', 'disk_write', ''],
+			column_labels: ['Container Name', 'ID', 'CPU', 'Mem Usage', 'Mem Total', 'Net In', 'Net Out', 'Disk Read', 'Disk Write', 'Actions']
+		};
+		
+		return this.getSortableTable( containers, cont_opts, function(cont) {
+			var actions = [];
+			if (app.isAdmin() && self.ID.match(/^(Servers|Groups)$/)) {
+				actions = [
+					`<button class="link danger" data-id="${cont.id}" data-name="${encode_attrib_entities(cont.name)}" onClick="$P().restartContainer(this)"><b>Restart</b></button>`,
+					`<button class="link danger" data-id="${cont.id}" data-name="${encode_attrib_entities(cont.name)}" onClick="$P().stopContainer(this)"><b>Stop</b></button>`
+				];
+			}
+			return [
+				'<b><i class="mdi mdi-docker">&nbsp;</i>' + cont.name + '</b>',
+				'<span class="monospace">' + cont.id +'</span>',
+				pct( cont.cpu, 100 ),
+				get_text_from_bytes( cont.mem_usage ),
+				get_text_from_bytes( cont.mem_total ),
+				get_text_from_bytes( cont.net_read ),
+				get_text_from_bytes( cont.net_write ),
+				get_text_from_bytes( cont.disk_read ),
+				get_text_from_bytes( cont.disk_write ),
+				actions.join(' | ') || '-'
+			];
+		});
+	}
+	
+	restartContainer(elem) {
+		// restart selected container
+		var self = this;
+		var $elem = $(elem);
+		var cont_id = $elem.data('id');
+		var cont_name = $elem.data('name');
+		var server_id = $elem.data('server') || this.server.id;
+		
+		var msg = `Are you sure you want to restart the container &ldquo;<b>${cont_name}</b>&rdquo; running on the &ldquo;<b>${self.getNiceServerText(server_id)}</b>&rdquo; host?`;
+		
+		Dialog.confirmDanger( 'Restart Container', msg, ['restart', 'Restart'], function(result) {
+			if (!result) return;
+			Dialog.hide();
+			app.clearError();
+			self.sendContainerCommand(server_id, cont_id, cont_name, 'restart');
+		} ); // confirm
+	}
+	
+	stopContainer(elem) {
+		// stop selected container
+		var self = this;
+		var $elem = $(elem);
+		var cont_id = $elem.data('id');
+		var cont_name = $elem.data('name');
+		var server_id = $elem.data('server') || this.server.id;
+		
+		var msg = `Are you sure you want to stop the container &ldquo;<b>${cont_name}</b>&rdquo; running on the &ldquo;<b>${self.getNiceServerText(server_id)}</b>&rdquo; host?`;
+		
+		Dialog.confirmDanger( 'Stop Container', msg, ['power-standby', 'Stop'], function(result) {
+			if (!result) return;
+			Dialog.hide();
+			app.clearError();
+			self.sendContainerCommand(server_id, cont_id, cont_name, 'stop');
+		} ); // confirm
+	}
+	
+	sendContainerCommand(server_id, cont_id, cont_name, cmd) {
+		// send command to specified container on specified server
+		var self = this;
+		var server = app.servers[server_id];
+		var cat_def = find_object( app.categories, { id: 'general' } ) || app.categories[0];
+		
+		if (!server) return app.doError("Server not found in active list: " + server_id);
+		if (!cat_def) return app.doError("No categories found.  Please add a category before killing processes.");
+		if (!find_object(app.plugins, { id: 'shellplug' })) return app.doError("The built-in Shell Plugin was not found.");
+		if (!cont_id.match(/^\w+$/)) return app.doError("Malformed Container ID: " + cont_id);
+		if (!cmd.match(/^\w+$/)) return app.doError("Malformed Container Command: " + cmd);
+		
+		var script = `#!/bin/sh\nset -e\necho "${ucfirst(cmd)} container ${cont_name} (${cont_id})..."\ndocker ${cmd} ${cont_id}\necho "Done."\n`;
+		
+		var event = {
+			enabled: true,
+			title: ucfirst(cmd) + " Container",
+			icon: 'docker',
+			category: cat_def.id,
+			targets: [ server_id ],
+			algo: 'random',
+			plugin: 'shellplug',
+			params: {
+				script: script
+			},
+			triggers: [
+				{ type: "manual", enabled: true }
+			],
+			actions: [
+				{ type: "delete", enabled: true, condition: "complete" }
+			],
+			limits: [],
+			fields: [],
+			tags: [],
+			notes: ""
+		};
+		
+		var job = deep_copy_object(event);
+		job.label = ucfirst(cmd) + " Container";
+		
+		// pre-open new window/tab for job details
+		var win = window.open('', '_blank');
+		
+		app.api.post( 'app/create_event', event, function(resp) {
+			// now run the job
+			if (!self.active) return; // sanity
+			job.event = resp.event.id;
+			
+			app.api.post( 'app/run_event', job, function(resp) {
+				// Dialog.hideProgress();
+				if (!self.active) return; // sanity
+				
+				// jump immediately to live details page in new window
+				win.location.href = '#Job?id=' + resp.id;
+			}, 
+			function(err) {
+				// capture error so we can close the window we just opened
+				win.close();
+				app.doError("API Error: " + err.description);
+			}); // run_event error
+		},
+		function(err) {
+			win.close();
+			app.doError("API Error: " + err.description);
+		} ); // create_event error
+	}
+	
 	getProcessTable(snapshot) {
 		// get initial html for sortable proc table
 		var self = this;
@@ -1678,6 +1819,71 @@ Page.ServerUtils = class ServerUtils extends Page.PageUtils {
 		}
 		
 		return true; // show
+	}
+	
+	renderGroupContainerTable() {
+		// render html for sortable container table
+		var self = this;
+		
+		var cont_opts = {
+			id: 't_grp_conts',
+			item_name: 'container',
+			attribs: {
+				class: 'data_grid grp_cont_grid' // TODO: css
+			},
+			sort_by: 'cpu',
+			sort_dir: -1,
+			filter: '',
+			column_ids: ['name', 'id', 'server_label', 'cpu', 'mem_usage', 'mem_total', 'net_read', 'net_write', 'disk_read', 'disk_write', ''],
+			column_labels: ['Container Name', 'ID', 'Server', 'CPU', 'Mem Usage', 'Mem Total', 'Net In', 'Net Out', 'Disk Read', 'Disk Write', 'Actions']
+		};
+		
+		var cont_list = [];
+		this.servers.forEach( function(server) {
+			if (server.offline) return; // skip offline servers
+			if (!self.visibleServerIDs[ server.id ]) return; // skip hidden servers
+			
+			var snapshot = server.snapshot || {};
+			if (!snapshot.data || !snapshot.data.docker) return;
+			
+			snapshot.data.docker.containers.forEach( function(cont) {
+				cont_list.push({ ...cont,
+					server_label: server.title || server.hostname || server.id,
+					server: server.id
+				 });
+			} );
+		} );
+		
+		if (!cont_list.length) {
+			this.div.find('#d_vg_conts').hide();
+			return;
+		}
+		
+		var html = this.getSortableTable( cont_list, cont_opts, function(cont) {
+			var actions = [];
+			if (app.isAdmin() && self.ID.match(/^(Servers|Groups)$/)) {
+				actions = [
+					`<button class="link danger" data-id="${cont.id}" data-server="${cont.server}" data-name="${encode_attrib_entities(cont.name)}" onClick="$P().restartContainer(this)"><b>Restart</b></button>`,
+					`<button class="link danger" data-id="${cont.id}" data-server="${cont.server}" data-name="${encode_attrib_entities(cont.name)}" onClick="$P().stopContainer(this)"><b>Stop</b></button>`
+				];
+			}
+			return [
+				'<b><i class="mdi mdi-docker">&nbsp;</i>' + cont.name + '</b>',
+				'<span class="monospace">' + cont.id +'</span>',
+				self.getNiceServer(cont.server, true),
+				pct( cont.cpu, 100 ),
+				get_text_from_bytes( cont.mem_usage ),
+				get_text_from_bytes( cont.mem_total ),
+				get_text_from_bytes( cont.net_read ),
+				get_text_from_bytes( cont.net_write ),
+				get_text_from_bytes( cont.disk_read ),
+				get_text_from_bytes( cont.disk_write ),
+				actions.join(' | ') || '-'
+			];
+		});
+		
+		this.div.find('#d_vg_conts > .box_content').html( html );
+		this.div.find('#d_vg_conts').show();
 	}
 	
 	renderGroupProcessTable() {
