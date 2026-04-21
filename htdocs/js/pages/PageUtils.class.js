@@ -3096,7 +3096,7 @@ Page.PageUtils = class PageUtils extends Page.Base {
 				options: sort_by(servers.map( function(server) {
 						return merge_objects( server, { title: server.title || server.hostname } );
 					} ), 'title'),
-				value: '',
+				value: app.getPref('sde_server') || '',
 				default_icon: 'router-network'
 			})
 		});
@@ -3134,6 +3134,7 @@ Page.PageUtils = class PageUtils extends Page.Base {
 		$('#fe_ex_server').on('change', function() {
 			var id = $(this).val();
 			if (!id) return; // sanity
+			app.setPref('sde_server', id);
 			
 			// now load server host data
 			app.api.get( 'app/get_server', { id }, function(resp) {

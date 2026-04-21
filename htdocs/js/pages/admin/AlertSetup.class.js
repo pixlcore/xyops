@@ -668,7 +668,7 @@ Page.AlertSetup = class AlertSetup extends Page.PageUtils {
 			content: this.getFormMenuSingle({
 				id: 'fe_ex_server',
 				options: servers,
-				value: '',
+				value: app.getPref('sta_server') || app.getPref('sde_server') || '',
 				default_icon: 'router-network'
 			})
 		});
@@ -702,6 +702,7 @@ Page.AlertSetup = class AlertSetup extends Page.PageUtils {
 		$('#fe_ex_server').on('change', function() {
 			var id = $(this).val();
 			if (!id) return; // sanity
+			app.setPref('sta_server', id);
 			
 			$('#d_ead_form_result').removeClass().addClass('form_result').html('...');
 			$('#d_ead_form_message').html('...');
