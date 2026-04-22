@@ -1135,6 +1135,10 @@ Page.System = class System extends Page.PageUtils {
 			}
 			catch (e) {;}
 			
+			// redact all ip-looking strings
+			md = md.replace( /\b(::ffff:)?(\d+\.\d+\.\d+\.\d+)\b/g, '(Redacted)' );
+			md = md.replace( /\b(?:[0-9a-f]{1,4}:){2,7}[0-9a-f]{1,4}\b/g, '(Redacted)' );
+			
 			self.viewMarkdownAuto('View Report', md);
 		} ); // api.get
 	}
