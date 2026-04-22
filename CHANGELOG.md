@@ -1,5 +1,24 @@
 # xyOps Changelog
 
+## Version v1.0.49
+
+> April 22, 2026
+
+- [`86a410e`](https://github.com/pixlcore/xyops/commit/86a410e381f6831a4b4b9f05e949986d88c5a3c7): Version 1.0.49
+	- Bump pixl-tools to v2.0.3 for updated getBytesFromText and getTextFromBytes functions.
+- [`3c016ab`](https://github.com/pixlcore/xyops/commit/3c016abe73e0e00f3ab3501eecbf8bc8d59768a4): Diagnostic Report: Redact all IP addresses by regex.
+- [`da83f3a`](https://github.com/pixlcore/xyops/commit/da83f3a3691ec20613a59035de5eb72c4857e236): CSS: Tweak responsive data grid rules for server list to improve readability.
+- [`a669eb1`](https://github.com/pixlcore/xyops/commit/a669eb188b5f20dda52a2b74fea965fa9255e34b): Server Data Explorer / Test Alert & Monitor: Save/restore server menu selection in localStorage.
+- [`6cc0188`](https://github.com/pixlcore/xyops/commit/6cc01881c6c0c2c3e056116281358c3fb5e1cd4e): Feature: Docker container monitoring and basic management on server/group pages.
+- [`63ece0b`](https://github.com/pixlcore/xyops/commit/63ece0bec48a219a8ff6f21919cdac5b5ad4929e): Feature: Allow individual live server processes to be killed with a custom signal.
+- [`d999de8`](https://github.com/pixlcore/xyops/commit/d999de867e83f05a86e82e240fe20edd3cf903d8): Cosmetic UI FIx: Show proper "admin" badge for users that inherit administrator priv from a role.  Fixes #270
+- [`5606f2e`](https://github.com/pixlcore/xyops/commit/5606f2e122f4f7f8d992268533c426512e149d90): Workflows Doc: Add clarification on data and files output.  Ref discussion #268.
+- [`0a54276`](https://github.com/pixlcore/xyops/commit/0a54276d859987badf6d7f4ca5aed373eafce17b): New API: `empty_bucket`: Delete all files and/or data from a bucket, but leave the bucket itself intact.  Ref discussion #269.
+- [`179c5c7`](https://github.com/pixlcore/xyops/commit/179c5c7330259c6d879c4789f27f027d65b06ea8): Server Detail View UI: Correctly strip hostname suffix in header.
+- [`7f63e86`](https://github.com/pixlcore/xyops/commit/7f63e8617c34cfca2ae674d8170d11734494a658): SSO: Correctly apply "admin" privilege as sole privilege.
+- [`560150c`](https://github.com/pixlcore/xyops/commit/560150c7544dbc302af2d866d505296e7969edcb): Tailscale Doc: Minor adjustments for clarity.
+- [`50d1904`](https://github.com/pixlcore/xyops/commit/50d1904e103cef480a6bc58e74804def826b64c5): SSO Doc: Clarified behavior regarding replace_privileges and default_user_privileges.
+
 ## Version v1.0.48
 
 > April 16, 2026
