@@ -300,7 +300,7 @@ Page.ServerUtils = class ServerUtils extends Page.PageUtils {
 				app.api.post( 'app/create_event', event, function(resp) {
 					// now run the job
 					if (!self.active) return; // sanity
-					job.event = resp.event.id;
+					job.id = resp.event.id;
 					
 					app.api.post( 'app/run_event', job, function(resp) {
 						// Dialog.hideProgress();
@@ -752,7 +752,7 @@ Page.ServerUtils = class ServerUtils extends Page.PageUtils {
 		app.api.post( 'app/create_event', event, function(resp) {
 			// now run the job
 			if (!self.active) return; // sanity
-			job.event = resp.event.id;
+			job.id = resp.event.id;
 			
 			app.api.post( 'app/run_event', job, function(resp) {
 				// Dialog.hideProgress();
