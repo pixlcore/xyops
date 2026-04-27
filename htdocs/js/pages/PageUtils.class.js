@@ -5600,6 +5600,7 @@ Page.PageUtils = class PageUtils extends Page.Base {
 		
 		app.api.post( 'app/user_settings', { page_info: false }, function(resp) {
 			app.user = resp.user;
+			app.applyUserRoles();
 		});
 	}
 	

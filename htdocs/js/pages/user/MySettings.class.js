@@ -670,6 +670,7 @@ Page.MySettings = class MySettings extends Page.Base {
 		// persist hot keys back to user storage
 		app.api.post( 'app/user_settings', { hot_keys: app.user.hot_keys }, function(resp) {
 			app.user = resp.user;
+			app.applyUserRoles();
 		});
 	}
 	
@@ -798,6 +799,7 @@ Page.MySettings = class MySettings extends Page.Base {
 			app.user = resp.user;
 			
 			// app.prepUser();
+			app.applyUserRoles();
 			app.initSidebarTabs();
 			app.updateHeaderInfo();
 			app.updateAccessibility();

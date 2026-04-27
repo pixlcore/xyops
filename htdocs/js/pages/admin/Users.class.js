@@ -367,6 +367,7 @@ Page.Users = class Users extends Page.PageUtils {
 		// if we edited ourself, update header
 		if (this.args.username == app.username) {
 			app.user = resp.user;
+			app.applyUserRoles();
 			app.updateHeaderInfo();
 		}
 	}
