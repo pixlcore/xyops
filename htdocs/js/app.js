@@ -443,6 +443,7 @@ app.extend({
 			
 			callback: function(value) {
 				var enabled = (value == 'enabled');
+				if (enabled == self.state.scheduler.enabled) return;
 				
 				app.api.post( 'app/update_global_state', { 'scheduler.enabled': enabled }, function(resp) {
 					self.state.scheduler.enabled = enabled;
