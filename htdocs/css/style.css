@@ -826,7 +826,7 @@ body.dark .dialog .markdown-body table tr th {
 	padding: 0;
 }
 
-.markdown-body p code, .markdown-body td code, .markdown-body li code, .fr_caption code {
+.markdown-body p code, .markdown-body td code, .markdown-body li code, .fr_caption code, .blocknote code {
 	font-family: var(--font-family-monospace);
 	background-color: var(--shadow-color);
 	border-radius: 4px;
@@ -837,7 +837,7 @@ body.dark .dialog .markdown-body table tr th {
 	font-size: 0.85em;
 	word-break: break-word;
 }
-body.dark .markdown-body p code, body.dark .markdown-body td code, body.dark .markdown-body li code, .fr_caption code {
+body.dark .markdown-body p code, body.dark .markdown-body td code, body.dark .markdown-body li code, body.dark .fr_caption code, body.dark .blocknote code {
 	background-color: var(--border-color);
 }
 
