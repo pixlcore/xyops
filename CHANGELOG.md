@@ -1,5 +1,23 @@
 # xyOps Changelog
 
+## Version v1.0.51
+
+> April 30, 2026
+
+- [`dc5815d`](https://github.com/pixlcore/xyops/commit/dc5815d44d72b07df3334fb206db0cdfcb5035fe): Version 1.0.51
+	- Bump pixl-xyapp to v2.1.25 for bug fix in keybind assignment UI.
+- [`e0a546b`](https://github.com/pixlcore/xyops/commit/e0a546b86eecf66f4c26186ab43cbaa004b4837d): Bug Fix: Local Satellite: Fix localhost hostname issue (must use hostID due to remote runners).
+- [`9b6b39b`](https://github.com/pixlcore/xyops/commit/9b6b39bac988a1ac5350ff5b880f73ec3a85e49c): Markdown Rendering: Fix styling for code spans inside blockquotes.
+- [`de2e8ee`](https://github.com/pixlcore/xyops/commit/de2e8ee936fd39249b0469f8418ce67fff6f9e8e): UI: Add caption note regarding "files" keyword for split controller.
+- [`bb60200`](https://github.com/pixlcore/xyops/commit/bb60200a928a19f2065f374b6a18d50986d1fc61): Bug Fix: Workflow Split Controller: Evaluate expression using XYEXP (was using legacy getPath API).
+- [`0e57018`](https://github.com/pixlcore/xyops/commit/0e57018a71c2c55cf31f7f841087287bf032c277): Marketplace Doc: Add section on inline source plugins and how to publish them.
+- [`ec6d0b7`](https://github.com/pixlcore/xyops/commit/ec6d0b766ca63778fbf8bad06eae12b1a3ea9a49): Import File UI: When importing plugins, show syntax-highlighted script separately from JSON, when applicable.
+- [`0bce166`](https://github.com/pixlcore/xyops/commit/0bce16600692b02144db7e32b444598b33f4a539): Marketplace: Add UI support for dependency-free plugins.
+- [`a88d1e4`](https://github.com/pixlcore/xyops/commit/a88d1e45c357448bec977366b8e9b5eaffd1064e): Marketplace: Show a more user-friendly plugin source view when installing / upgrading plugins.
+- [`dfa2de4`](https://github.com/pixlcore/xyops/commit/dfa2de44fcbf3892dcd9fe14526466e59179d6a4): Bug Fix: Apply event user field defaults to schedule triggers on every save.  Fixes #283
+- [`46d90de`](https://github.com/pixlcore/xyops/commit/46d90de7b56ed770126232d167a632dd73cb71ee): Scheduler State Menu: Prevent updating state and showing a notification if the selected menu item is re-selected.
+- [`ded6204`](https://github.com/pixlcore/xyops/commit/ded6204d32e0aa27e18d126096dd1be3d977ea9c): Bug FIx: If admin priv is inherited from a role, editing own account or settings can "appear" to remove the admin priv in the UI.  Fixes #282.
+
 ## Version v1.0.50
 
 > April 27, 2026
