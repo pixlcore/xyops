@@ -431,6 +431,11 @@ Default:
 { "rejectUnauthorized": false }
 ```
 
+### multi.disable_version_checks
+<!-- Title: Disable Version Checks -->
+
+When set to `true`, this boolean will disable all remote version checks for xyOps software.
+
 
 
 ## satellite
@@ -468,6 +473,11 @@ This number (seconds) sets the cache TTL for satellite release metadata and tarb
 <!-- Title: xySat Configuration -->
 
 This object contains web server and runtime settings for xySat; these options are passed along when managing or provisioning satellite nodes (defaults provided in the sample config).
+
+### satellite.disable_version_checks
+<!-- Title: Disable Version Checks -->
+
+When set to `true`, this boolean will disable all remote version checks for xySat software.
 
 
 
