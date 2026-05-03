@@ -3729,6 +3729,95 @@ Page.PageUtils = class PageUtils extends Page.Base {
 		return html;
 	}
 	
+	getWFEventActionPreviewHTML(event) {
+		// get action details in compact list (read-only)
+		var self = this;
+		var html = '';
+		var rows = (event.actions || []).filter( function(action) { return action.enabled; } );
+		
+		// add inherited category actions
+		var category = find_object( app.categories, { id: event.category } ) || {};
+		(category.actions || []).forEach( function(action) {
+			if (action.enabled) rows.push({ ...action, source: 'category' });
+		} );
+		
+		// add universal actions (not hidden)
+		var temp_event_type = event.workflow ? 'workflow' : 'default';
+		config.job_universal_actions[temp_event_type].forEach( function(action) {
+			if (action.enabled && action.condition && !action.hidden) rows.push({ ...action, source: 'universal' });
+		} );
+		
+		if (!rows.length) return '';
+		
+		var title = 'Inherited Actions:';
+		html += `<div class="info_group"><span>${title}</span></div>`;
+		html += '<div class="summary_grid single">';
+		
+		rows.forEach( function(item) {
+			var disp = self.getJobActionDisplayArgs(item);
+			
+			var disp_icon = disp.icon;
+			if (item.source == 'category') disp_icon = 'lock-outline';
+			else if (item.source == 'universal') disp_icon = 'lock';
+			
+			var tooltip = item.source ? `title="(Inherited from ${item.source})"` : 'title="(Inherited from event)"';
+			if ((item.source == 'category') || (item.source == 'universal')) tooltip += ` style="color:var(--cyan)"`;
+			
+			html += '<div>'; // grid unit
+			html += `<div class="info_label">${disp.condition.title}</div>`;
+			html += `<div class="info_value" ${tooltip}><i class="mdi mdi-${disp_icon}">&nbsp;</i>${disp.type}</div>`;
+			html += '</div>'; // grid unit
+		} ); // foreach action
+		
+		html += '</div>'; // summary_grid
+		
+		return html;
+	}
+	
+	getWFEventLimitPreviewHTML(event) {
+		// get resource limit details in compact table (read-only)
+		var self = this;
+		var html = '';
+		var rows = (event.limits || []).filter( function(limit) { return limit.enabled; } );
+		
+		// add inherited category limits
+		var category = find_object( app.categories, { id: event.category } ) || {};
+		(category.limits || []).forEach( function(limit) {
+			if (limit.enabled) rows.push({ ...limit, source: 'category' });
+		} );
+		
+		// add universal limits (not hidden)
+		var temp_event_type = event.workflow ? 'workflow' : 'default';
+		config.job_universal_limits[temp_event_type].forEach( function(limit) {
+			if (limit.enabled && limit.type && !limit.hidden) rows.push({ ...limit, source: 'universal' });
+		} );
+		
+		if (!rows.length) return '';
+		
+		var title = 'Inherited Limits:';
+		html += `<div class="info_group"><span>${title}</span></div>`;
+		html += '<div class="summary_grid single">';
+		
+		rows.forEach( function(item) {
+			var { nice_title, nice_desc, icon } = self.getResLimitDisplayArgs(item);
+			
+			if (item.source == 'category') icon = 'lock-outline';
+			else if (item.source == 'universal') icon = 'lock';
+			
+			var tooltip = item.source ? `title="(Inherited from ${item.source})"` : 'title="(Inherited from event)"';
+			if ((item.source == 'category') || (item.source == 'universal')) tooltip += ` style="color:var(--cyan)"`;
+			
+			html += '<div>'; // grid unit
+			html += `<div class="info_label">${nice_title}</div>`;
+			html += `<div class="info_value" ${tooltip}><i class="mdi mdi-${icon}">&nbsp;</i>${nice_desc}</div>`;
+			html += '</div>'; // grid unit
+		} ); // foreach action
+		
+		html += '</div>'; // summary_grid
+		
+		return html;
+	}
+	
 	getWF_event(node, workflow) {
 		// get HTML for single workflow node of type event
 		var html = '';
@@ -3778,14 +3867,18 @@ Page.PageUtils = class PageUtils extends Page.Base {
 		html += '<div class="info_value">' + this.getNiceTagList(node.data.tags || []) + '</div>';
 		html += '</div>'; // grid unit
 		
+		html += '</div>'; // summary_grid
+		
 		if (event.fields && event.fields.filter( function(param) { return param.type != 'hidden'; } ).length) {
-			html += '</div>';
+			html += `<div class="info_group"><span>User Parameters:</span></div>`;
 			html += '<div class="summary_grid single">';
+			html += this.getWFParamPreviewHTML(event.fields, params);
+			html += '</div>'; // summary_grid
 		}
 		
-		html += this.getWFParamPreviewHTML(event.fields, params);
+		html += this.getWFEventActionPreviewHTML(event);
+		html += this.getWFEventLimitPreviewHTML(event);
 		
-		html += '</div>'; // summary_grid
 		html += '</div>'; // wf_body
 		
 		html += `
@@ -3845,14 +3938,18 @@ Page.PageUtils = class PageUtils extends Page.Base {
 		html += '<div class="info_value">' + this.getNiceTagList(node.data.tags || []) + '</div>';
 		html += '</div>'; // grid unit
 		
+		html += '</div>'; // summary_grid
+		
 		if (plugin.params && plugin.params.filter( function(param) { return param.type != 'hidden'; } ).length) {
-			html += '</div>';
+			html += `<div class="info_group"><span>Plugin Parameters:</span></div>`;
 			html += '<div class="summary_grid single">';
+			html += this.getWFParamPreviewHTML(plugin.params, params);
+			html += '</div>'; // summary_grid
 		}
 		
-		html += this.getWFParamPreviewHTML(plugin.params, params);
+		html += this.getWFEventActionPreviewHTML(node.data);
+		html += this.getWFEventLimitPreviewHTML(node.data);
 		
-		html += '</div>'; // summary_grid
 		html += '</div>'; // wf_body
 		
 		html += `
