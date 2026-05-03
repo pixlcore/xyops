@@ -121,6 +121,11 @@ Page.Conductors = class Conductors extends Page.PageUtils {
 					'<button class="link danger" style="color:var(--red); font-weight:bold;" data-host="' + item.id + '" onClick="$P().go_nav_upgrade(this)" title="xyOps version is outdated."><i class="mdi mdi-alert-rhombus">&nbsp;</i>v' + item.version + '</span>'
 				);
 			}
+			else {
+				self.div.find('#d_ec_ver_' + CSS.escape(item.id)).attr('title', 'xyOps is up to date.').css({ color: 'var(--green)', fontWeight: 'bold' }).html(
+					`<i class="mdi mdi-check-circle">&nbsp;</i>v${item.version}</span>`
+				);
+			}
 		} );
 	}
 	

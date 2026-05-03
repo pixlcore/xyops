@@ -247,6 +247,11 @@ Page.Servers = class Servers extends Page.ServerUtils {
 					'<button class="link danger" style="color:var(--red); font-weight:bold;" data-server="' + server.id + '" onClick="$P().go_nav_upgrade(this)" title="xySat version is outdated."><i class="mdi mdi-alert-rhombus">&nbsp;</i>v' + server.info.satellite + '</span>'
 				);
 			}
+			else {
+				self.div.find('#d_es_sat_ver_' + server.id).attr('title', 'xySat is up to date.').css({ color: 'var(--green)', fontWeight: 'bold' }).html(
+					`<i class="mdi mdi-check-circle">&nbsp;</i>v${server.info.satellite}</span>`
+				);
+			}
 		} );
 	}
 	
@@ -1169,6 +1174,11 @@ Page.Servers = class Servers extends Page.ServerUtils {
 			// outdated!
 			this.div.find('#d_vs_sat_ver').html(
 				'<button class="link danger" style="color:var(--red); font-weight:bold;" data-server="' + server.id + '" onClick="$P().go_nav_upgrade(this)" title="xySat version is outdated."><i class="mdi mdi-alert-rhombus">&nbsp;</i>v' + server.info.satellite + '</span>'
+			);
+		}
+		else {
+			this.div.find('#d_vs_sat_ver').attr('title', 'xySat is up to date.').css({ color: 'var(--green)', fontWeight: 'bold' }).html(
+				`<i class="mdi mdi-check-circle">&nbsp;</i>v${server.info.satellite}</span>`
 			);
 		}
 	}
