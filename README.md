@@ -72,6 +72,14 @@ Check out our official docs site here: **[xyOps Documentation](https://docs.xyop
 
 Full documentation is also provided inside the xyOps app.  Just click the "Documentation" link in the sidebar.
 
+# Videos
+
+Visit our official YouTube channel for xyOps tutorials: [@PixlCore-Media](https://www.youtube.com/@PixlCore-Media)
+
+Watch a quick overview of xyOps to see how the platform helps teams orchestrate workflows, monitor systems, and operate with confidence:
+
+[![Watch the video](https://img.youtube.com/vi/NxZKylkKfOg/hqdefault.jpg)](https://www.youtube.com/watch?v=NxZKylkKfOg)
+
 # Contributing
 
 Please read our **[Contributing Guide](https://github.com/pixlcore/xyops/blob/main/CONTRIBUTING.md)** before opening a pull request.
