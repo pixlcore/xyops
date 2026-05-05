@@ -239,7 +239,9 @@ This string controls the email body format (default: `html`).  Use `html` for st
 <!-- Type: Menu -->
 <!-- Items: ["link", "inline", "none"] -->
 
-This controls the email logo image (default: `inline`).  Use `link` to link out to the logo image on your xyOps conductor server, `inline` to include it as an inline attachment, or `none` to hide the logo image entirely.
+This controls the email logo image (default: `inline`).  Use `inline` to include the logo as an inline attachment, `link` to link to the logo image URL directly, or `none` to hide the logo image entirely.
+
+When this is set to `inline`, [client.logo_url](#client-logo_url) must be a local web root path under the xyOps `htdocs` directory, because xyOps loads the image from disk before attaching it to outgoing emails.  When this is set to `link`, `client.logo_url` may be a normal linked image URL instead.
 
 ## max_emails_per_day
 <!-- Title: Maximum Emails Per Day -->
@@ -616,7 +618,9 @@ This string is displayed as part of the copyright message at the bottom-left cor
 ### client.logo_url
 <!-- Title: App Logo Image URL -->
 
-This path string points to the logo used in the UI header/sidebar and in emails (default: `images/logotype.png`).
+This points to the logo used in the UI header/sidebar and in emails (default: `/images/logotype.png`).
+
+For the default [email_logo](#email_logo) mode of `inline`, this must be a local web root path under the xyOps `htdocs` directory, because xyOps loads the image from disk before attaching it to outgoing emails.  If `email_logo` is set to `link`, this may be a normal image URL instead.
 
 ### client.hide_sidebar_sections
 <!-- Title: Hide Sidebar Sections -->

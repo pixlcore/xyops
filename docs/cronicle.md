@@ -72,7 +72,7 @@ XYOPS_client__name="Cronicle"
 XYOPS_client__logo_url="/images/cronicle-logo.png"
 ```
 
-Make sure the logo URL is an absolute path, or a fully-qualified URL.
+Make sure the logo path matches your [email_logo](config.md#email_logo) setting.  With the default `inline` email logo mode, this must be a local web root path under the xyOps `htdocs` directory, typically beginning with `/`.  If you set `email_logo` to `link`, the logo may be a regular image URL instead.
 
 ## Multiplex Events
 

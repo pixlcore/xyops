@@ -9,6 +9,7 @@ Welcome to the xyOps documentation. xyOps is a job scheduler, workflow engine, a
 - **[Welcome to xyOps](welcome.md)**: Introduces xyOps and provides some tips for beginners.  Shown on first login.
 - **[Self-Hosting](hosting.md)**: Install xyOps with Docker, add workers, configure TLS, storage, and production settings.
 - **[Configuration](config.md)**: All server configuration options, override layers, and where settings live on disk.
+- **[User Interface](ui.md)**: Client UI settings, sidebar visibility, whitelabeling, table sort defaults, and upload limits.
 - **[Storage Setup](storage.md)**: How to setup and configure backend file storage and database engines.
 - **[Production Scaling](scaling.md)**: Best practices for running at scale, hardware sizing, caching, and multi-conductor.
 - **[Command Line](cli.md)**: Service control commands and admin utilities available via `bin/control.sh`.
