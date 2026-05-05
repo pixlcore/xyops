@@ -272,6 +272,7 @@
 		"company": "PixlCore LLC",
 		"logo_url": "/images/logotype.png",
 		"hide_sidebar_sections": [],
+		"tables": {},
 		
 		"items_per_page": 50,
 		"alt_items_per_page": 25,

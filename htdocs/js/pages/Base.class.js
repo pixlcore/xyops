@@ -3679,8 +3679,8 @@ Page.Base = class Base extends Page {
 		var html = '';
 		if (!this.tables) this.tables = {};
 		
-		opts.sort_by = app.getPref(`tables.${opts.id}.sort_by`) || opts.sort_by;
-		opts.sort_dir = app.getPref(`tables.${opts.id}.sort_dir`) || opts.sort_dir;
+		opts.sort_by = app.getPref(`tables.${opts.id}.sort_by`) || get_path(config, `tables.${opts.id}.sort_by`) || opts.sort_by;
+		opts.sort_dir = app.getPref(`tables.${opts.id}.sort_dir`) || get_path(config, `tables.${opts.id}.sort_dir`) || opts.sort_dir;
 		
 		// retrieve previous settings if applicable
 		if (this.tables[ opts.id ]) {

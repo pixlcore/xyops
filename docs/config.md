@@ -623,6 +623,11 @@ This path string points to the logo used in the UI header/sidebar and in emails 
 
 This array allows you to globally hide specific sidebar sections for all users, regardless of their preferences.
 
+### client.tables
+<!-- Title: Default Table Sort -->
+
+This object allows you to set default sort preferences for all the sortable tables in the UI.
+
 ### client.items_per_page
 <!-- Title: List Items Per Page -->
 
