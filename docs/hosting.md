@@ -22,7 +22,8 @@ docker run \
 	-e XYOPS_xysat_local="true" \
 	-e TZ="America/Los_Angeles" \
 	-v xy-data:/opt/xyops/data \
-	-v /local/path/to/xyops01-conf:/opt/xyops/conf \
+	-v ./xyops01-conf:/opt/xyops/conf \
+	-v ./xyops01-logs:/opt/xyops/logs \
 	-v /var/run/docker.sock:/var/run/docker.sock \
 	--restart unless-stopped \
 	-p 5522:5522 \
@@ -44,12 +45,13 @@ services:
 
     environment:
       XYOPS_xysat_local: "true"
-	  XYOPS_masters: "xyops01.internal.mycompany.com"
+      XYOPS_masters: "xyops01.internal.mycompany.com"
       TZ: America/Los_Angeles
 
     volumes:
       - xy-data:/opt/xyops/data
-	  - /local/path/to/xyops01-conf:/opt/xyops/conf
+      - ./xyops01-conf:/opt/xyops/conf
+      - ./xyops01-logs:/opt/xyops/logs
       - /var/run/docker.sock:/var/run/docker.sock
 
     ports:
@@ -60,7 +62,7 @@ volumes:
   xy-data:
 ```
 
-Please change `/local/path/to/xyops01-conf` to a suitable location for the xyOps configuration directory to live on the host machine.
+Please change `./xyops01-conf` and `./xyops01-logs` to suitable locations for the xyOps configuration and logs directories to live on the host machine.
 
 Then hit http://localhost:5522/ in your browser (see [TLS](#tls) below for HTTPS setup).  A default administrator account will be created with username `admin` and password `admin`.  This will create a Docker volume (`xy-data`) to persist the xyOps database, which by default is a hybrid of a SQLite DB and the filesystem itself for file storage.
 
@@ -81,7 +83,7 @@ Note that in order to add worker servers, the container needs to be *addressable
 The xyOps main configuration file is located at `/opt/xyops/conf/config.json`, but there are other useful files in the `/opt/xyops/conf` directory as well.  For e.g. if any configuration properties are updated via the UI, they are written to an `/opt/xyops/conf/overrides.json` file.  If you intend to use the Docker container long term, it is best to map the entire `/opt/xyops/conf` directory.  You can do this as a volume, or bind mount it to a host directory (recommended):
 
 ```
--v /local/path/to/xyops01-conf:/opt/xyops/conf
+-v ./xyops01-conf:/opt/xyops/conf
 ```
 
 xyOps will automatically copy over all default configuration files on first launch.
@@ -324,7 +326,8 @@ docker run \
 	--hostname xyops01.internal.mycompany.com \
 	-e XYOPS_masters="xyops01.internal.mycompany.com,xyops02.internal.mycompany.com" \
 	-e TZ="America/Los_Angeles" \
-	-v "/local/path/to/xyops01-conf:/opt/xyops/conf" \
+	-v "./xyops01-conf:/opt/xyops/conf" \
+	-v "./xyops01-logs:/opt/xyops/logs" \
 	-v "/var/run/docker.sock:/var/run/docker.sock" \
 	--restart unless-stopped \
 	-p 5522:5522 \
@@ -338,14 +341,15 @@ And here it is as a docker compose file:
 services:
   xyops1:
     image: ghcr.io/pixlcore/xyops:latest
-	container_name: xyops-conductor-01
+    container_name: xyops-conductor-01
     hostname: xyops01.internal.mycompany.com # change this per conductor server
     init: true
     environment:
       XYOPS_masters: xyops01.internal.mycompany.com,xyops02.internal.mycompany.com
       TZ: America/Los_Angeles
     volumes:
-      - "/local/path/to/xyops01-conf:/opt/xyops/conf"
+      - "./xyops01-conf:/opt/xyops/conf"
+      - "./xyops01-logs:/opt/xyops/logs"
       - "/var/run/docker.sock:/var/run/docker.sock"
     ports:
       - "5522:5522"
@@ -361,10 +365,11 @@ A few things to note here:
 - All conductor servers need to be able to route to each other via their hostnames, so they can self-negotiate and hold elections.
 - The timezone (`TZ`) should be set to your company's main timezone, so things like midnight log rotation and daily stat resets work as expected.
 - The `/var/run/docker.sock` bind allows xyOps to launch its own containers (i.e. for the [Plugin Marketplace](marketplace.md)).
-- The `/local/path/to/xyops01-conf` path should be changed to a location on the host where you want to store the xyOps configuration directory.
+- The `./xyops01-conf` path should be changed to a location on the host where you want to store the xyOps configuration directory.
 	- xyOps will automatically populate this directory on first container launch.
 	- Each conductor needs a unique directory for config (they cannot be shared).
 	- See the [xyOps Configuration Guide](config.md) for details on how to customize the `config.json` file in this directory.
+- The `./xyops01-logs` path should be changes to a location on the host where you want to store the xyOps logs directory.
 
 ## External Storage
 
