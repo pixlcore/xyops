@@ -17,12 +17,14 @@ We stand on the shoulders of giants.  xyOps was built using these awesome open s
 | [clean-css](https://www.npmjs.com/package/clean-css) | A fast and efficient CSS optimizer for Node.js platform and any modern browser. | MIT |
 | [codemirror](https://www.npmjs.com/package/codemirror) | Full-featured in-browser code editor. | MIT |
 | [diff](https://www.npmjs.com/package/diff) | JavaScript text diff implementation. | BSD-3-Clause |
+| [ioredis](https://www.npmjs.com/package/ioredis) | A robust Redis client for Node.js. | MIT |
 | [jexl](https://www.npmjs.com/package/jexl) | Context-based expression language parser and evaluator. | MIT |
 | [jquery](https://www.npmjs.com/package/jquery) | JavaScript library for DOM operations. | MIT |
 | [juice](https://www.npmjs.com/package/juice) | Inline CSS into HTML source. | MIT |
 | [marked](https://www.npmjs.com/package/marked) | Fast Markdown parser. | MIT |
 | [mime](https://www.npmjs.com/package/mime) | Comprehensive library for MIME type mapping. | MIT |
 | [node-pty](https://www.npmjs.com/package/node-pty) | Fork pseudoterminals in Node.js | MIT |
+| [pg](https://www.npmjs.com/package/pg) | PostgreSQL client for Node.js. | MIT |
 | [sanitize-html](https://www.npmjs.com/package/sanitize-html) | Sanitize user-submitted HTML while preserving allowed elements and attributes. | MIT |
 | [shell-quote](https://www.npmjs.com/package/shell-quote) | Parse and quote shell commands. | MIT |
 | [systeminformation](https://www.npmjs.com/package/systeminformation) | System and OS information library for Node.js | MIT |
