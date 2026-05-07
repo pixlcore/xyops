@@ -92,6 +92,12 @@ Page.Workflows = class Workflows extends Page.Events {
 			else if (!app.plugins.length) return this.doFullPageError(config.ui.errors.new_wf_no_plugins);
 			else plug_id = app.plugins[0].id;
 			
+			var plug_params = {};
+			var plugin = find_object(app.plugins, { id: plug_id }) || {};
+			(plugin.params || []).forEach( function(param) {
+				plug_params[ param.id ] = (typeof(param.value) == 'object') ? deep_copy_object(param.value) : param.value;
+			} );
+			
 			var target_ids = [];
 			if (app.config.new_event_template.targets && app.config.new_event_template.targets.length) target_ids = [ ...app.config.new_event_template.targets ];
 			else if (find_object(app.groups, { id: 'main' })) target_ids = ['main'];
@@ -102,7 +108,7 @@ Page.Workflows = class Workflows extends Page.Events {
                 "id": job_node_id,
                 "type": "job",
                 "data": {
-                    "params": {},
+                    "params": plug_params,
                     "targets": target_ids,
                     "algo": app.config.new_event_template.algo || "random",
                     "label": "",
