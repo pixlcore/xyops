@@ -2,11 +2,12 @@
 
 ## Overview
 
-Welcome to the xyOps documentation. xyOps is a job scheduler, workflow engine, and server monitoring platform with a built-in web UI and REST API. This index organizes the docs into logical sections with short summaries to help you find what you need quickly. If you are deploying xyOps, start with Self-Hosting.
+Welcome to the xyOps documentation. xyOps is a job scheduler, workflow engine, and server monitoring platform with a built-in web UI and REST API. This index organizes the docs into logical sections with short summaries to help you find what you need quickly. If you are new to xyOps, start with Getting Started.  If you are planning a production deployment, start with Self-Hosting.
 
-## Getting Started
+## Start Here
 
 - **[Welcome to xyOps](welcome.md)**: Introduces xyOps and provides some tips for beginners.  Shown on first login.
+- **[Getting Started](start.md)**: A friendly tutorial from first install to your first event and workflow.
 - **[Self-Hosting](hosting.md)**: Install xyOps with Docker, add workers, configure TLS, storage, and production settings.
 - **[Configuration](config.md)**: All server configuration options, override layers, and where settings live on disk.
 - **[User Interface](ui.md)**: Client UI settings, sidebar visibility, whitelabeling, table sort defaults, and upload limits.

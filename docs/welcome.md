@@ -4,6 +4,8 @@ xyOps is a job scheduler, workflow automation engine, and server monitoring plat
 
 This guide is shown on the dashboard for new users to help you take your first steps, and introduce some core concepts.  It will disappear as soon as you create your first event.  You can always get back to it later by clicking on "Documentation" in the sidebar, then "Welcome to xyOps".
 
+If you would like a more detailed walk-through, see [Getting Started with xyOps](start.md).  It covers the first install, conductor hostname, `base_app_url`, your first event, event chaining, JSON over STDIO, limits, web hook actions, and a basic workflow.
+
 
 ## Step 1: Add a Server
 
@@ -105,6 +107,7 @@ See [Workflows](workflows.md) for node types, controllers, and graph editing too
 
 ## Where To Go Next
 
+- Follow the step-by-step beginner tutorial. See [Getting Started with xyOps](start.md).
 - Add more servers and organize them with groups. See [Servers](servers.md) and [Groups](groups.md).
 - Create monitors and alerts for server metrics. See [Monitors](monitors.md) and [Alerts](alerts.md).
 - Reuse notifications with channels. See [Channels](channels.md).
