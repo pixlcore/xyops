@@ -70,11 +70,50 @@ Key behavior:
 - URL placeholders are URL-encoded automatically.
 - Secrets are available as `{{ secrets.VAR_NAME }}` when the secret is assigned to the hook (see "Secrets" below).
 - Helpers include `float()`, `integer()`, `bytes()`, `number()`, `pct()`, `encode()`, `stringify()`, `count()`, `min()`, `max()`, `round()`, `ceil()`, `floor()`, `clamp()`. See [xyOps Expression Format](xyexp.md) for the full helper list.
+- To use a job parameter, including a user field value from the event, use `{{ job.params.PARAM_NAME }}`.
+- To use a workflow launch parameter from a child job in a workflow, use `{{ job.workflow.params.PARAM_NAME }}`.
 - To use the output data from a job, use `{{ job.data.PROP_NAME }}`.
 - Job context: [JobHookData](data.md#jobhookdata) including `text`, `event`, `job`, `server`, `display` (CPU/mem summaries), `links`, etc.
 - Alert context: [AlertHookData](data.md#alerthookdata) including `text`, `def`, `alert`, `server`, `links`, and other niceties.
 
 Tip: Prefer JSON for bodies where possible; for form-encoded APIs, set `Content-Type: application/x-www-form-urlencoded` and compose the body accordingly.
+
+
+### Job and Workflow Parameters
+
+When a web hook fires for a job, its macros are evaluated against [JobHookData](data.md#jobhookdata).  The full job object is available as `job`, so event parameters and user fields can be read from `job.params`.
+
+For example, if your event has user fields named `TARGET` and `REGION`, you can use them in the hook URL, headers, body, or the action's "Custom Text" field:
+
+```
+{{ job.params.TARGET }}
+{{ job.params.REGION }}
+```
+
+A JSON body might look like this:
+
+```json
+{
+	"message": "User selected {{ job.params.TARGET }}",
+	"target": "{{ job.params.TARGET }}",
+	"region": "{{ job.params.REGION }}",
+	"job_id": "{{ job.id }}"
+}
+```
+
+For jobs launched inside a workflow, there are two different parameter scopes:
+
+- `job.params`: Parameters on the current job or event node.
+- `job.workflow.params`: Parameters supplied when the outer workflow was launched.
+
+For example, if the workflow launch form has a `TARGET` field, and a child event also has its own `TARGET` field, you can address them separately:
+
+```
+Current job target: {{ job.params.TARGET }}
+Workflow target: {{ job.workflow.params.TARGET }}
+```
+
+This is different from shell plugin environment variables, where workflow parameters are exposed with a `workflow_` prefix such as `${workflow_TARGET}`.  In web hook templates, use object paths instead: `{{ job.workflow.params.TARGET }}`.
 
 
 ## Secrets
