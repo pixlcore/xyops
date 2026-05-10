@@ -80,6 +80,28 @@ Watch a quick overview of xyOps to see how the platform helps teams orchestrate 
 
 [![Watch the video](https://img.youtube.com/vi/NxZKylkKfOg/hqdefault.jpg)](https://www.youtube.com/watch?v=NxZKylkKfOg)
 
+# Community
+
+## Reddit
+
+Join our subreddit to get help from the xyOps community:
+
+https://reddit.com/r/xyOps/
+
+## Discord
+
+Join our Discord server to chat with community members in real-time:
+
+https://discord.gg/FTzqmbGbdd
+
+## Social Media
+
+Follow us on social media:
+
+- [Bluesky](https://pixlcore.bsky.social/)
+- [Mastodon](https://mastodon.social/@pixlcore)
+- [LinkedIn](https://linkedin.com/company/pixlcore)
+
 # Contributing
 
 Please read our **[Contributing Guide](https://github.com/pixlcore/xyops/blob/main/CONTRIBUTING.md)** before opening a pull request.
