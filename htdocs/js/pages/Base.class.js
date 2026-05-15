@@ -587,6 +587,7 @@ Page.Base = class Base extends Page {
 		var self = this;
 		if (!glue) glue = ', ';
 		if (!targets || !targets.length) return '(None)';
+		if (typeof(targets) == 'string') targets = targets.split(/\,\s*/);
 		return targets.map( function(target) { return self.getNiceTarget(target, link); } ).join(glue);
 	}
 	

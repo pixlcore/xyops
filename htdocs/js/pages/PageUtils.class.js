@@ -3691,7 +3691,7 @@ Page.PageUtils = class PageUtils extends Page.Base {
 				break;
 				
 				case 'code':
-					if (elem_value.toString().length) {
+					if (String(elem_value).length) {
 						html += '<i class="mdi mdi-' + elem_icon + '">&nbsp;</i>';
 						html += '<span class="monospace">' + strip_html(elem_value) + '</span>';
 					}
@@ -3713,11 +3713,11 @@ Page.PageUtils = class PageUtils extends Page.Base {
 				
 				case 'select':
 					html += '<i class="mdi mdi-' + elem_icon + '">&nbsp;</i>';
-					html += strip_html( elem_value.toString().replace(/\,.*$/, '').replace(/^.+\[([\w\-\.]+)\]\s*$/, '$1') );
+					html += strip_html( str_value(elem_value).replace(/\,.*$/, '').replace(/^.+\[([\w\-\.]+)\]\s*$/, '$1') );
 				break;
 				
 				case 'bucket':
-					if (elem_value.toString().length) {
+					if (str_value(elem_value).length) {
 						html += '<i class="mdi mdi-' + elem_icon + '">&nbsp;</i>';
 						html += strip_html( elem_value );
 					}
@@ -3726,7 +3726,7 @@ Page.PageUtils = class PageUtils extends Page.Base {
 				
 				case 'system':
 					html += '<i class="mdi mdi-' + elem_icon + '">&nbsp;</i>';
-					html += strip_html( elem_value.toString() || '(None)' );
+					html += strip_html( str_value(elem_value) || '(None)' );
 				break;
 				
 				case 'toolset':
