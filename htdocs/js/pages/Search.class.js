@@ -488,6 +488,7 @@ Page.Search = class Search extends Page.PageUtils {
 		}
 		else {
 			// standard job search
+			delete this.jobFileSearch;
 			app.api.get( 'app/search_jobs', sopts, this.receiveResults.bind(this) );
 		}
 	}
@@ -890,7 +891,7 @@ Page.Search = class Search extends Page.PageUtils {
 	
 	onStatusUpdate(data) {
 		// refresh search results if jobsChanged
-		if (data.jobsChanged) {
+		if (data.jobsChanged && !this.jobFileSearch) {
 			if (document.hidden) this.requestSearch = true;
 			else this.doSearchDebounce();
 		}
