@@ -737,6 +737,8 @@ A string ID indicating what spawned the job.  This will be one of:
 | `action` | Job was spawned by a custom job action (i.e. start, complete, success or fail action condition).  [Job.parent](#job-parent) will also be present in this case. |
 | `alert` | Job was spawned by an alert notification from the server monitoring system. |
 | `workflow` | Job was spawned as part of a workflow sequence. |
+| `magic` | Job was spawned as part of a magic link. |
+| `startup` | Job was spawned as part of a startup trigger. |
 
 ### Job.parent
 

@@ -1027,6 +1027,17 @@
 		}
 	},
 	
+	"job_source_types": [
+		{ "id": "scheduler", "title": "Scheduler", "icon": "update" },
+		{ "id": "user", "title": "User", "icon": "account" },
+		{ "id": "key", "title": "API Key", "icon": "key" },
+		{ "id": "action", "title": "Action", "icon": "gesture-tap" },
+		{ "id": "alert", "title": "Alert", "icon": "bell-outline" },
+		{ "id": "workflow", "title": "Workflow", "icon": "clipboard-flow-outline" },
+		{ "id": "magic", "title": "Magic Link", "icon": "link-variant" },
+		{ "id": "startup", "title": "Startup", "icon": "desktop-classic" }
+	],
+	
 	"snapshot_source_menu": [
 		{ "id": "alert", "title": "Alert", "icon": "bell-outline" },
 		{ "id": "user", "title": "User", "icon": "account" },

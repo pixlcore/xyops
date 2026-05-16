@@ -2107,6 +2107,22 @@ Page.PageUtils = class PageUtils extends Page.Base {
 			caption: 'Select the desired action type.'
 		});
 		
+		// suspend sources
+		html += this.getFormRow({
+			id: 'd_eja_suspend_sources',
+			label: 'Job Sources:',
+			content: this.getFormMenuMulti({
+				id: 'fe_eja_suspend_sources',
+				title: 'Select Job Sources',
+				placeholder: '(Always Suspend)',
+				options: config.ui.job_source_types.filter( (item) => { return item.id != 'workflow'; } ),
+				values: action.sources || [],
+				default_icon: '',
+				'data-hold': 1,
+			}),
+			caption: 'Select which job sources should trigger the suspension action.'
+		});
+		
 		// email
 		html += this.getFormRow({
 			id: 'd_eja_users',
@@ -2421,6 +2437,7 @@ Page.PageUtils = class PageUtils extends Page.Base {
 				break;
 				
 				case 'suspend':
+					action.sources = $('#fe_eja_suspend_sources').val();
 					action.users = $('#fe_eja_users').val();
 					action.email = $('#fe_eja_email').val();
 					action.web_hook = $('#fe_eja_web_hook').val();
@@ -2445,7 +2462,7 @@ Page.PageUtils = class PageUtils extends Page.Base {
 		} ); // Dialog.confirm
 		
 		var change_action_type = function(new_type) {
-			$('#d_eja_email, #d_eja_users, #d_eja_body, #d_eja_web_hook, #d_eja_web_hook_text, #d_eja_run_job, #d_eja_target_server, #d_eja_clear_alert, #d_eja_event_params, #d_eja_channel, #d_eja_bucket, #d_eja_bucket_sync, #d_eja_bucket_glob, #d_nt_type, #d_nt_assignees, #d_nt_tags, #d_eja_tags, #d_eja_plugin, #d_eja_plugin_params').hide();
+			$('#d_eja_email, #d_eja_users, #d_eja_body, #d_eja_web_hook, #d_eja_web_hook_text, #d_eja_run_job, #d_eja_target_server, #d_eja_clear_alert, #d_eja_event_params, #d_eja_channel, #d_eja_bucket, #d_eja_bucket_sync, #d_eja_bucket_glob, #d_nt_type, #d_nt_assignees, #d_nt_tags, #d_eja_tags, #d_eja_suspend_sources, #d_eja_plugin, #d_eja_plugin_params').hide();
 			
 			switch (new_type) {
 				case 'email':
@@ -2488,6 +2505,7 @@ Page.PageUtils = class PageUtils extends Page.Base {
 				break;
 				
 				case 'suspend':
+					$('#d_eja_suspend_sources').show();
 					$('#d_eja_email').show();
 					$('#d_eja_users').show();
 					$('#d_eja_web_hook').show();
@@ -2533,7 +2551,7 @@ Page.PageUtils = class PageUtils extends Page.Base {
 			Dialog.autoResize();
 		}); // event change
 		
-		MultiSelect.init( $('#fe_eja_users, #fe_nt_assignees, #fe_nt_tags, #fe_eja_tags') );
+		MultiSelect.init( $('#fe_eja_users, #fe_nt_assignees, #fe_nt_tags, #fe_eja_tags, #fe_eja_suspend_sources') );
 		SingleSelect.init( $('#fe_eja_condition, #fe_eja_type, #fe_eja_event, #fe_eja_channel, #fe_eja_web_hook, #fe_eja_plugin, #fe_eja_bucket, #fe_eja_bucket_sync, #fe_nt_type') );
 		
 		Dialog.autoResize();

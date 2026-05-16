@@ -1621,7 +1621,7 @@ Page.Base = class Base extends Page {
 			return '' + this.getNiceAPIKey(job.username, true) + '';
 		}
 		else if (job.source.match(/action/i)) {
-			return '<i class="mdi mdi-eye-outline">&nbsp;</i>Action';
+			return '<i class="mdi mdi-gesture-tap">&nbsp;</i>Action';
 		}
 		else if (job.source.match(/alert/i)) {
 			return '<i class="mdi mdi-bell-outline">&nbsp;</i>Alert';
@@ -1644,17 +1644,9 @@ Page.Base = class Base extends Page {
 		if (!sources || !sources.length) return '(None)';
 		
 		return sources.map( function(source) {
-			switch (source) {
-				case 'scheduler': return '<i class="mdi mdi-update">&nbsp;</i>Scheduler';
-				case 'user': return '<i class="mdi mdi-account">&nbsp;</i>User';
-				case 'key': return '<i class="mdi mdi-key">&nbsp;</i>API Key';
-				case 'action': return '<i class="mdi mdi-eye-outline">&nbsp;</i>Action';
-				case 'alert': return '<i class="mdi mdi-bell-outline">&nbsp;</i>Alert';
-				case 'workflow': return '<i class="mdi mdi-clipboard-flow-outline">&nbsp;</i>Workflow';
-				case 'magic': return '<i class="mdi mdi-link-variant">&nbsp;</i>Magic Link';
-				case 'startup': return '<i class="mdi mdi-desktop-classic">&nbsp;</i>Startup';
-				default: return ucfirst(source);
-			}
+			var source_def = find_object( config.ui.job_source_types, { id: source } );
+			if (source_def) return `<i class="mdi mdi-${source_def.icon}">&nbsp;</i>${source_def.title}`;
+			else return ucfirst(source);
 		} ).join(', ');
 	}
 	
