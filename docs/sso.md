@@ -1,4 +1,4 @@
-# Single Sign-On 
+# Single Sign-On
 
 ## Overview
 
@@ -6,21 +6,398 @@ Single Sign-On (SSO) is a mechanism for outsourcing the xyOps user authenticatio
 
 Configuring SSO is a complex, highly technical process that requires careful coordination between identity providers, certificates, middleware, and application settings.  It is easy to get things wrong and expose security holes in your system.  While we provide all necessary documentation here, we strongly recommend our [Enterprise Plan](https://xyops.io/pricing). This gives you access to our white-glove onboarding service, where our team will guide you through every step, validate your configuration, and ensure your integration is both secure and reliable.  This also gets you priority ticket support, and live chat support from a xyOps engineer.
 
-xyOps uses the "trusted headers" implementation for SSO, allowing for easy integration with several authentication tools and middlewares.  These include [OAuth2-Proxy](https://github.com/oauth2-proxy/oauth2-proxy), [Vouch](https://github.com/vouch/vouch-proxy), [Authelia](https://github.com/authelia/authelia), and [Authentik](https://github.com/goauthentik/authentik), among others.  It also supports [Tailscale](tailscale.md) (i.e. [Tailscale Serve](https://tailscale.com/kb/1312/serve)) which forwards headers in the same way.
+xyOps uses the "trusted headers" implementation for SSO, allowing for easy integration with several authentication tools and middlewares.  These include our [xyOps OIDC Plugin](#xyops-oidc-plugin), [OAuth2-Proxy](https://github.com/oauth2-proxy/oauth2-proxy), [Vouch](https://github.com/vouch/vouch-proxy), [Authelia](https://github.com/authelia/authelia), and [Authentik](https://github.com/goauthentik/authentik), among others.  It also supports [Tailscale](tailscale.md) (i.e. [Tailscale Serve](https://tailscale.com/kb/1312/serve)) which forwards headers in the same way.
 
 The trusted header flow works as follows:
 
-1. The authentication tool sits in front, and redirects the user to the identity provider as needed.
-	- Some of these auth tools can also provide SSL termination for you, or be used in combination with a proxy such as [Nginx](https://nginx.org/) for SSL.
+1. The authentication tool authenticates the user, either by sitting in front of xyOps or by running as an xyOps SSO command.
 2. Once the user is authenticated, the tool forwards the request to xyOps and includes a set of special "trusted headers".
 3. xyOps detects the headers and creates/updates a user account as necessary, and logs the user in using its own session system.
 	- xyOps can also automatically assign user roles and/or privileges based on groups you define in your identity provider.
 
-## Setup
+Here are the main paths we recommend:
 
-The first step is to pick an authentication tool, and get it all configured and working before we throw xyOps in the mix.  We'll focus on [OAuth2-Proxy](https://github.com/oauth2-proxy/oauth2-proxy) for this guide, as it is extremely quick and easy to get up and running.  It is also free, open source, and supports all the major OIDC providers (SAML is covered separately below).
+- [xyOps OIDC Plugin](#xyops-oidc-plugin) is usually the simplest OIDC path.  It has fewer moving parts, and is especially nice for non-Docker installs.
+- [OAuth2-Proxy](#oauth2-proxy) is a popular and widely tested solution.  It has more deployment pieces, but it is likely to be compatible with more OIDC providers and handle more provider edge cases.
+- [Authentik](#authentik), [Authelia](#active-directory), [Tailscale](#tailscale), and other trusted-header systems can also work well, depending on your environment.
 
-You can follow their [installation guide](https://oauth2-proxy.github.io/oauth2-proxy/installation), or use the following [Docker Compose](https://docs.docker.com/compose/) configuration with a generic OIDC provider as a starting point:
+## Configuration
+
+All the SSO settings for xyOps are contained in the `sso.json` file, which is typically installed to `/opt/xyops/conf/sso.json`, but may be mapped to a different host location if using Docker.  The default configuration looks like this:
+
+```json
+{
+	"enabled": false,
+	"whitelist": ["127.0.0.1", "10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16", "::1/128", "fd00::/8", "169.254.0.0/16", "fe80::/10"],
+	"header_map": {
+		"username": "x-forwarded-email",
+		"full_name": "x-forwarded-email",
+		"email": "x-forwarded-email",
+		"groups": "x-forwarded-groups"
+	},
+	"cleanup_username": true,
+	"cleanup_full_name": true,
+	"group_role_map": {},
+	"group_privilege_map": {},
+	"replace_roles": false,
+	"replace_privileges": false,
+	"admin_bootstrap": "",
+	"logout_url": "",
+	"command": "",
+	"preset": "",
+	"oidc": {}
+}
+```
+
+Here are descriptions of all the SSO properties:
+
+| Property Name | Type | Description |
+|---------------|------|-------------|
+| `enabled` | Boolean | Set this to `true` to enable SSO login (and disable classic user/pass login!). |
+| `whitelist` | Array or Boolean | This allows you to limit trusted headers to a specific proxy or network range.  Set to `false` when there is no separate trusted proxy, such as with the OIDC Plugin.  See [Live Production](#live-production) for more on this. |
+| `header_map` | Object | This allows you to map trusted headers to standard xyOps user properties.  See [Header Map](#header-map) below for details. |
+| `cleanup_username` | Boolean | Set this to `true` to cleanup the username received from the trusted headers.  See [Header Map](#header-map) below for details. |
+| `cleanup_full_name` | Boolean | Set this to `true` to cleanup the user's full name received from the trusted headers.  See [Header Map](#header-map) below for details. |
+| `group_role_map` | Object | Automatically assign roles to users based on groups received from the trusted headers.  See [User Groups](#user-groups) below for details. |
+| `group_role_separator` | String | Optional custom character to split up the external group roles (defaults to comma).  See [User Groups](#user-groups) below for details. |
+| `group_privilege_map` | Object | Automatically assign privileges to users based on groups received from the trusted headers.  See [User Groups](#user-groups) below for details. |
+| `replace_roles` | Boolean | Set this to `true` to replace **all** the user's roles with those mapped via `group_role_map` only.  See [User Groups](#user-groups) below for details. |
+| `replace_privileges` | Boolean | Set this to `true` to replace **all** the user's privileges with those mapped via `group_role_map` only.  See [User Groups](#user-groups) below for details. |
+| `admin_bootstrap` | String | Temporarily assign full administrator privileges to a given user.  This is used for bootstrapping the system on initial setup.  See [Admin Bootstrap](#admin-bootstrap) for more. |
+| `logout_url` | String | Set this to the URL to redirect the user to after xyOps performs its own logout.  See [Logging Out](#logging-out) below for details. |
+| `command` | String | Optional custom shell command to filter all incoming SSO requests and inject headers.  See [Custom Command](#custom-command) below for details. |
+| `preset` | String | Optional preset ID which pre-configures SSO for specific providers.  Currently used for [Tailscale](tailscale.md). |
+
+Custom SSO commands may also define their own extra configuration blocks inside `sso.json`.  For example, the [xyOps OIDC Plugin](#xyops-oidc-plugin) uses an `oidc` object.  xyOps passes the full SSO configuration to the command, but only uses the standard properties itself.
+
+### Header Map
+
+The `header_map` object allows you to define which incoming headers map to which xyOps user properties (username, email, etc.).  The reason we need a map is because all auth middleware tools and identity providers do this a little differently.  Different auth tools use different header names, and some identity providers *only* provide an email address, while some also provide a username, and some also provide groups.  The header map allows for full flexibility in our configuration, so we can support any combination of tools and IdPs.
+
+For example, many SSO tools can send a user header, a name header, an email header, and a groups header.  If you get all four, use a header map setup like this:
+
+```json
+"header_map": {
+	"username": "x-forwarded-user",
+	"full_name": "x-forwarded-name",
+	"email": "x-forwarded-email",
+	"groups": "x-forwarded-groups"
+}
+```
+
+If your SSO tool only sends a username and email, use the username for the display name too:
+
+```json
+"header_map": {
+	"username": "x-forwarded-user",
+	"full_name": "x-forwarded-user",
+	"email": "x-forwarded-email",
+	"groups": "x-forwarded-groups"
+}
+```
+
+And if your identity provider only sends an email address, use something like this:
+
+```json
+"header_map": {
+	"username": "x-forwarded-email",
+	"full_name": "x-forwarded-email",
+	"email": "x-forwarded-email"
+}
+```
+
+In this case we're using the email address as the username, full name, and email.  Here xyOps can help "clean up" the username and full name fields as it extracts them from the user's email address.  See the following section for details on this.
+
+#### Header Cleanup
+
+To perform header cleanup, set the `cleanup_username` and/or `cleanup_full_name` properties to `true`.  Here is what each does:
+
+- `cleanup_username` extracts a usable username from an email address.  It does this by grabbing everything up to the `@` symbol, stripping all illegal symbols (anything other than alphanumerics, dots, dashes, periods and underscores), and converting it to lower-case.  For example, `John.Smith@example.com` would become `john.smith`.
+	- This assumes all of your users have "company email addresses" and all share the same email domain, so the first part of their email addresses is a viable username.
+	- If you would rather use the full email address as the username, set `cleanup_username` to `false`.  This will use the full email address but still convert all illegal symbols to underscores, and lower-case the final result.  In this case `John.Smith@example.com` would become `john.smith_example.com`.
+- `cleanup_full_name` extracts a usable display name from an email address.  It does this by grabbing everything up to the `@` symbol, converting periods to spaces, and title-casing each word.  For example, `john.smith@example.com` would become `John Smith`.  Obviously this works best for `first.last` email address formats.
+	- If you set `cleanup_full_name` to false the user's full email address will be used for their display name.
+
+These complications are why it helps to test your SSO tool before integrating xyOps, especially when using a proxy-based setup.  A passthrough echo server can show you exactly what headers your IdP and auth middleware send, which makes the xyOps `header_map` much easier to configure.
+
+### Default User Privileges
+
+When users are first created via SSO, a default set of privileges is applied, unless `replace_privileges` is set.  This is configured in the main `config.json` file in the [default_user_privileges](config.md#default_user_privileges) property.  The default set is:
+
+```json
+"default_user_privileges": {
+	"create_events": true,
+	"edit_events": true,
+	"run_jobs": true,
+	"tag_jobs": true,
+	"create_tickets": true,
+	"edit_tickets": true
+}
+```
+
+This is the same set of default privileges applied to new users created manually in the xyOps Admin UI.  These privileges (along with custom user roles) can be further customized by mapping your IdP groups.  See the next section for details.
+
+### User Groups
+
+With `group_role_map` and `group_privilege_map` you can map your own user groups (as defined in your OIDC/SAML identity provider) to user [roles and privileges](privileges.md) on the xyOps side.  Here is how it works.  Imagine a set of incoming trusted headers like these (GitHub IdP used here as an example):
+
+```json
+{
+    "x-forwarded-email": "jhuckaby@example.com",
+    "x-forwarded-groups": "pixlcore,pixlcore:owners",
+    "x-forwarded-user": "jhuckaby"
+}
+```
+
+In this case user `jhuckaby` is a member of two groups: `pixlcore` and `pixlcore:owners`, using comma-delimited groups.  Assuming you have the `x-forwarded-groups` header mapped to `groups` via the [Header Map](#header-map), here is how you could assign `pixlcore:owners` so users with this group automatically become a full administrator:
+
+```json
+"group_privilege_map": {
+	"pixlcore:owners": ["admin"]
+}
+```
+
+And if you have roles defined in xyOps, you can also map user groups to those, by using the Role IDs.  Example, assuming you have two roles with IDs `r12345` and `r67890`:
+
+```json
+"group_role_map": {
+	"pixlcore": ["r12345", "r67890"]
+}
+```
+
+This would apply both roles to all users in the `pixlcore` IdP group.
+
+If your IdP specifies group roles delimited with a character other than comma (e.g. pipe), use the [SSO.group_role_separator](config.md#sso-group_role_separator) property to customize it.
+
+Now, by default, these roles and privileges are applied "additively" to user records.  Meaning, they will never *remove* a role or privilege.  This is so you can manually apply your own user roles and permissions using the xyOps Admin UI, and everything plays nice.  However, if you do not want this behavior, and instead want your IdP to be the single source of truth for all user roles and privileges, set `replace_roles` and/or `replace_privileges` to true.  Those will replace **all** the roles and/or privileges with whatever we get from the IdP group map (this includes the default set for new users).  This sync happens on every user login, replacing any local changes made in xyOps.
+
+Note that not all identity providers send along groups by default.  In many cases you will have to manually enable it in your IdP admin portal.
+
+See [Privileges](privileges.md) for more on xyOps user roles and privileges.
+
+### Admin Bootstrap
+
+For the initial setup and configuration phase, it is often useful to promote yourself to a full administrator.  This comes in handy if your IdP doesn't send along groups, or you haven't yet configured that feature.  To force a single user to be admin, add `admin_bootstrap` and set it to your *exact username*:
+
+```json
+"admin_bootstrap": "jhuckaby"
+```
+
+Note that the username must match exactly here, including any cleanup that may be happening (see `cleanup_username` above).  Also note that xyOps logs a warning in the activity log each time this is applied to a user.  This serves as a reminder to remove `admin_bootstrap` once everything is configured and working with your IdP groups (or manually assigned roles / privileges).
+
+### Logging Out
+
+When a user clicks the "Logout" button in the top-right corner of the xyOps UI, xyOps clears its own local session cookie.  In many SSO setups, there may also be an external auth proxy session and an identity provider session.  If you want to clear or continue through those systems too, configure a `logout_url` in `sso.json`.
+
+For the [xyOps OIDC Plugin](#xyops-oidc-plugin) plugin, the plugin does not manage IdP logout directly.  Set `logout_url` to your provider's logout URL, if you have one:
+
+```json
+"logout_url": "https://your-idp.example.com/logout"
+```
+
+For Authentik, `logout_url` usually points to the Authentik proxy sign-out endpoint.  See [Authentik SSO Configuration](#authentik-sso-configuration) in the Authentik section below.
+
+For OAuth2-Proxy, logout commonly needs to clear these cookies in order:
+
+- The xyOps session cookie.
+- The OAuth2-Proxy cookie.
+- The external IdP cookie.
+
+xyOps handles the first one using its own API.  To continue through OAuth2-Proxy logout, set `logout_url` like this:
+
+```json
+"logout_url": "/oauth2/sign_out?rd=_ENCODED_IDP_LOGOUT_URL_"
+```
+
+The `/oauth2/sign_out` is intercepted by OAuth2-Proxy and handles clearing the second cookie, and then finally that redirects to your IdP logout endpoint to close out the process.  The `_ENCODED_IDP_LOGOUT_URL` needs to be set by you, as it is customized per IdP and often specific to your organization (for e.g. your own branded logout page).  Also note that it needs to be properly URL-encoded.  Consult your identity provider documentation to see how to format this URL.
+
+Here is the logout URL to use for GitHub, as an example:
+
+```json
+"logout_url": "/oauth2/sign_out?rd=https%3A%2F%2Fgithub.com%2Flogout"
+```
+
+**Advanced:** If your IdP passes along an ID Token via `Authorization: Bearer ...` header, and their logout URL accepts an [id_token_hint](https://openid.net/specs/openid-connect-rpinitiated-1_0.html#RPLogout) query parameter, you can include it in your encoded redirect URL by using this special placeholder macro: `[id_token_hint]`.  The expanded token itself will also be URL-encoded.  Example:
+
+```json
+"logout_url": "/oauth2/sign_out?rd=https%3A%2F%2F_YOUR_IDP_DOMAIN_%2Flogout%3Fid_token_hint%3D[id_token_hint]"
+```
+
+One final important note here.  When using OAuth2-Proxy, you will need to "whitelist" the IdP domain you will be redirecting to for logout.  Use the [whitelist_domains](https://oauth2-proxy.github.io/oauth2-proxy/configuration/overview/) configuration property for this (or the `OAUTH2_PROXY_WHITELIST_DOMAINS` environment variable).  Add the IdP domain *in addition to* your own xyOps domain, comma-separated:
+
+```
+OAUTH2_PROXY_WHITELIST_DOMAINS: ".yourcompany.com,.github.com"
+```
+
+## xyOps OIDC Plugin
+
+The [xyplug-sso-oidc](https://github.com/pixlcore/xyplug-sso-oidc) plugin is an xyOps SSO command that performs a direct [OpenID Connect](https://openid.net/developers/how-connect-works/) login flow.  It redirects the browser to your identity provider, handles the callback, validates the OIDC tokens, fetches user profile data, and emits trusted headers back to xyOps.
+
+This keeps the deployment simple: xyOps talks to the plugin, and the plugin talks to your IdP.  You do not need to run a separate OAuth2-Proxy, Authentik, AWS ALB, or reverse proxy just to complete the OIDC browser flow.
+
+The tradeoff is provider coverage.  The plugin is intentionally lightweight and direct, so it may not handle every provider quirk or enterprise edge case.  If your IdP has unusual OIDC behavior, or if you want a front-door proxy with a long history across many providers, [OAuth2-Proxy](#oauth2-proxy) is still an excellent choice.
+
+### How It Works
+
+The plugin runs during the xyOps SSO login flow:
+
+1. xyOps receives a browser request for the app root URL.
+2. xyOps launches the configured SSO command and sends it request metadata over STDIN.
+3. The plugin redirects the browser to your OIDC provider.
+4. The provider sends the browser back to your xyOps `base_app_url` with an authorization code.
+5. xyOps launches the plugin again for the callback request.
+6. The plugin validates state, exchanges the code, validates the ID token, fetches UserInfo when configured, and emits trusted headers.
+7. xyOps consumes those trusted headers through the normal SSO login system.
+
+### Requirements
+
+- Node.js 20 or higher on the xyOps conductor.
+- An OIDC application/client configured at your identity provider.
+- The OIDC redirect/callback URI set to your xyOps [base_app_url](config.md#base_app_url) exactly.
+
+Example redirect URI:
+
+```text
+https://xyops.yourcompany.com
+```
+
+Do not add `/callback`, `/oauth2/callback`, or any other path to the redirect URL.  xyOps activates this plugin from the root URI, so the IdP callback URL must match your xyOps Base App URL exactly.
+
+### Install
+
+You can run the plugin via `npx`:
+
+```json
+"command": "npx -y @pixlcore/xyplug-sso-oidc@1.0.0"
+```
+
+For production, we recommend preinstalling the NPM module globally and pointing xyOps at the installed executable:
+
+```bash
+npm i -g @pixlcore/xyplug-sso-oidc@1.0.0
+```
+
+Then configure `command` like this:
+
+```json
+"command": "/usr/local/bin/xyplug-sso-oidc"
+```
+
+Note that your NPM CLI may place global executables somewhere other than `/usr/local/bin`.  To find the correct directory on your system, run:
+
+```bash
+npm bin -g
+```
+
+Then use the full path to `xyplug-sso-oidc` from that directory in your `command` setting.
+
+This avoids invoking `npx` on every user visit, which can add a request to the NPM registry and slow down login.
+
+### Basic Configuration
+
+Here is a complete `sso.json` example utilizing the OIDC Plugin:
+
+```json
+{
+	"enabled": true,
+	"whitelist": false,
+	"header_map": {
+		"username": "x-forwarded-user",
+		"full_name": "x-forwarded-name",
+		"email": "x-forwarded-email",
+		"groups": "x-forwarded-groups"
+	},
+	"cleanup_username": false,
+	"cleanup_full_name": false,
+	"group_role_map": {},
+	"group_privilege_map": {},
+	"logout_url": "https://YOUR_IDP_LOGOUT_URL",
+	"command": "/usr/local/bin/xyplug-sso-oidc",
+	"oidc": {
+		"issuer": "https://YOUR_OIDC_ISSUER",
+		"client_id": "YOUR_CLIENT_ID",
+		"client_secret": "YOUR_CLIENT_SECRET",
+		"state_secret": "GENERATE_A_LONG_RANDOM_SECRET",
+		"scope": "openid profile email",
+		"token_endpoint_auth_method": "client_secret_basic",
+		"use_pkce": true,
+		"claim_map": {
+			"username": ["preferred_username", "email", "sub"],
+			"full_name": ["name", "email"],
+			"email": "email",
+			"groups": ["groups", "roles"]
+		}
+	}
+}
+```
+
+A few important notes:
+
+- `whitelist` is usually set to `false` for this plugin, because there is no separate trusted proxy IP.  The plugin itself performs the authentication bridge.
+- `header_map` should match the headers emitted by the plugin.
+- `state_secret`, `client_secret`, and SSO debug logs should be kept private.
+
+Generate a new `state_secret` with:
+
+```bash
+openssl rand -base64 48
+```
+
+The plugin uses this secret to encrypt and authenticate the OIDC `state` value that travels through the browser and comes back from your IdP.
+
+### Claim Map
+
+The `oidc.claim_map` object tells the plugin which OIDC claims should become xyOps trusted headers.  Each value may be a claim name, a dotted path, or an array of fallback claim names.
+
+For example:
+
+```json
+"claim_map": {
+	"username": ["preferred_username", "email", "sub"],
+	"full_name": ["name", "email"],
+	"email": "email",
+	"groups": ["groups", "roles"]
+}
+```
+
+This lets the plugin work with providers that use slightly different claim names.  If your provider puts groups in a custom claim, point `groups` at that exact claim.
+
+### Provider Notes
+
+The [OIDC plugin documentation](https://github.com/pixlcore/xyplug-sso-oidc) includes more complete provider examples for [Okta](https://github.com/pixlcore/xyplug-sso-oidc#okta), [Auth0](https://github.com/pixlcore/xyplug-sso-oidc#auth0), [Microsoft Entra ID](https://github.com/pixlcore/xyplug-sso-oidc#microsoft-entra-id), [Keycloak](https://github.com/pixlcore/xyplug-sso-oidc#keycloak), [AWS Cognito Hosted UI](https://github.com/pixlcore/xyplug-sso-oidc#aws-cognito-hosted-ui), and [SAML via SSOReady](https://github.com/pixlcore/xyplug-sso-oidc#saml-via-ssoready).  Please use those examples as your main provider-specific reference.
+
+Here are a few universal setup tips:
+
+- Start with the basic `openid profile email` scope.
+- Get a simple login working before adding groups or custom claims.
+- Make sure your IdP callback URL is exactly the xyOps `base_app_url`, with no extra path.
+- If groups are missing, verify that your IdP is actually including them in the ID token or UserInfo response before debugging xyOps group maps.
+
+### Plugin Debugging
+
+For debugging issues on the xyOps side, set the [debug_level](config.md#debug_level) configuration property to `9`, and also enable the global [debug](config.md#debug) flag.  xyOps logs SSO details here:
+
+```text
+/opt/xyops/logs/SSO.log
+```
+
+For additional plugin debug output, set this environment variable for the xyOps service:
+
+```bash
+XYP_SSO_DEBUG=1
+```
+
+xyOps logs raw plugin STDOUT and STDERR at SSO debug level 9, so be careful with these logs in production.
+
+## OAuth2-Proxy
+
+[OAuth2-Proxy](https://github.com/oauth2-proxy/oauth2-proxy) is a popular, free, open source authentication proxy.  It sits in front of xyOps, redirects users to your identity provider, creates its own authenticated proxy session, and forwards trusted headers to xyOps.
+
+OAuth2-Proxy is a great choice when provider compatibility is the top priority.  It supports many OIDC providers, has specific provider documentation for common platforms, and has been tested in a wide variety of deployment shapes.  The tradeoff is that you are adding another service to run and configure.
+
+### Local Test with Echo Server
+
+The first step is to get OAuth2-Proxy configured and working before we add xyOps to the mix.  You can follow the [OAuth2-Proxy installation guide](https://oauth2-proxy.github.io/oauth2-proxy/installation), or use the following [Docker Compose](https://docs.docker.com/compose/) configuration with a generic OIDC provider as a starting point:
 
 ```yaml
 services:
@@ -35,7 +412,7 @@ services:
       OAUTH2_PROXY_REDIRECT_URL: "http://localhost:4180/oauth2/callback"
       OAUTH2_PROXY_SCOPE: "openid profile email"
       OAUTH2_PROXY_COOKIE_SECRET: "_YOUR_COOKIE_SECRET_"
-      OAUTH2_PROXY_EMAIL_DOMAINS: "*" 
+      OAUTH2_PROXY_EMAIL_DOMAINS: "*"
       OAUTH2_PROXY_UPSTREAMS: "http://echo-server:80"
       OAUTH2_PROXY_HTTP_ADDRESS: "0.0.0.0:4180"
       OAUTH2_PROXY_COOKIE_SECURE: "false" # for dev testing
@@ -49,7 +426,7 @@ services:
     image: ealen/echo-server
 ```
 
-Notice how this docker compose actually starts *two* separate containers: the OAuth2-Proxy itself, and also something called [echo-server](https://hub.docker.com/r/ealen/echo-server).  The latter is a simple passthrough web server for testing, which echoes request metadata back to the browser in JSON format.  This is extremely useful for the initial SSO setup process, because you can test your auth implementation *in isolation*, and see exactly which headers will be passed down to the app after authentication (we'll need to map these headers to standard fields in xyOps, which is covered below).
+Notice how this docker compose starts *two* separate containers: OAuth2-Proxy itself, and also [echo-server](https://hub.docker.com/r/ealen/echo-server).  The echo server is a simple passthrough web server for testing, which echoes request metadata back to the browser in JSON format.  This is extremely useful for the initial SSO setup process, because you can test your auth implementation in isolation and see exactly which headers will be passed down to xyOps after authentication.
 
 Check out the [OAuth2-Proxy configuration docs](https://oauth2-proxy.github.io/oauth2-proxy/configuration/overview/) for details on all the environment variables used above.  OAuth2-Proxy also provides a set of [example setup files](https://github.com/oauth2-proxy/oauth2-proxy/tree/master/contrib/local-environment) which are quite useful for specific configurations.
 
@@ -57,11 +434,11 @@ Note that OAuth2-Proxy has [specific instructions for certain providers](https:/
 
 Once you have the docker containers up and running, hit this URL in your browser:
 
-```
+```text
 http://localhost:4180/
 ```
 
-This should first redirect you to log in using your identity provider.  Once you log in successfully, it should forward the authenticated request to the backend `echo-server` container (running alongside OAuth2-Proxy), and echo back the request information to the browser in JSON format, including the request headers.  You should see something like this on your screen (pretty-printed):
+This should first redirect you to log in using your identity provider.  Once you log in successfully, it should forward the authenticated request to the backend `echo-server` container and echo back the request information to the browser in JSON format, including the request headers.  You should see something like this on your screen, pretty-printed here:
 
 ```json
 {
@@ -90,7 +467,7 @@ This should first redirect you to log in using your identity provider.  Once you
 			"accept-language": "en-US,en;q=0.9",
 			"cookie": "2F5DmA84rnYAoZi********pym6VyPzhVj4zU58w=",
 			"x-forwarded-access-token": "gho_C7WF*****3JXT6P",
-			"x-forwarded-email": "jhuckaby@gmail.com",
+			"x-forwarded-email": "jhuckaby@example.com",
 			"x-forwarded-for": "192.168.148.1",
 			"x-forwarded-groups": "pixlcore,pixlcore:owners",
 			"x-forwarded-user": "jhuckaby"
@@ -100,201 +477,17 @@ This should first redirect you to log in using your identity provider.  Once you
 }
 ```
 
-The important headers we want to see are these three right here:
+The important headers we want to see are these:
 
-```
-"x-forwarded-email": "jhuckaby@example.com", 
-"x-forwarded-groups": "pixlcore,pixlcore:owners", 
+```text
+"x-forwarded-email": "jhuckaby@example.com"
+"x-forwarded-groups": "pixlcore,pixlcore:owners"
 "x-forwarded-user": "jhuckaby"
 ```
 
-These are the magical "trusted headers" that xyOps will use to automatically log in the user (and create/update their user account if necessary).  So, if you are seeing these headers in your test request (or at the very least `x-forwarded-email`), then things are working, and you can swap out `echo-server` for the real xyOps.  But before you do that, proceed to the next section to learn how to configure xyOps for SSO.
+These are the trusted headers that xyOps will use to automatically log in the user and create/update their user account if necessary.  If you are seeing these headers in your test request, or at the very least `x-forwarded-email`, then things are working.  Next, configure xyOps using the generic [Configuration](#configuration) section above, and then swap out `echo-server` for the real xyOps service.
 
-## Configuration
-
-All the SSO settings for xyOps are contained in the `./xyops-conf/sso.json` file, assuming you are using the Docker Compose examples in this guide.  This maps to `/opt/xyops/conf/sso.json` inside the container.  The default configuration looks like this:
-
-```json
-{
-	"enabled": false,
-	"whitelist": ["127.0.0.1", "10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16", "::1/128", "fd00::/8", "169.254.0.0/16", "fe80::/10"],
-	"header_map": {
-		"username": "x-forwarded-email",
-		"full_name": "x-forwarded-email",
-		"email": "x-forwarded-email",
-		"groups": "x-forwarded-groups"
-	},
-	"cleanup_username": true,
-	"cleanup_full_name": true,
-	"group_role_map": {},
-	"group_privilege_map": {},
-	"replace_roles": false,
-	"replace_privileges": false,
-	"admin_bootstrap": "",
-	"logout_url": "",
-	"command": "",
-	"preset": ""
-}
-```
-
-Here are descriptions of all the SSO properties:
-
-| Property Name | Type | Description |
-|---------------|------|-------------|
-| `enabled` | Boolean | Set this to `true` to enable SSO login (and disable classic user/pass login!). |
-| `whitelist` | Array | This allows you to limit the trusted headers mechanism to the proxy that performed the auth.  See [Live Production](#live-production) for more on this. |
-| `header_map` | Object | This allows you to map trusted headers to standard xyOps user properties.  See [Header Map](#header-map) below for details. |
-| `cleanup_username` | Boolean | Set this to `true` to cleanup the username received from the trusted headers.  See [Header Map](#header-map) below for details. |
-| `cleanup_full_name` | Boolean | Set this to `true` to cleanup the user's full name received from the trusted headers.  See [Header Map](#header-map) below for details. |
-| `group_role_map` | Object | Automatically assign roles to users based on groups received from the trusted headers.  See [User Groups](#user-groups) below for details. |
-| `group_role_separator` | String | Optional custom character to split up the external group roles (defaults to comma).  See [User Groups](#user-groups) below for details. |
-| `group_privilege_map` | Object | Automatically assign privileges to users based on groups received from the trusted headers.  See [User Groups](#user-groups) below for details. |
-| `replace_roles` | Boolean | Set this to `true` to replace **all** the user's roles with those mapped via `group_role_map` only.  See [User Groups](#user-groups) below for details. |
-| `replace_privileges` | Boolean | Set this to `true` to replace **all** the user's privileges with those mapped via `group_role_map` only.  See [User Groups](#user-groups) below for details. |
-| `admin_bootstrap` | String | Temporarily assign full administrator privileges to a given user.  This is used for bootstrapping the system on initial setup.  See [Admin Bootstrap](#admin-bootstrap) for more. |
-| `logout_url` | String | Set this to the URL to redirect the user to after xyOps performs its own logout.  See [Logging Out](#logging-out) below for details. |
-| `command` | String | Optional custom shell command to filter all incoming SSO requests and inject headers.  See [Custom Command](#custom-command) below for details. |
-| `preset` | String | Optional preset ID which pre-configures SSO for specific providers.  Currently used for [Tailscale](tailscale.md). |
-
-### Header Map
-
-The `header_map` object allows you to define which incoming headers map to which xyOps user properties (username, email, etc.).  The reason we need a map is because all auth middleware tools and identity providers do this a little differently.  Different auth tools use different header names, and some identity providers *only* provide an email address, while some also provide a username, and some also provide groups.  The header map allows for full flexibility in our configuration, so we can support any combination of tools and IdPs.
-
-For example, using OAuth2-Proxy and most OIDC providers, you'll usually get at least a `x-forwarded-email` header.  Some providers also send along a `x-forwarded-user` and, if you enable it in your IdP, you'll get an `x-forwarded-groups` as well.  If you get all three, use a header map setup like this:
-
-```json
-"header_map": {
-	"username": "x-forwarded-user",
-	"full_name": "x-forwarded-user",
-	"email": "x-forwarded-email",
-	"groups": "x-forwarded-groups"
-}
-```
-
-However, if you use an identity provider that *only* sends an email address, use something like this:
-
-```json
-"header_map": {
-	"username": "x-forwarded-email",
-	"full_name": "x-forwarded-email",
-	"email": "x-forwarded-email"
-}
-```
-
-In this case we're using the email address as the username, full name, and email.  Here xyOps can help "clean up" the username and full name fields as it extracts them from the user's email address.  See the following section for details on this.
-
-#### Header Cleanup
-
-To perform header cleanup, set the `cleanup_username` and/or `cleanup_full_name` properties to `true`.  Here is what each does:
-
-- `cleanup_username` extracts a usable username from an email address.  It does this by grabbing everything up to the `@` symbol, stripping all illegal symbols (anything other than alphanumerics, dots, dashes, periods and underscores), and converting it to lower-case.  For example, `John.Smith@example.com` would become `john.smith`.
-	- This assumes all of your users have "company email addresses" and all share the same email domain, so the first part of their email addresses is a viable username.
-	- If you would rather use the full email address as the username, set `cleanup_username` to `false`.  This will use the full email address but still convert all illegal symbols to underscores, and lower-case the final result.  In this case `John.Smith@example.com` would become `john.smith_example.com`.
-- `cleanup_full_name` extracts a usable display name from an email address.  It does this by grabbing everything up to the `@` symbol, converting periods to spaces, and title-casing each word.  For example, `john.smith@example.com` would become `John Smith`.  Obviously this works best for `first.last` email address formats.
-	- If you set `cleanup_full_name` to false the user's full email address will be set to their display name.
-
-These complications are why it's important to first follow the initial [Setup](#setup) step above, where you can test your SSO setup with a pure passthrough echo server, so you can see exactly what fields your IdP sends over, and how your auth middleware maps those fields to request headers.  Armed with this knowledge, you'll know exactly how to configure the `header_map` in xyOps.
-
-### Default User Privileges
-
-When users are first created via SSO, a default set of privileges is applied (unless `replace_privileges` is set -- see below).  This is configured in the main `./xyops-conf/config.json` file in the [default_user_privileges](config.md#default_user_privileges) property.  The default set is:
-
-```json
-"default_user_privileges": {
-	"create_events": true,
-	"edit_events": true,
-	"run_jobs": true,
-	"tag_jobs": true,
-	"create_tickets": true,
-	"edit_tickets": true
-}
-```
-
-This is the same set of default privileges applied to new users created manually in the xyOps Admin UI.  These privileges (along with custom user roles) can be further customized by mapping your IdP groups.  See the next section for details.
-
-### User Groups
-
-With `group_role_map` and `group_privilege_map` you can map your own user groups (as defined in your OIDC/SAML identity provider) to user [roles and privileges](privileges.md) on the xyOps side.  Here is how it works.  Imagine a set of incoming trusted headers like these (GitHub IdP used here as an example):
-
-```json
-{
-    "x-forwarded-email": "jhuckaby@example.com",
-    "x-forwarded-groups": "pixlcore,pixlcore:owners",
-    "x-forwarded-user": "jhuckaby"
-}
-```
-
-In this case user `jhuckaby` is a member of two groups: `pixlcore` and `pixlcore:owners` (comma-delimited -- see below).  Assuming you have the `x-forwarded-groups` header mapped to `groups` via the [Header Map](#header-map), here is how you could assign `pixlcore:owners` so users with this group automatically become a full administrator:
-
-```json
-"group_privilege_map": {
-	"pixlcore:owners": ["admin"]
-}
-```
-
-And if you have roles defined in xyOps, you can also map user groups to those, by using the Role IDs.  Example, assuming you have two roles with IDs `r12345` and `r67890`:
-
-```json
-"group_role_map": {
-	"pixlcore": ["r12345", "r67890"]
-}
-```
-
-This would apply both roles to all users in the `pixlcore` IdP group.
-
-If your IdP specifies group roles delimited with a character other than comma (e.g. pipe), use the [SSO.group_role_separator](config.md#sso-group_role_separator) property to customize it.
-
-Now, by default, these roles and privileges are applied "additively" to user records.  Meaning, they will never *remove* a role or privilege.  This is so you can manually apply your own user roles and permissions using the xyOps Admin UI, and everything plays nice.  However, if you do not want this behavior, and instead want your IdP to be the single source of truth for all user roles and privileges, set `replace_roles` and/or `replace_privileges` to true.  Those will replace **all** the roles and/or privileges with whatever we get from the IdP group map (this includes the default set for new users).  This sync happens on every user login and session refresh, wiping out any local changes made in xyOps.
-
-Note that not all identity providers send along groups by default.  In many cases you will have to manually enable it in your IdP admin portal.
-
-See [Privileges](privileges.md) for more on xyOps user roles and privileges.
-
-### Admin Bootstrap
-
-For the initial setup and configuration phase, it is often useful to promote yourself to a full administrator.  This comes in handy if your IdP doesn't send along groups, or you haven't yet configured that feature.  To force a single user to be admin, add `admin_bootstrap` and set it to your *exact username*:
-
-```json
-"admin_bootstrap": "jhuckaby"
-```
-
-Note that the username must match exactly here, including any cleanup that may be happening (see `cleanup_username` above).  Also note that xyOps logs a warning in the activity log each time this is applied to a user.  This serves as a reminder to remove `admin_bootstrap` once everything is configured and working with your IdP groups (or manually assigned roles / privileges).
-
-### Logging Out
-
-When a user clicks the "Logout" button in the top-right corner of the xyOps UI, we need to perform some additional steps behind the scenes to *fully* log the user out.  With SSO in the mix, there are actually three cookies that need to be cleared:
-
-- The xyOps session cookie.
-- The OAuth2-Proxy cookie.
-- The external IdP cookie.
-
-xyOps handles the first one using its own API.  But you'll need to configure a custom `logout_url` in your `sso.json` file to redirect the user to afterwards.  With OAuth2-Proxy this should be set to:
-
-```json
-"logout_url": "/oauth2/sign_out?rd=_ENCODED_IDP_LOGOUT_URL_"
-```
-
-The `/oauth2/sign_out` is intercepted by OAuth2-Proxy and handles clearing the second cookie, and then finally that redirects to your IdP logout endpoint to close out the process.  The `_ENCODED_IDP_LOGOUT_URL` needs to be set by you, as it is customized per IdP and often specific to your organization (for e.g. your own branded logout page).  Also note that it needs to be properly URL-encoded.  Consult your identity provider documentation to see how to format this URL.
-
-Here is the logout URL to use for GitHub, as an example:
-
-```json
-"logout_url": "/oauth2/sign_out?rd=https%3A%2F%2Fgithub.com%2Flogout"
-```
-
-**Advanced:** If your IdP passes along an ID Token via `Authorization: Bearer ...` header, and their logout URL accepts an [id_token_hint](https://openid.net/specs/openid-connect-rpinitiated-1_0.html#RPLogout) query parameter, you can include it in your encoded redirect URL by using this special placeholder macro: `[id_token_hint]`.  The expanded token itself will also be URL-encoded.  Example:
-
-```json
-"logout_url": "/oauth2/sign_out?rd=https%3A%2F%2F_YOUR_IDP_DOMAIN_%2Flogout%3Fid_token_hint%3D[id_token_hint]"
-```
-
-One final important note here.  When using OAuth2-Proxy, you will need to "whitelist" the IdP domain you will be redirecting to for logout.  Use the [whitelist_domains](https://oauth2-proxy.github.io/oauth2-proxy/configuration/overview/) configuration property for this (or the `OAUTH2_PROXY_WHITELIST_DOMAINS` environment variable).  Add the IdP domain *in addition to* your own xyOps domain, comma-separated:
-
-```
-OAUTH2_PROXY_WHITELIST_DOMAINS: ".yourcompany.com,.github.com"
-```
-
-## OAuth2-Proxy with TLS
+### OAuth2-Proxy with TLS
 
 Now you should be ready to integrate xyOps with OAuth2-Proxy.  You have several options for doing this.  If you have a single xyOps conductor server, then the best way is to run OAuth2-Proxy standalone.  That has the fewest moving parts, and OAuth2-Proxy can also terminate TLS for you.  This section covers that configuration.
 
@@ -383,7 +576,7 @@ For the examples below, we'll be using the following domain placeholders:
 - `xyops01.yourcompany.com` - Internal domain for conductor server #1.
 - `xyops02.yourcompany.com` - Internal domain for conductor server #2.
 
-The reason why the conductor servers each need their own unique (internal) domain name is because of how the multi-conductor system works.  Each conductor server needs to be individually addressable, and reachable by all of your worker servers in your org.  Worker servers don't know or care about Nginx -- they contact conductors directly, and have their own auto-failover system.  Also, worker servers use a persistent WebSocket connection, and can send a large amount of traffic, depending on how many worker servers you have and how many jobs you run.  For these reasons, it's better to have worker servers connect the conductors directly, especially at production scale.
+The reason why the conductor servers each need their own unique internal domain name is because of how the multi-conductor system works.  Each conductor server needs to be individually addressable, and reachable by all of your worker servers in your org.  Worker servers don't know or care about Nginx, as they contact conductors directly and have their own auto-failover system.  Also, worker servers use a persistent WebSocket connection, and can send a large amount of traffic, depending on how many worker servers you have and how many jobs you run.  For these reasons, it's better to have worker servers connect the conductors directly, especially at production scale.
 
 That being said, you *can* configure your worker servers to connect through the Nginx front door if you want.  This can be useful if you have worker servers in another network or out in the wild, but it is not recommended for most setups.  To do this, please see [Overriding The Connect URL](hosting.md#overriding-the-connect-url) in our self-hosting guide.
 
@@ -467,7 +660,7 @@ A few things to note here:
 - All conductor servers must share the same central storage backend.  Do not mount separate local `/opt/xyops/data` volumes per conductor, as that will create split-brain data.
 - The timezone (`TZ`) should be set to your company's main timezone, so things like midnight log rotation and daily stat resets work as expected.
 
-For the xyOps container, we are bind mapping local host directories for configuration and logs (`./xyops-conf` and `./xyops-logs`).  Please change those paths to appropriate locations on the host where you want these files stored.  Launch the container once, and it will generate all the config files for you.  Then configure a central storage engine in `./xyops-conf/config.json` before bringing up multiple conductors.  See the [xyOps Configuration Guide](config.md) and [Storage Setup Guide](storage.md) for details.  Specifically though, let's talk about `sso.conf` for this configuration.  This file is largely discussed above (see [Configuration](#configuration) above), but the [Header Map](#header-map) in particular is going to be different for Nginx + OAuth2-Proxy:
+For the xyOps container, we are bind mapping local host directories for configuration and logs (`./xyops-conf` and `./xyops-logs`).  Please change those paths to appropriate locations on the host where you want these files stored.  Launch the container once, and it will generate all the config files for you.  Then configure a central storage engine in `./xyops-conf/config.json` before bringing up multiple conductors.  See the [xyOps Configuration Guide](config.md) and [Storage Setup Guide](storage.md) for details.  Specifically though, let's talk about `sso.json` for this configuration.  This file is largely discussed above (see [Configuration](#configuration)), but the [Header Map](#header-map) in particular is going to be different for Nginx + OAuth2-Proxy:
 
 ```json
 "header_map": {
@@ -752,7 +945,7 @@ http://auth.localhost:9000/
 
 Save the outpost.  Authentik should now route requests for the provider's external host through the embedded outpost and onward to xyOps.
 
-### xyOps SSO Configuration
+### Authentik SSO Configuration
 
 Authentik's Proxy Provider sends the trusted headers xyOps needs, but the header names are different from OAuth2-Proxy.  Configure `./xyops-conf/sso.json` like this:
 
@@ -892,7 +1085,7 @@ Note that all of these configuration properties can be specified as environment 
 
 **Why we map the email claim:** OAuth2-Proxy needs an email to create a session. If your ID token's email lives in `sub` (common with SAML providers), set `oidc_email_claim=sub` as shown.  However, this may differ for your SAML identity provider.  The default value of this setting in OAuth2-Proxy is `email`, so make sure to test that if `sub` doesn't work for you.
 
-See the [Setup](#setup) section above to run a local test of OAuth2-Proxy using the [echo-server](https://hub.docker.com/r/ealen/echo-server) echoing web server, to test everything before you integrate xyOps.
+See [Local Test with Echo Server](#local-test-with-echo-server) above to run a local test of OAuth2-Proxy using the [echo-server](https://hub.docker.com/r/ealen/echo-server) echoing web server, to test everything before you integrate xyOps.
 
 Once everything is working, see the [Configuration](#configuration) section above to configure xyOps for SSO.
 
@@ -1071,15 +1264,18 @@ In a production environment, it is crucial to ensure the security and reliabilit
 1. **Use HTTPS Everywhere**: Always use HTTPS to encrypt the communication between the client and the server, as well as between the server and the identity provider.
 2. **Monitor and Audit**: Continuously monitor and audit the SSO implementation for any suspicious activity or potential security breaches.
 3. **Keep Software Updated**: Regularly update xyOps, including authentication libraries and frameworks, to ensure that any security vulnerabilities are patched.
-4. **Whitelist Trusted IPs**: Use an IP whitelist to restrict where the trusted headers can come from (see below).
-5. **Secure-Only Cookies**: Remember to set `OAUTH2_PROXY_COOKIE_SECURE` to `true` for live production.
-6. **Restrict Email Domains**: Set `OAUTH2_PROXY_EMAIL_DOMAINS` to restrict your login email domain list.
-7. **xyOps Base App URL**: Remember to set the [base_app_url](config.md#base_app_url) configuration property for your live production setup.
-8. **Use Multiple Availability Zones**: For running multiple xyOps conductor servers, ideally put them in separate AZs.
+4. **Protect Secrets**: Keep client secrets, state secrets, cookie secrets, and SSO debug logs private.
+5. **Whitelist Trusted IPs**: For proxy-based setups, use an IP whitelist to restrict where trusted headers can come from (see below).
+6. **Secure-Only Cookies**: For OAuth2-Proxy, remember to set `OAUTH2_PROXY_COOKIE_SECURE` to `true` for live production.
+7. **Restrict Email Domains**: For OAuth2-Proxy, set `OAUTH2_PROXY_EMAIL_DOMAINS` to restrict your login email domain list.
+8. **xyOps Base App URL**: Remember to set the [base_app_url](config.md#base_app_url) configuration property for your live production setup.
+9. **Use Multiple Availability Zones**: For running multiple xyOps conductor servers, ideally put them in separate AZs.
 
 ### IP Whitelist
 
-It's important to configure xyOps so that it **only** accepts trusted headers from your auth proxy server, and *nowhere else*.  To do this, add an IP `whitelist` property in your xyOps SSO configuration.  This should be an array of IPv4 and/or IPv6 addresses or ranges, including single IPs, partial IPs, and/or [CIDR blocks](https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing).
+For proxy-based SSO, it's important to configure xyOps so that it **only** accepts trusted headers from your auth proxy server, and *nowhere else*.  To do this, add an IP `whitelist` property in your xyOps SSO configuration.  This should be an array of IPv4 and/or IPv6 addresses or ranges, including single IPs, partial IPs, and/or [CIDR blocks](https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing).
+
+For command-based SSO such as the [xyOps OIDC Plugin](#xyops-oidc-plugin), there is no separate trusted proxy IP, so `whitelist` is usually set to `false`.
 
 Our sample [sso.json](https://github.com/pixlcore/xyops/sample_conf/sso.json) file comes with a default whitelist consisting of all the [IPv4](https://en.wikipedia.org/wiki/Private_network#Private_IPv4_addresses) and [IPv6](https://en.wikipedia.org/wiki/Private_network#Private_IPv6_addresses) private address ranges, including the [localhost loopback](https://en.wikipedia.org/wiki/Localhost#Loopback) addresses (both IPv4 and IPv6 versions), and [link-local addresses](https://en.wikipedia.org/wiki/Link-local_address) (both IPv4 and IPv6 versions).  It uses the following set of [CIDR blocks](https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing):
 
