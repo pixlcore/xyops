@@ -5085,6 +5085,11 @@ Page.PageUtils = class PageUtils extends Page.Base {
 				"id": "algos",
 				"title": "Algorithms",
 				"icon": "dice-5-outline"
+			},
+			{
+				"id": "icons",
+				"title": "Icons",
+				"icon": "emoticon-happy-outline"
 			}
 		]);
 		
@@ -5114,11 +5119,17 @@ Page.PageUtils = class PageUtils extends Page.Base {
 			break;
 			
 			case 'algos':
-				items = config.ui.event_target_algo_menu;
+				items = config.ui.event_target_algo_menu.concat(
+					this.buildOptGroup( app.monitors, "Least Monitor Value:", 'chart-line', 'monitor:' )
+				);
 			break;
 			
 			case 'users':
 				items = app.users.map( function(user) { return { id: user.username, title: user.full_name, icon: user.icon || 'account' }; } );
+			break;
+			
+			case 'icons':
+				items = iconFontNames.map( function(name) { return { id: name, title: name, icon: name }; } );
 			break;
 			
 			default: 
