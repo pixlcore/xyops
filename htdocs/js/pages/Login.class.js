@@ -211,7 +211,7 @@ Page.Login = class Login extends Page.Base {
 		
 		setTimeout( function() {
 			$('#fe_login_new_password').focus();
-			$('#fe_login_new_password, #fe_login_verify_password').keypress( function(event) {
+			$('#fe_login_new_password, #fe_login_verify_password, #fe_login_old_password').keypress( function(event) {
 				if (event.keyCode == '13') { // enter key
 					event.preventDefault();
 					$P().doChangePassword();
