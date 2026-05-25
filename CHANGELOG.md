@@ -1,5 +1,17 @@
 # xyOps Changelog
 
+## Version v1.0.60
+
+> May 25, 2026
+
+- [`11ff41a9`](https://github.com/pixlcore/xyops/commit/11ff41a9c429809626124ddb8e6abbca8ef0b28a): Version 1.0.60
+	- Bump pixl-xyapp to v2.1.30 for CSS tweaks and a scrolling dialog popover fix in Safari.
+- [`7ee46c5b`](https://github.com/pixlcore/xyops/commit/7ee46c5b0d49b4588c624e4025916cf50baa85cd): Bug Fix: When rerunning a job, inherited actions and limits accumulate in the new job.
+- [`6aa2b5ee`](https://github.com/pixlcore/xyops/commit/6aa2b5eeeda3c72f63fafcc32cae16774cdef870): Feature: Number fields can now define a min/max range, and a step increment.
+- [`e97f35fb`](https://github.com/pixlcore/xyops/commit/e97f35fb6f21502729df41927011c708c6a9dafa): Feature: Improve param group separators, add optional captions, and play nicer with toolsets.
+- [`66c72e3b`](https://github.com/pixlcore/xyops/commit/66c72e3b8c3c34f5d1024e872a6b5b2287cd703e): Bug Fix: Login: Initial admin password reset form missing a keyboard handler on the current password field.
+- [`9856af46`](https://github.com/pixlcore/xyops/commit/9856af46cd9efe94e2943843e721514527d2b666): Plugins Doc: Add section on legacy shell plugin "data passthrough" feature.  Fixes #303.
+
 ## Version v1.0.59
 
 > May 23, 2026
