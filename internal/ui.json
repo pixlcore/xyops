@@ -593,6 +593,13 @@
 				"label": "Expression:",
 				"caption": "Enter the expression to evaluate using [XYEXP](#Docs/xyexp), e.g. `data.random > 0.5`.  If true, control will pass onto the next node."
 			},
+			"d_wfd_if_abort": {
+				"label": "Behavior:",
+				"caption": "Optionally abort the entire workflow if the expression evaluates to false."
+			},
+			"fe_wfd_if_abort": {
+				"label": "Abort on False"
+			},
 			"d_wfd_title": {
 				"label": "Custom Title:",
 				"caption": "Optionally enter a custom title for the node."

@@ -2145,7 +2145,7 @@ Page.Workflows = class Workflows extends Page.Events {
 			})
 		});
 		
-		// if expression
+		// decision expression
 		html += this.getFormRow({
 			id: 'd_wfd_if',
 			content: this.getFormText({
@@ -2157,6 +2157,15 @@ Page.Workflows = class Workflows extends Page.Events {
 				class: 'monospace',
 				value: node.data.decision || ''
 			}) + '<div class="text_field_icon mdi mdi-database-search-outline" title="' + config.ui.tooltips.wfd_exp_builder + '" onClick="$P().openExpressionBuilder(this)"></div>'
+		});
+		
+		// decision abort
+		html += this.getFormRow({
+			id: 'd_wfd_if_abort',
+			content: this.getFormCheckbox({
+				id: 'fe_wfd_if_abort',
+				checked: !!node.data.abort
+			})
 		});
 		
 		// custom title
@@ -2232,6 +2241,7 @@ Page.Workflows = class Workflows extends Page.Events {
 					node.data.label = strip_html( $('#fe_wfd_title').val() );
 					node.data.icon = $('#fe_wfd_icon').val();
 					node.data.decision = $('#fe_wfd_if').val().trim();
+					node.data.abort = $('#fe_wfd_if_abort').is(':checked');
 					if (!node.data.decision.length) return app.badField('#fe_wfd_if');
 				break;
 			} // switch type
@@ -2275,7 +2285,7 @@ Page.Workflows = class Workflows extends Page.Events {
 		// handle type change
 		var do_change_type = function() {
 			// show/hide sections based on type
-			$('#d_wfd_stagger, #d_wfd_wait, #d_wfd_repeat, #d_wfd_split, #d_wfd_split_filter, #d_wfd_if, #d_wfd_title, #d_wfd_icon, #d_wfd_continue').hide();
+			$('#d_wfd_stagger, #d_wfd_wait, #d_wfd_repeat, #d_wfd_split, #d_wfd_split_filter, #d_wfd_if, #d_wfd_if_abort, #d_wfd_title, #d_wfd_icon, #d_wfd_continue').hide();
 			
 			var type = $('#fe_wfd_type').val();
 			switch (type) {
@@ -2283,7 +2293,7 @@ Page.Workflows = class Workflows extends Page.Events {
 				case 'wait': $('#d_wfd_wait').show(); break;
 				case 'repeat': $('#d_wfd_repeat, #d_wfd_continue').show(); break;
 				case 'split': $('#d_wfd_split, #d_wfd_split_filter, #d_wfd_continue').show(); break;
-				case 'decision': $('#d_wfd_if, #d_wfd_title, #d_wfd_icon').show(); break;
+				case 'decision': $('#d_wfd_if, #d_wfd_if_abort, #d_wfd_title, #d_wfd_icon').show(); break;
 			}
 			
 			$('#d_wfd_desc .fr_content').html( '<span class="markdown-inline">' + inline_marked(config.ui.workflow_controller_descriptions[type]) + '</span>' );
