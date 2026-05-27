@@ -508,7 +508,7 @@ Page.ActivityLog = class ActivityLog extends Page.PageUtils {
 			} // action
 			
 			if (click) {
-				desc = `<button class="link" onClick="${click}">${desc}</button>`;
+				desc = `<a class="link" onClick="${click}">${desc}</a>`;
 			}
 			
 			var tds = [

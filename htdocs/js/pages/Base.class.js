@@ -271,8 +271,8 @@ Page.Base = class Base extends Page {
 				if (item.server) link = `$P().showGroupProcessInfo(${item.pid},'${item.server}')`;
 				else link = '$P().showProcessInfo(' + item.pid + ')';
 			}
-			html += '<button class="link" onClick="' + link + '" title="' + encode_attrib_entities(item.command) + '">';
-			html += icon + '<span>' + encode_entities(short_cmd) + '</span></button>';
+			html += '<a class="link" onClick="' + link + '" title="' + encode_attrib_entities(item.command) + '">';
+			html += icon + '<span>' + encode_entities(short_cmd) + '</span></a>';
 		}
 		else {
 			html += icon + encode_entities(short_cmd);

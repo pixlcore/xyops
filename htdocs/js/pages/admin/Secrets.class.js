@@ -559,7 +559,7 @@ Page.Secrets = class Secrets extends Page.PageUtils {
 			var links = [];
 			
 			if (self.fields) {
-				link = '<button class="link" onClick="$P().editVariable('+idx+')">' + encode_entities(item.name) + '</button>';
+				link = '<a class="link" onClick="$P().editVariable('+idx+')">' + encode_entities(item.name) + '</a>';
 				links.push( '<button class="link" onClick="$P().editVariable('+idx+')"><b>Edit</b></button>' );
 				links.push( '<button class="link danger" onClick="$P().deleteVariable('+idx+')"><b>Delete</b></button>' );
 			}

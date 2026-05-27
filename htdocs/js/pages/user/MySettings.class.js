@@ -591,7 +591,7 @@ Page.MySettings = class MySettings extends Page.Base {
 		html += this.getBasicGrid( grid_args, function(item, idx) {
 			var tds = [
 				'<span><i class="mdi mdi-' + ((item.page_id == 'Global') ? 'earth' : 'folder-open-outline') + '">&nbsp;</i>' + item.page_id + '</span>',
-				`<button class="link icon_pad" onClick="$P().doEditHotKey(this)" data-keyid="${item.id}"><i class="mdi mdi-keyboard-outline"></i><b>${item.title}</b></button>`,
+				`<a class="link icon_pad" onClick="$P().doEditHotKey(this)" data-keyid="${item.id}"><i class="mdi mdi-keyboard-outline"></i><b>${item.title}</b></a>`,
 				self.getNiceHotKeyList(item.keys, ' , ') || '&nbsp;',
 				item.edited ? '<i class="mdi mdi-checkbox-marked-outline"></i>' : '-',
 				`<button class="link" onClick="$P().doEditHotKey(this)" data-keyid="${item.id}"><b>Edit Keys</b></button>`

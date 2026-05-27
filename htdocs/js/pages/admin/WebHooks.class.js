@@ -867,7 +867,7 @@ Page.WebHooks = class WebHooks extends Page.PageUtils {
 			links.push( '<button class="link danger" onClick="$P().deleteHeader('+idx+')"><b>Delete</b></button>' );
 			
 			var tds = [
-				'<div class="td_big ellip monospace"><i class="mdi mdi-form-textbox">&nbsp;</i><button class="link" onClick="$P().editHeader('+idx+')">' + encode_entities(item.name) + '</button></div>',
+				'<div class="td_big ellip monospace"><i class="mdi mdi-form-textbox">&nbsp;</i><a class="link" onClick="$P().editHeader('+idx+')">' + encode_entities(item.name) + '</a></div>',
 				'<div class="ellip monospace">' + encode_entities(item.value) + '</div>',
 				'<div class="ellip">' + links.join(' | ') + '</div>'
 			];

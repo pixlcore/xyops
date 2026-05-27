@@ -307,7 +307,7 @@ Page.PageUtils = class PageUtils extends Page.Base {
 			}
 			
 			if (click) {
-				desc = `<button class="link" onClick="${click}">${desc}</button>`;
+				desc = `<a class="link" onClick="${click}">${desc}</a>`;
 				if (obj.revision) {
 					nice_rev = `<button class="link" onClick="${click}"><i class="mdi mdi-file-compare">&nbsp;</i><b>${obj.revision}</b></button>`;
 				}
@@ -4657,7 +4657,7 @@ Page.PageUtils = class PageUtils extends Page.Base {
 			
 			return [
 				'<div class="td_drag_handle" draggable="true" title="Drag to reorder"><i class="mdi mdi-menu"></i></div>',
-				'<div class="td_big nowrap"><button class="link" onClick="$P().editParam('+idx+')"><i class="mdi mdi-' + nice_label_icon + '"></i>' + item.title + '</button></div>',
+				'<div class="td_big nowrap ellip"><a class="link" onClick="$P().editParam('+idx+')"><i class="mdi mdi-' + nice_label_icon + '"></i>' + item.title + '</a></div>',
 				'<div class="ellip mono">' + nice_id + '</div>',
 				'<div class="ellip"><i class="mdi mdi-' + nice_icon + '">&nbsp;</i>' + nice_type + '</div>',
 				'<div class="ellip">' + pairs.join(', ') + '</div>',

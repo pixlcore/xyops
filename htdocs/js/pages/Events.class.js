@@ -1714,7 +1714,7 @@ Page.Events = class Events extends Page.PageUtils {
 			}
 			
 			if (click) {
-				desc = `<button class="link" onClick="${click}">${desc}</button>`;
+				desc = `<a class="link" onClick="${click}">${desc}</a>`;
 				if (item.event.revision) {
 					nice_rev = `<button class="link" onClick="${click}"><i class="mdi mdi-file-compare">&nbsp;</i><b>${item.event.revision}</b></button>`;
 				}
