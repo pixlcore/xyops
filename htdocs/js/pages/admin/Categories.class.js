@@ -234,7 +234,7 @@ Page.Categories = class Categories extends Page.PageUtils {
 		html += '<div class="box_buttons">';
 			html += '<div class="button phone_collapse" onClick="$P().cancel_category_edit()"><i class="mdi mdi-close-circle-outline">&nbsp;</i><span>Cancel</span></div>';
 			html += '<div class="button secondary phone_collapse" onClick="$P().do_export()"><i class="mdi mdi-cloud-download-outline">&nbsp;</i><span>Export...</span></div>';
-			html += '<div class="button primary" id="btn_save" onClick="$P().do_new_category()"><i class="mdi mdi-floppy">&nbsp;</i><span>Create Category</span></div>';
+			html += '<div class="button save" id="btn_save" onClick="$P().do_new_category()"><i class="mdi mdi-floppy">&nbsp;</i><span>Create Category</span></div>';
 		html += '</div>'; // box_buttons
 		
 		html += '</div>'; // box
@@ -245,10 +245,12 @@ Page.Categories = class Categories extends Page.PageUtils {
 		// MultiSelect.init( this.div.find('select[multiple]') );
 		$('#fe_ec_title').focus();
 		this.setupBoxButtonFloater();
+		this.setupEditTriggers();
 	}
 	
 	cancel_category_edit() {
 		// cancel editing category and return to list
+		$('.button.save').removeClass('primary');
 		Nav.go( '#Categories?sub=list' );
 	}
 	
@@ -270,6 +272,7 @@ Page.Categories = class Categories extends Page.PageUtils {
 		Dialog.hideProgress();
 		if (!this.active) return; // sanity
 		
+		$('.button.save').removeClass('primary');
 		Nav.go('Categories?sub=list');
 		app.showMessage('success', "The new category was created successfully.");
 	}
@@ -404,6 +407,7 @@ Page.Categories = class Categories extends Page.PageUtils {
 		Dialog.hideProgress();
 		if (!this.active) return; // sanity
 		
+		$('.button.save').removeClass('primary');
 		Nav.go('Categories?sub=list', 'force');
 		app.showMessage('success', "The event category &ldquo;" + this.category.title + "&rdquo; was deleted successfully.");
 	}
@@ -573,8 +577,15 @@ Page.Categories = class Categories extends Page.PageUtils {
 		if ((key == 'categories') && (this.args.sub == 'list')) this.gosub_list(this.args);
 	}
 	
-	onDeactivate() {
+	onDeactivate(new_id, anchor) {
 		// called when page is deactivated
+		
+		// check for changes on specific subs, with some sanity checks first
+		if (this.hasUnsavedChanges()) {
+			this.showNavLeaveConfirm( anchor );
+			return false;
+		}
+		
 		this.cleanupRevHistory();
 		this.cleanupBoxButtonFloater();
 		this.div.html( '' );

@@ -2972,8 +2972,8 @@ Page.Workflows = class Workflows extends Page.Events {
 		// called when page is deactivated
 		
 		// check for changes on specific subs, with some sanity checks first
-		if (this.args && String(this.args.sub).match(/^(new|edit)$/) && app.comm.socket && app.comm.socket.connected && $('.button.save').hasClass('primary')) {
-			this.showNavConfirm( anchor );
+		if (this.hasUnsavedChanges()) {
+			this.showNavLeaveConfirm( anchor );
 			return false;
 		}
 		

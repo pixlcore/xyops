@@ -242,7 +242,7 @@ Page.Groups = class Groups extends Page.ServerUtils {
 		html += '<div class="box_buttons">';
 			html += '<div class="button phone_collapse" onClick="$P().cancel_group_new()"><i class="mdi mdi-close-circle-outline">&nbsp;</i><span>Cancel</span></div>';
 			html += '<div class="button secondary phone_collapse" onClick="$P().do_export()"><i class="mdi mdi-cloud-download-outline">&nbsp;</i><span>Export...</span></div>';
-			html += '<div class="button primary" id="btn_save" onClick="$P().do_new_group()"><i class="mdi mdi-floppy">&nbsp;</i><span>Create Group</span></div>';
+			html += '<div class="button save" id="btn_save" onClick="$P().do_new_group()"><i class="mdi mdi-floppy">&nbsp;</i><span>Create Group</span></div>';
 		html += '</div>'; // box_buttons
 		
 		html += '</div>'; // box
@@ -252,10 +252,12 @@ Page.Groups = class Groups extends Page.ServerUtils {
 		SingleSelect.init( this.div.find('#fe_eg_icon, #fe_eg_web_hook') );
 		$('#fe_eg_title').focus();
 		this.setupBoxButtonFloater();
+		this.setupEditTriggers();
 	}
 	
 	cancel_group_new() {
 		// cancel editing group and return to list
+		$('.button.save').removeClass('primary');
 		Nav.go( '#Groups?sub=list' );
 	}
 	
@@ -277,6 +279,7 @@ Page.Groups = class Groups extends Page.ServerUtils {
 		Dialog.hideProgress();
 		if (!this.active) return; // sanity
 		
+		$('.button.save').removeClass('primary');
 		Nav.go('Groups?sub=list');
 		app.showMessage('success', "The new group was created successfully.");
 	}
@@ -358,6 +361,7 @@ Page.Groups = class Groups extends Page.ServerUtils {
 	
 	cancel_group_edit() {
 		// cancel editing group and return to view
+		$('.button.save').removeClass('primary');
 		Nav.go( '#Groups?sub=view&id=' + this.group.id );
 	}
 	
@@ -410,6 +414,7 @@ Page.Groups = class Groups extends Page.ServerUtils {
 		Dialog.hideProgress();
 		if (!this.active) return; // sanity
 		
+		$('.button.save').removeClass('primary');
 		Nav.go('Groups?sub=list', 'force');
 		app.showMessage('success', "The server group &ldquo;" + this.group.title + "&rdquo; was deleted successfully.");
 	}
@@ -1772,8 +1777,15 @@ Page.Groups = class Groups extends Page.ServerUtils {
 		}
 	}
 	
-	onDeactivate() {
+	onDeactivate(new_id, anchor) {
 		// called when page is deactivated
+		
+		// check for changes on specific subs, with some sanity checks first
+		if (this.hasUnsavedChanges()) {
+			this.showNavLeaveConfirm( anchor );
+			return false;
+		}
+		
 		delete this.visibleServerIDs;
 		delete this.serverQueue;
 		delete this.monitors;

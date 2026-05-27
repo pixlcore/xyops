@@ -202,7 +202,7 @@ Page.Users = class Users extends Page.PageUtils {
 		// buttons at bottom
 		html += '<div class="box_buttons">';
 			html += '<div class="button phone_collapse" onClick="$P().cancel_user_edit()"><i class="mdi mdi-close-circle-outline">&nbsp;</i><span>Cancel</span></div>';
-			html += '<div class="button primary" id="btn_save" onClick="$P().do_new_user()"><i class="mdi mdi-floppy">&nbsp;</i><span>Create User</span></div>';
+			html += '<div class="button save" id="btn_save" onClick="$P().do_new_user()"><i class="mdi mdi-floppy">&nbsp;</i><span>Create User</span></div>';
 		html += '</div>'; // box_buttons
 		
 		html += '</div>'; // box
@@ -213,10 +213,12 @@ Page.Users = class Users extends Page.PageUtils {
 		MultiSelect.init( this.div.find('select[multiple]') );
 		$('#fe_eu_username').focus();
 		this.setupBoxButtonFloater();
+		this.setupEditTriggers();
 	}
 	
 	cancel_user_edit() {
 		// cancel editing user and return to list
+		$('.button.save').removeClass('primary');
 		Nav.go( 'Users?sub=list' );
 	}
 	
@@ -259,7 +261,7 @@ Page.Users = class Users extends Page.PageUtils {
 		Dialog.hideProgress();
 		if (!this.active) return; // sanity
 		
-		// Nav.go('Users?sub=edit&username=' + this.user.username);
+		$('.button.save').removeClass('primary');
 		Nav.go( 'Users?sub=list' );
 		
 		app.showMessage('success', "The new user account was created successfully.");
@@ -393,6 +395,7 @@ Page.Users = class Users extends Page.PageUtils {
 		Dialog.hideProgress();
 		if (!this.active) return; // sanity
 		
+		$('.button.save').removeClass('primary');
 		Nav.go('Users?sub=list', 'force');
 		app.showMessage('success', "The user account &ldquo;" + this.user.username + "&rdquo; was deleted successfully.");
 	}
@@ -663,8 +666,15 @@ Page.Users = class Users extends Page.PageUtils {
 		// if ((key == 'users') && (this.args.sub == 'list')) this.gosub_list(this.args);
 	}
 	
-	onDeactivate() {
+	onDeactivate(new_id, anchor) {
 		// called when page is deactivated
+		
+		// check for changes on specific subs, with some sanity checks first
+		if (this.hasUnsavedChanges()) {
+			this.showNavLeaveConfirm( anchor );
+			return false;
+		}
+		
 		this.cleanupBoxButtonFloater();
 		this.div.html( '' );
 		return true;

@@ -213,7 +213,7 @@ Page.AlertSetup = class AlertSetup extends Page.PageUtils {
 			html += '<div class="button phone_collapse" onClick="$P().cancel_alert_edit()"><i class="mdi mdi-close-circle-outline">&nbsp;</i><span>Cancel</span></div>';
 			html += '<div class="button secondary phone_collapse" onClick="$P().do_test_alert()"><i class="mdi mdi-test-tube">&nbsp;</i><span>Test...</span></div>';
 			html += '<div class="button secondary phone_collapse" onClick="$P().do_export()"><i class="mdi mdi-cloud-download-outline">&nbsp;</i><span>Export...</span></div>';
-			html += '<div class="button primary" id="btn_save" onClick="$P().do_new_alert()"><i class="mdi mdi-floppy">&nbsp;</i><span>Create Alert</span></div>';
+			html += '<div class="button save" id="btn_save" onClick="$P().do_new_alert()"><i class="mdi mdi-floppy">&nbsp;</i><span>Create Alert</span></div>';
 		html += '</div>'; // box_buttons
 		
 		html += '</div>'; // box
@@ -226,10 +226,12 @@ Page.AlertSetup = class AlertSetup extends Page.PageUtils {
 		$('#fe_ea_title').focus();
 		this.setupBoxButtonFloater();
 		this.setupEditor('text/plain');
+		this.setupEditTriggers();
 	}
 	
 	cancel_alert_edit() {
 		// cancel editing alert and return to list
+		$('.button.save').removeClass('primary');
 		Nav.go( '#AlertSetup?sub=list' );
 	}
 	
@@ -251,6 +253,7 @@ Page.AlertSetup = class AlertSetup extends Page.PageUtils {
 		Dialog.hideProgress();
 		if (!this.active) return; // sanity
 		
+		$('.button.save').removeClass('primary');
 		Nav.go('#AlertSetup?sub=list');
 		app.showMessage('success', "The new alert was created successfully.");
 	}
@@ -332,6 +335,7 @@ Page.AlertSetup = class AlertSetup extends Page.PageUtils {
 		delete clone.username;
 		
 		this.clone = clone;
+		$('.button.save').removeClass('primary');
 		Nav.go('AlertSetup?sub=new');
 	}
 	
@@ -394,6 +398,7 @@ Page.AlertSetup = class AlertSetup extends Page.PageUtils {
 		Dialog.hideProgress();
 		if (!this.active) return; // sanity
 		
+		$('.button.save').removeClass('primary');
 		Nav.go('#AlertSetup?sub=list', 'force');
 		app.showMessage('success', "The alert &ldquo;" + this.alert.title + "&rdquo; was deleted successfully.");
 	}
@@ -760,8 +765,15 @@ Page.AlertSetup = class AlertSetup extends Page.PageUtils {
 		this.handleEditorThemeChange(theme);
 	}
 	
-	onDeactivate() {
+	onDeactivate(new_id, anchor) {
 		// called when page is deactivated
+		
+		// check for changes on specific subs, with some sanity checks first
+		if (this.hasUnsavedChanges()) {
+			this.showNavLeaveConfirm( anchor );
+			return false;
+		}
+		
 		delete this.alert;
 		delete this.actions;
 		

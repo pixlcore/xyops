@@ -163,7 +163,7 @@ Page.Tags = class Tags extends Page.PageUtils {
 		html += '<div class="box_buttons">';
 			html += '<div class="button phone_collapse" onClick="$P().cancel_tag_edit()"><i class="mdi mdi-close-circle-outline">&nbsp;</i><span>Cancel</span></div>';
 			html += '<div class="button secondary phone_collapse" onClick="$P().do_export()"><i class="mdi mdi-cloud-download-outline">&nbsp;</i><span>Export...</span></div>';
-			html += '<div class="button primary" id="btn_save" onClick="$P().do_new_tag()"><i class="mdi mdi-tag-plus-outline">&nbsp;</i><span>Create Tag</span></div>';
+			html += '<div class="button save" id="btn_save" onClick="$P().do_new_tag()"><i class="mdi mdi-tag-plus-outline">&nbsp;</i><span>Create Tag</span></div>';
 		html += '</div>'; // box_buttons
 		
 		html += '</div>'; // box
@@ -173,10 +173,12 @@ Page.Tags = class Tags extends Page.PageUtils {
 		$('#fe_et_title').focus();
 		SingleSelect.init( this.div.find('#fe_et_icon') );
 		this.setupBoxButtonFloater();
+		this.setupEditTriggers();
 	}
 	
 	cancel_tag_edit() {
 		// cancel editing tag and return to list
+		$('.button.save').removeClass('primary');
 		Nav.go( '#Tags?sub=list' );
 	}
 	
@@ -198,6 +200,7 @@ Page.Tags = class Tags extends Page.PageUtils {
 		Dialog.hideProgress();
 		if (!this.active) return; // sanity
 		
+		$('.button.save').removeClass('primary');
 		Nav.go('Tags?sub=list');
 		app.showMessage('success', "The new tag was created successfully.");
 	}
@@ -316,6 +319,7 @@ Page.Tags = class Tags extends Page.PageUtils {
 		Dialog.hideProgress();
 		if (!this.active) return; // sanity
 		
+		$('.button.save').removeClass('primary');
 		Nav.go('Tags?sub=list', 'force');
 		app.showMessage('success', "The tag &ldquo;" + this.tag.title + "&rdquo; was deleted successfully.");
 	}
@@ -399,8 +403,15 @@ Page.Tags = class Tags extends Page.PageUtils {
 		if ((key == 'tags') && (this.args.sub == 'list')) this.gosub_list(this.args);
 	}
 	
-	onDeactivate() {
+	onDeactivate(new_id, anchor) {
 		// called when page is deactivated
+		
+		// check for changes on specific subs, with some sanity checks first
+		if (this.hasUnsavedChanges()) {
+			this.showNavLeaveConfirm( anchor );
+			return false;
+		}
+		
 		this.cleanupRevHistory();
 		this.cleanupBoxButtonFloater();
 		this.div.html( '' );

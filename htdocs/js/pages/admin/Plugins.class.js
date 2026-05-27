@@ -263,7 +263,7 @@ Page.Plugins = class Plugins extends Page.PageUtils {
 		html += '<div class="box_buttons">';
 			html += '<div class="button phone_collapse" onClick="$P().cancel_plugin_edit()"><i class="mdi mdi-close-circle-outline">&nbsp;</i><span>Cancel</span></div>';
 			html += '<div class="button secondary phone_collapse" onClick="$P().do_export()"><i class="mdi mdi-cloud-download-outline">&nbsp;</i><span>Export...</span></div>';
-			html += '<div class="button primary" id="btn_save" onClick="$P().do_new_plugin()"><i class="mdi mdi-floppy">&nbsp;</i><span>Create Plugin</span></div>';
+			html += '<div class="button save" id="btn_save" onClick="$P().do_new_plugin()"><i class="mdi mdi-floppy">&nbsp;</i><span>Create Plugin</span></div>';
 		html += '</div>'; // box_buttons
 		
 		html += '</div>'; // box
@@ -277,10 +277,12 @@ Page.Plugins = class Plugins extends Page.PageUtils {
 		this.setPluginType();
 		this.renderParamEditor();
 		this.setupBoxButtonFloater();
+		this.setupEditTriggers();
 	}
 	
 	cancel_plugin_edit() {
 		// cancel editing plugin and return to list
+		$('.button.save').removeClass('primary');
 		Nav.go( '#Plugins?sub=list' );
 	}
 	
@@ -302,6 +304,7 @@ Page.Plugins = class Plugins extends Page.PageUtils {
 		Dialog.hideProgress();
 		if (!this.active) return; // sanity
 		
+		$('.button.save').removeClass('primary');
 		Nav.go('Plugins?sub=list');
 		app.showMessage('success', "The new plugin was created successfully.");
 	}
@@ -867,6 +870,7 @@ Page.Plugins = class Plugins extends Page.PageUtils {
 		delete clone.stock;
 		
 		this.clone = clone;
+		$('.button.save').removeClass('primary');
 		Nav.go('Plugins?sub=new');
 	}
 	
@@ -1007,6 +1011,7 @@ Page.Plugins = class Plugins extends Page.PageUtils {
 		Dialog.hideProgress();
 		if (!this.active) return; // sanity
 		
+		$('.button.save').removeClass('primary');
 		Nav.go('Plugins?sub=list', 'force');
 		app.showMessage('success', "The " + this.plugin.type + " plugin &ldquo;" + this.plugin.title + "&rdquo; was deleted successfully.");
 	}
@@ -1330,8 +1335,15 @@ Page.Plugins = class Plugins extends Page.PageUtils {
 		if ((key == 'plugins') && (this.args.sub == 'list')) this.gosub_list(this.args);
 	}
 	
-	onDeactivate() {
+	onDeactivate(new_id, anchor) {
 		// called when page is deactivated
+		
+		// check for changes on specific subs, with some sanity checks first
+		if (this.hasUnsavedChanges()) {
+			this.showNavLeaveConfirm( anchor );
+			return false;
+		}
+		
 		delete this.plugins;
 		delete this.plugin;
 		delete this.params;

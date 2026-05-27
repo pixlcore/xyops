@@ -691,7 +691,7 @@ Page.Tickets = class Tickets extends Page.PageUtils {
 		// buttons at bottom
 		html += '<div class="box_buttons">';
 			html += '<div class="button" onClick="$P().cancel_ticket_edit()">Cancel</div>';
-			html += '<div class="button primary" onClick="$P().do_new_ticket()"><i class="mdi mdi-floppy">&nbsp;</i>Create Ticket</div>';
+			html += '<div class="button save" onClick="$P().do_new_ticket()"><i class="mdi mdi-floppy">&nbsp;</i>Create Ticket</div>';
 		html += '</div>'; // box_buttons
 		
 		html += '</div>'; // box
@@ -699,6 +699,7 @@ Page.Tickets = class Tickets extends Page.PageUtils {
 		this.div.html( html ).buttonize();
 		this.setup_dynamic_elements();
 		this.setupBoxButtonFloater();
+		this.setupEditTriggers();
 		
 		$('#fe_nt_subject').focus();
 		
@@ -707,6 +708,7 @@ Page.Tickets = class Tickets extends Page.PageUtils {
 	
 	cancel_ticket_edit() {
 		// cancel editing ticket and return to new
+		$('.button.save').removeClass('primary');
 		if (this.args.sub == 'new') Nav.go('#Tickets');
 		else Nav.go( '#Tickets?sub=new', 'force' );
 	}
@@ -732,6 +734,7 @@ Page.Tickets = class Tickets extends Page.PageUtils {
 		this.ticket.created = this.ticket.modified = time_now();
 		
 		// Note: We MUST nav to the ticket id here, as the rest is being indexed in the background
+		$('.button.save').removeClass('primary');
 		Nav.go('Tickets?id=' + this.ticket.id);
 		app.showMessage('success', "The new ticket was created successfully.");
 	}
@@ -755,6 +758,7 @@ Page.Tickets = class Tickets extends Page.PageUtils {
 		
 		app.cacheBust = hires_time_now();
 		
+		$('.button.save').removeClass('primary');
 		if (this.args.sub == 'search') Nav.go( this.selfNav({}), 'force' );
 		else Nav.go('Tickets', 'force');
 		
@@ -1993,7 +1997,7 @@ Page.Tickets = class Tickets extends Page.PageUtils {
 		// buttons at bottom
 		html += '<div class="box_buttons compact">';
 			html += '<div class="button" onClick="$P().close_current_editor()">Cancel</div>';
-			html += '<div class="button primary" onClick="$P().save_main_body_editor()"><i class="mdi mdi-floppy">&nbsp;</i>Save Changes</div>';
+			html += '<div class="button save" onClick="$P().save_main_body_editor()"><i class="mdi mdi-floppy">&nbsp;</i>Save Changes</div>';
 		html += '</div>'; // box_buttons
 		
 		this.div.find('#d_ticket_main_body').hide();
@@ -2004,6 +2008,8 @@ Page.Tickets = class Tickets extends Page.PageUtils {
 		this.editor.setSize( null, '65vh' );
 		
 		this.current_editor_type = 'main';
+		
+		this.setupEditTriggers( this.div.find('#d_ticket_main_editor') );
 	}
 	
 	save_main_body_editor() {
@@ -2261,7 +2267,7 @@ Page.Tickets = class Tickets extends Page.PageUtils {
 		// buttons at bottom
 		html += '<div class="box_buttons compact">';
 			html += '<div class="button" onClick="$P().close_current_editor()">Cancel</div>';
-			html += '<div class="button primary" onClick="$P().do_save_comment()"><i class="mdi mdi-floppy">&nbsp;</i>Save Changes</div>';
+			html += '<div class="button save" onClick="$P().do_save_comment()"><i class="mdi mdi-floppy">&nbsp;</i>Save Changes</div>';
 		html += '</div>'; // box_buttons
 		
 		html += '</div>'; // box
@@ -2277,6 +2283,8 @@ Page.Tickets = class Tickets extends Page.PageUtils {
 		this.current_editor_type = 'edit_comment';
 		
 		this.div.find('#d_ticket_comment_editor')[0].scrollIntoViewIfNeeded();
+		
+		this.setupEditTriggers( this.div.find('#d_ticket_comment_editor') );
 	}
 	
 	do_save_comment() {
@@ -2385,7 +2393,7 @@ Page.Tickets = class Tickets extends Page.PageUtils {
 		// buttons at bottom
 		html += '<div class="box_buttons compact">';
 			html += '<div class="button" onClick="$P().close_current_editor()">Cancel</div>';
-			html += '<div class="button primary" onClick="$P().do_add_comment()"><i class="mdi mdi-comment-plus">&nbsp;</i>Add Comment</div>';
+			html += '<div class="button save" onClick="$P().do_add_comment()"><i class="mdi mdi-comment-plus">&nbsp;</i>Add Comment</div>';
 		html += '</div>'; // box_buttons
 		
 		html += '</div>'; // box
@@ -2402,6 +2410,8 @@ Page.Tickets = class Tickets extends Page.PageUtils {
 		
 		// scroll to bottom
 		$(document).scrollTop( this.div.find('#d_ticket_add_comment_editor').offset().top );
+		
+		this.setupEditTriggers( this.div.find('#d_ticket_add_comment_editor') );
 	}
 	
 	do_add_comment() {
@@ -2697,8 +2707,14 @@ Page.Tickets = class Tickets extends Page.PageUtils {
 		}
 	}
 	
-	onDeactivate() {
+	onDeactivate(new_id, anchor) {
 		// called when page is deactivated
+		
+		// check for changes on specific subs, with some sanity checks first
+		if (this.args && String(this.args.sub).match(/^(new|view)$/) && app.comm.socket && app.comm.socket.connected && $('.button.save').hasClass('primary')) {
+			this.showNavLeaveConfirm( anchor );
+			return false;
+		}
 		
 		// this.killEditor();
 		this.close_current_editor();

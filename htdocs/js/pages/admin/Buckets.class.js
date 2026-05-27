@@ -202,7 +202,7 @@ Page.Buckets = class Buckets extends Page.PageUtils {
 		html += '<div class="box_buttons">';
 			html += '<div class="button phone_collapse" onClick="$P().cancel_bucket_edit()"><i class="mdi mdi-close-circle-outline">&nbsp;</i><span>Cancel</span></div>';
 			html += '<div class="button secondary phone_collapse" onClick="$P().do_export()"><i class="mdi mdi-cloud-download-outline">&nbsp;</i><span>Export...</span></div>';
-			html += '<div class="button primary" id="btn_save" onClick="$P().do_new_bucket()"><i class="mdi mdi-floppy">&nbsp;</i><span>Create Bucket</span></div>';
+			html += '<div class="button save" id="btn_save" onClick="$P().do_new_bucket()"><i class="mdi mdi-floppy">&nbsp;</i><span>Create Bucket</span></div>';
 		html += '</div>'; // box_buttons
 		
 		html += '</div>'; // box
@@ -214,10 +214,12 @@ Page.Buckets = class Buckets extends Page.PageUtils {
 		// this.updateAddRemoveMe('#fe_bu_email');
 		$('#fe_bu_title').focus();
 		this.setupBoxButtonFloater();
+		this.setupEditTriggers();
 	}
 	
 	cancel_bucket_edit() {
 		// cancel editing bucket and return to list
+		$('.button.save').removeClass('primary');
 		Nav.go( '#Buckets?sub=list' );
 	}
 	
@@ -239,6 +241,7 @@ Page.Buckets = class Buckets extends Page.PageUtils {
 		Dialog.hideProgress();
 		if (!this.active) return; // sanity
 		
+		$('.button.save').removeClass('primary');
 		Nav.go('Buckets?sub=list');
 		app.showMessage('success', "The new bucket was created successfully.");
 	}
@@ -368,6 +371,7 @@ Page.Buckets = class Buckets extends Page.PageUtils {
 		Dialog.hideProgress();
 		if (!this.active) return; // sanity
 		
+		$('.button.save').removeClass('primary');
 		Nav.go('Buckets?sub=list', 'force');
 		app.showMessage('success', "The bucket &ldquo;" + this.bucket.title + "&rdquo; was deleted successfully.");
 	}
@@ -664,8 +668,15 @@ Page.Buckets = class Buckets extends Page.PageUtils {
 		if ((key == 'buckets') && (this.args.sub == 'list')) this.gosub_list(this.args);
 	}
 	
-	onDeactivate() {
+	onDeactivate(new_id, anchor) {
 		// called when page is deactivated
+		
+		// check for changes on specific subs, with some sanity checks first
+		if (this.hasUnsavedChanges()) {
+			this.showNavLeaveConfirm( anchor );
+			return false;
+		}
+		
 		this.cleanupRevHistory();
 		this.cleanupBoxButtonFloater();
 		this.div.html( '' );

@@ -216,7 +216,7 @@ Page.Monitors = class Monitors extends Page.PageUtils {
 			html += '<div class="button phone_collapse" onClick="$P().cancel_monitor_edit()"><i class="mdi mdi-close-circle-outline">&nbsp;</i><span>Cancel</span></div>';
 			html += '<div class="button secondary phone_collapse" onClick="$P().do_test_monitor()"><i class="mdi mdi-test-tube">&nbsp;</i><span>Test...</span></div>';
 			html += '<div class="button secondary phone_collapse" onClick="$P().do_export()"><i class="mdi mdi-cloud-download-outline">&nbsp;</i><span>Export...</span></div>';
-			html += '<div class="button primary" id="btn_save" onClick="$P().do_new_monitor()"><i class="mdi mdi-floppy">&nbsp;</i><span>Create Monitor</span></div>';
+			html += '<div class="button save" id="btn_save" onClick="$P().do_new_monitor()"><i class="mdi mdi-floppy">&nbsp;</i><span>Create Monitor</span></div>';
 		html += '</div>'; // box_buttons
 		
 		html += '</div>'; // box
@@ -227,10 +227,12 @@ Page.Monitors = class Monitors extends Page.PageUtils {
 		MultiSelect.init( this.div.find('select[multiple]') );
 		$('#fe_em_title').focus();
 		this.setupBoxButtonFloater();
+		this.setupEditTriggers();
 	}
 	
 	cancel_monitor_edit() {
 		// cancel editing monitor and return to list
+		$('.button.save').removeClass('primary');
 		Nav.go( '#Monitors?sub=list' );
 	}
 	
@@ -252,6 +254,7 @@ Page.Monitors = class Monitors extends Page.PageUtils {
 		Dialog.hideProgress();
 		if (!this.active) return; // sanity
 		
+		$('.button.save').removeClass('primary');
 		Nav.go('Monitors?sub=list');
 		app.showMessage('success', "The new monitor was created successfully.");
 	}
@@ -329,6 +332,7 @@ Page.Monitors = class Monitors extends Page.PageUtils {
 		delete clone.username;
 		
 		this.clone = clone;
+		$('.button.save').removeClass('primary');
 		Nav.go('Monitors?sub=new');
 	}
 	
@@ -391,6 +395,7 @@ Page.Monitors = class Monitors extends Page.PageUtils {
 		Dialog.hideProgress();
 		if (!this.active) return; // sanity
 		
+		$('.button.save').removeClass('primary');
 		Nav.go('Monitors?sub=list', 'force');
 		app.showMessage('success', "The monitor &ldquo;" + this.monitor.title + "&rdquo; was deleted successfully.");
 	}
@@ -714,8 +719,15 @@ Page.Monitors = class Monitors extends Page.PageUtils {
 		if ((key == 'monitors') && (this.args.sub == 'list')) this.gosub_list(this.args);
 	}
 	
-	onDeactivate() {
+	onDeactivate(new_id, anchor) {
 		// called when page is deactivated
+		
+		// check for changes on specific subs, with some sanity checks first
+		if (this.hasUnsavedChanges()) {
+			this.showNavLeaveConfirm( anchor );
+			return false;
+		}
+		
 		this.cleanupRevHistory();
 		this.cleanupBoxButtonFloater();
 		this.div.html( '' );

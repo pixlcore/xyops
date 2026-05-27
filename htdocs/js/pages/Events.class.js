@@ -4284,23 +4284,12 @@ Page.Events = class Events extends Page.PageUtils {
 		}
 	}
 	
-	showNavConfirm(anchor) {
-		// show confirmation dialog before leaving page
-		var text = `You have unsaved changes on the current page.  Are you sure you want to leave and abandon them?`;
-		
-		Dialog.confirmDanger( 'Unsaved Changes', text, ['check-circle', 'Leave'], function(result) {
-			if (!result) return;
-			$('.button.save').removeClass('primary');
-			Nav.go(anchor);
-		} ); // confirm
-	}
-	
 	onDeactivate(new_id, anchor) {
 		// called when page is deactivated
 		
 		// check for changes on specific subs, with some sanity checks first
-		if (this.args && String(this.args.sub).match(/^(new|edit)$/) && app.comm.socket && app.comm.socket.connected && $('.button.save').hasClass('primary')) {
-			this.showNavConfirm( anchor );
+		if (this.hasUnsavedChanges()) {
+			this.showNavLeaveConfirm( anchor );
 			return false;
 		}
 		

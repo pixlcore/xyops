@@ -219,7 +219,7 @@ Page.Secrets = class Secrets extends Page.PageUtils {
 		html += '<div class="box_buttons">';
 			html += '<div class="button phone_collapse" onClick="$P().cancel_secret_edit()"><i class="mdi mdi-close-circle-outline">&nbsp;</i><span>Cancel</span></div>';
 			// html += '<div class="button secondary phone_collapse" onClick="$P().do_export()"><i class="mdi mdi-cloud-download-outline">&nbsp;</i><span>Export...</span></div>';
-			html += '<div class="button primary" id="btn_save" onClick="$P().do_new_secret()"><i class="mdi mdi-floppy">&nbsp;</i><span>Create Vault</span></div>';
+			html += '<div class="button save" id="btn_save" onClick="$P().do_new_secret()"><i class="mdi mdi-floppy">&nbsp;</i><span>Create Vault</span></div>';
 		html += '</div>'; // box_buttons
 		
 		html += '</div>'; // box
@@ -231,10 +231,12 @@ Page.Secrets = class Secrets extends Page.PageUtils {
 		// this.updateAddRemoveMe('#fe_se_email');
 		$('#fe_se_title').focus();
 		this.setupBoxButtonFloater();
+		this.setupEditTriggers();
 	}
 	
 	cancel_secret_edit() {
 		// cancel editing secret and return to list
+		$('.button.save').removeClass('primary');
 		Nav.go( '#Secrets?sub=list' );
 	}
 	
@@ -256,6 +258,7 @@ Page.Secrets = class Secrets extends Page.PageUtils {
 		Dialog.hideProgress();
 		if (!this.active) return; // sanity
 		
+		$('.button.save').removeClass('primary');
 		Nav.go('Secrets?sub=list');
 		app.showMessage('success', "The new secret vault was created successfully.");
 	}
@@ -367,6 +370,7 @@ Page.Secrets = class Secrets extends Page.PageUtils {
 		Dialog.hideProgress();
 		if (!this.active) return; // sanity
 		
+		$('.button.save').removeClass('primary');
 		Nav.go('Secrets?sub=list', 'force');
 		app.showMessage('success', "The secret vault &ldquo;" + this.secret.title + "&rdquo; was deleted successfully.");
 	}
@@ -708,8 +712,15 @@ Page.Secrets = class Secrets extends Page.PageUtils {
 		if ((key == 'secrets') && (this.args.sub == 'list')) this.gosub_list(this.args);
 	}
 	
-	onDeactivate() {
+	onDeactivate(new_id, anchor) {
 		// called when page is deactivated
+		
+		// check for changes on specific subs, with some sanity checks first
+		if (this.hasUnsavedChanges()) {
+			this.showNavLeaveConfirm( anchor );
+			return false;
+		}
+		
 		this.cleanupRevHistory();
 		this.cleanupBoxButtonFloater();
 		this.div.html( '' );

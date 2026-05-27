@@ -38,6 +38,25 @@ Page.PageUtils = class PageUtils extends Page.Base {
 		$('.button.cancel').attr('id', 'btn_close');
 	}
 	
+	hasUnsavedChanges() {
+		// return true if current page has unsaved changes
+		if (this.args && String(this.args.sub).match(/^(new|edit)$/) && app.comm.socket && app.comm.socket.connected && $('.button.save').hasClass('primary')) {
+			return true;
+		}
+		return false;
+	}
+	
+	showNavLeaveConfirm(anchor) {
+		// show confirmation dialog before leaving page
+		var text = `You have unsaved changes on the current page.  Are you sure you want to leave and discard them?`;
+		
+		Dialog.confirmDanger( 'Discard Unsaved Changes?', text, ['trash-can', 'Discard'], function(result) {
+			if (!result) return;
+			$('.button.save').removeClass('primary');
+			Nav.go(anchor);
+		} ); // confirm
+	}
+	
 	goRevisionHistory(opts) {
 		// jump intp revision history view for parent page
 		var self = this;

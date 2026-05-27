@@ -339,7 +339,7 @@ Page.WebHooks = class WebHooks extends Page.PageUtils {
 			html += '<div class="button mobile_collapse" onClick="$P().cancel_web_hook_edit()"><i class="mdi mdi-close-circle-outline">&nbsp;</i><span>Cancel</span></div>';
 			html += '<div class="button secondary mobile_collapse" onClick="$P().do_test_web_hook()"><i class="mdi mdi-test-tube">&nbsp;</i><span>Test...</span></div>';
 			html += '<div class="button secondary mobile_collapse" onClick="$P().do_export()"><i class="mdi mdi-cloud-download-outline">&nbsp;</i><span>Export...</span></div>';
-			html += '<div class="button primary phone_collapse" id="btn_save" onClick="$P().do_new_web_hook()"><i class="mdi mdi-floppy">&nbsp;</i><span>Create Web Hook</span></div>';
+			html += '<div class="button save phone_collapse" id="btn_save" onClick="$P().do_new_web_hook()"><i class="mdi mdi-floppy">&nbsp;</i><span>Create Web Hook</span></div>';
 		html += '</div>'; // box_buttons
 		
 		html += '</div>'; // box
@@ -353,10 +353,12 @@ Page.WebHooks = class WebHooks extends Page.PageUtils {
 		$('#fe_ewh_title').focus();
 		this.setupBoxButtonFloater();
 		this.setupEditor();
+		this.setupEditTriggers();
 	}
 	
 	cancel_web_hook_edit() {
 		// cancel editing web hook and return to list
+		$('.button.save').removeClass('primary');
 		Nav.go( '#WebHooks?sub=list' );
 	}
 	
@@ -378,6 +380,7 @@ Page.WebHooks = class WebHooks extends Page.PageUtils {
 		Dialog.hideProgress();
 		if (!this.active) return; // sanity
 		
+		$('.button.save').removeClass('primary');
 		Nav.go('WebHooks?sub=list');
 		app.showMessage('success', "The new web hook was created successfully.");
 	}
@@ -463,6 +466,7 @@ Page.WebHooks = class WebHooks extends Page.PageUtils {
 		delete clone.username;
 		
 		this.clone = clone;
+		$('.button.save').removeClass('primary');
 		Nav.go('WebHooks?sub=new');
 	}
 	
@@ -645,6 +649,7 @@ Page.WebHooks = class WebHooks extends Page.PageUtils {
 		Dialog.hideProgress();
 		if (!this.active) return; // sanity
 		
+		$('.button.save').removeClass('primary');
 		Nav.go('WebHooks?sub=list', 'force');
 		app.showMessage('success', "The web hook &ldquo;" + this.web_hook.title + "&rdquo; was deleted successfully.");
 	}
@@ -998,8 +1003,15 @@ Page.WebHooks = class WebHooks extends Page.PageUtils {
 		if ((key == 'web_hooks') && (this.args.sub == 'list')) this.gosub_list(this.args);
 	}
 	
-	onDeactivate() {
+	onDeactivate(new_id, anchor) {
 		// called when page is deactivated
+		
+		// check for changes on specific subs, with some sanity checks first
+		if (this.hasUnsavedChanges()) {
+			this.showNavLeaveConfirm( anchor );
+			return false;
+		}
+		
 		this.killEditor();
 		this.cleanupRevHistory();
 		this.cleanupBoxButtonFloater();

@@ -180,7 +180,7 @@ Page.Roles = class Roles extends Page.PageUtils {
 		html += '<div class="box_buttons">';
 			html += '<div class="button phone_collapse" onClick="$P().cancel_role_edit()"><i class="mdi mdi-close-circle-outline">&nbsp;</i><span>Cancel</span></div>';
 			html += '<div class="button secondary phone_collapse" onClick="$P().do_export()"><i class="mdi mdi-cloud-download-outline">&nbsp;</i><span>Export...</span></div>';
-			html += '<div class="button primary" id="btn_save" onClick="$P().do_new_role()"><i class="mdi mdi-floppy">&nbsp;</i><span>Create Role</span></div>';
+			html += '<div class="button save" id="btn_save" onClick="$P().do_new_role()"><i class="mdi mdi-floppy">&nbsp;</i><span>Create Role</span></div>';
 		html += '</div>'; // box_buttons
 		
 		html += '</div>'; // box
@@ -191,10 +191,12 @@ Page.Roles = class Roles extends Page.PageUtils {
 		SingleSelect.init( this.div.find('#fe_ur_icon') );
 		$('#fe_ur_title').focus();
 		this.setupBoxButtonFloater();
+		this.setupEditTriggers();
 	}
 	
 	cancel_role_edit() {
 		// cancel editing role and return to list
+		$('.button.save').removeClass('primary');
 		Nav.go( 'Roles?sub=list' );
 	}
 	
@@ -216,7 +218,7 @@ Page.Roles = class Roles extends Page.PageUtils {
 		Dialog.hideProgress();
 		if (!this.active) return; // sanity
 		
-		// Nav.go('Roles?sub=edit&id=' + resp.id);
+		$('.button.save').removeClass('primary');
 		Nav.go( 'Roles?sub=list' );
 		
 		app.showMessage('success', "The new user role was created successfully.");
@@ -330,6 +332,7 @@ Page.Roles = class Roles extends Page.PageUtils {
 		Dialog.hideProgress();
 		if (!this.active) return; // sanity
 		
+		$('.button.save').removeClass('primary');
 		Nav.go('Roles?sub=list', 'force');
 		app.showMessage('success', "The user role &ldquo;" + this.role.title + "&rdquo; was deleted successfully.");
 	}
@@ -495,8 +498,15 @@ Page.Roles = class Roles extends Page.PageUtils {
 		return role;
 	}
 	
-	onDeactivate() {
+	onDeactivate(new_id, anchor) {
 		// called when page is deactivated
+		
+		// check for changes on specific subs, with some sanity checks first
+		if (this.hasUnsavedChanges()) {
+			this.showNavLeaveConfirm( anchor );
+			return false;
+		}
+		
 		delete this.roles;
 		this.cleanupBoxButtonFloater();
 		this.div.html( '' );

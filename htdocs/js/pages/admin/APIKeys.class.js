@@ -178,7 +178,7 @@ Page.APIKeys = class APIKeys extends Page.PageUtils {
 		html += '<div class="box_buttons">';
 			html += '<div class="button phone_collapse" onClick="$P().cancel_api_key_edit()"><i class="mdi mdi-close-circle-outline">&nbsp;</i><span>Cancel</span></div>';
 			html += '<div class="button secondary phone_collapse" onClick="$P().do_export()"><i class="mdi mdi-cloud-download-outline">&nbsp;</i><span>Export...</span></div>';
-			html += '<div class="button primary" id="btn_save" onClick="$P().do_new_api_key()"><i class="mdi mdi-floppy">&nbsp;</i><span>Create Key</span></div>';
+			html += '<div class="button save" id="btn_save" onClick="$P().do_new_api_key()"><i class="mdi mdi-floppy">&nbsp;</i><span>Create Key</span></div>';
 		html += '</div>'; // box_buttons
 		
 		html += '</div>'; // box
@@ -189,10 +189,12 @@ Page.APIKeys = class APIKeys extends Page.PageUtils {
 		MultiSelect.init( this.div.find('select[multiple]') );
 		$('#fe_ak_title').focus();
 		this.setupBoxButtonFloater();
+		this.setupEditTriggers();
 	}
 	
 	cancel_api_key_edit() {
 		// cancel editing API Key and return to list
+		$('.button.save').removeClass('primary');
 		Nav.go( 'APIKeys?sub=list' );
 	}
 	
@@ -250,6 +252,7 @@ Page.APIKeys = class APIKeys extends Page.PageUtils {
 			if (result) Dialog.hide(); 
 		};
 		Dialog.onHide = function() {
+			$('.button.save').removeClass('primary');
 			Nav.go( 'APIKeys?sub=list' );
 		};
 		
@@ -357,6 +360,7 @@ Page.APIKeys = class APIKeys extends Page.PageUtils {
 		delete clone.username;
 		
 		this.clone = clone;
+		$('.button.save').removeClass('primary');
 		Nav.go('APIKeys?sub=new');
 	}
 	
@@ -419,6 +423,7 @@ Page.APIKeys = class APIKeys extends Page.PageUtils {
 		Dialog.hideProgress();
 		if (!this.active) return; // sanity
 		
+		$('.button.save').removeClass('primary');
 		Nav.go('APIKeys?sub=list', 'force');
 		app.showMessage('success', "The API Key &ldquo;" + this.api_key.title + "&rdquo; was deleted successfully.");
 	}
@@ -589,8 +594,15 @@ Page.APIKeys = class APIKeys extends Page.PageUtils {
 		return api_key;
 	}
 	
-	onDeactivate() {
+	onDeactivate(new_id, anchor) {
 		// called when page is deactivated
+		
+		// check for changes on specific subs, with some sanity checks first
+		if (this.hasUnsavedChanges()) {
+			this.showNavLeaveConfirm( anchor );
+			return false;
+		}
+		
 		delete this.api_keys;
 		this.cleanupBoxButtonFloater();
 		this.div.html( '' );
