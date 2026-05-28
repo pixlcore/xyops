@@ -1957,6 +1957,7 @@ Page.Events = class Events extends Page.PageUtils {
 			event = this.rollbackData;
 			delete this.rollbackData;
 			app.showMessage('info', `Revision ${event.revision} has been loaded as a draft edit.  Click 'Save Changes' to complete the rollback.  Note that a new revision number will be assigned.`);
+			delete event.revision; // prevent error on update api (issue # 306)
 		}
 		
 		this.receive_event({ code: 0, event: deep_copy_object(event) });
