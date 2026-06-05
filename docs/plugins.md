@@ -919,6 +919,8 @@ If your Monitor Plugin is set to XML or JSON format, you can actually output a l
 
 Most Plugins accept one or more "parameters", which are configurable user fields.  These are displayed in the UI for users to populate when they are configuring events or workflows.  See below for all the types of parameters available.  See [Plugin.params](data.md#plugin-params) for the internal data structure.
 
+Each parameter is stored as an object inside the Plugin's `params` array.  Every control type needs a locally unique `id`, a user-facing `title`, and a `type`.  Most controls also have a default `value`, plus optional `caption`, `required`, `regex` and `locked` properties where supported.
+
 ### Text
 
 A "text" parameter type is presented to the user as a single-line text field.
@@ -929,19 +931,90 @@ Note that the parameter value is almost always set to a string -- the "variant" 
 
 The "number" variant is also special in that you can specify a `range` property (string), which limits the minimum, maximum, and step increment for the value.  The range should be in the format: `MIN - MAX / STEP`.  So for example, to limit the number range from 0 to 100 with increments of 5, use `0 - 100 / 5`.  Floats and negatives are allowed, and the step can be the special keyword `any` (for no enforced step increment).
 
+Example text parameter definition:
+
+```json
+{
+	"id": "filename",
+	"title": "Filename",
+	"type": "text",
+	"variant": "text",
+	"value": "",
+	"caption": "Enter the target filename.",
+	"required": true,
+	"regex": "^[\\w\\-.]+$"
+}
+```
+
+Example number variant definition:
+
+```json
+{
+	"id": "timeout",
+	"title": "Timeout",
+	"type": "text",
+	"variant": "number",
+	"value": 30,
+	"range": "1 - 300 / 1",
+	"caption": "Enter the timeout in seconds.",
+	"required": true
+}
+```
+
 ### Textarea
 
 A "textarea" parameter type is presented to the user as a multi-line text box.  Here the user can enter multiple lines of text (no maximum length is enforced).
 
+Example textarea parameter definition:
+
+```json
+{
+	"id": "message",
+	"title": "Message",
+	"type": "textarea",
+	"value": "",
+	"caption": "Enter the message body.",
+	"required": true,
+	"regex": ".+"
+}
+```
+
 ### Code
 
 A "code" parameter type is a variant of the textarea, but it is presented to the user as a button that pops up a full code editor dialog.  The user can enter "code" of any language, and the format is automatically detected and syntax-highlighted.
+
+Example code parameter definition:
+
+```json
+{
+	"id": "script",
+	"title": "Script Source",
+	"type": "code",
+	"value": "#!/bin/sh\n\n# Enter your shell script code here\n",
+	"caption": "Enter the script source to execute.",
+	"required": true
+}
+```
 
 ### JSON
 
 A "JSON" parameter type is a variant of the textarea, but it is presented to the user as a button that pops up a full code editor dialog with JSON syntax-highlighting and line numbers.  The JSON is also validated, so the user can only enter a proper JSON document.
 
 This type is special in that the JSON is parsed and stored in the parameters as a real object (not a string).
+
+Example JSON parameter definition:
+
+```json
+{
+	"id": "headers",
+	"title": "HTTP Headers",
+	"type": "json",
+	"value": {
+		"Content-Type": "application/json"
+	},
+	"caption": "Enter custom request headers as a JSON object."
+}
+```
 
 ### Menu
 
@@ -968,6 +1041,32 @@ Alpha [a1], Beta [b2], Gamma [c3]
 This would show only the labels in the menu ("Alpha", "Beta", "Gamma"), but in the data the values would be specified instead (`a1`, `b2`, `c3`).  Note that the values may only contain alphanumerics, underscores, dashes and dots, and when this feature is used the visual labels are **not** passed into the data at all.
 
 Note that if you check the "Multi-Select" checkbox when configuring the menu field, your parameter value will be an array of selected values, as opposed to a string for a single-select menu.
+
+Example single-select menu parameter definition:
+
+```json
+{
+	"id": "environment",
+	"title": "Environment",
+	"type": "select",
+	"value": "Development [dev], Staging [stage], Production [prod]",
+	"caption": "Select the target environment.",
+	"multiple": false
+}
+```
+
+Example multi-select menu parameter definition:
+
+```json
+{
+	"id": "regions",
+	"title": "Regions",
+	"type": "select",
+	"value": "US East [us-east], US West [us-west], Europe [eu]",
+	"caption": "Select one or more deployment regions.",
+	"multiple": true
+}
+```
 
 ### Bucket Menu
 
@@ -1074,6 +1173,34 @@ Finally, you can define groups of items in the menu by including an object with 
 
 Note that if you check the "Multi-Select" checkbox when configuring the bucket menu field, your parameter value will be an array of selected values, as opposed to a string for a single-select menu.
 
+Example bucket menu parameter definition:
+
+```json
+{
+	"id": "country",
+	"title": "Country",
+	"type": "bucket",
+	"bucket_id": "countries",
+	"bucket_path": "countries",
+	"caption": "Select the country to process.",
+	"multiple": false
+}
+```
+
+If the item array is at the top level of the bucket data, set `bucket_path` to an empty string:
+
+```json
+{
+	"id": "countries",
+	"title": "Countries",
+	"type": "bucket",
+	"bucket_id": "countries",
+	"bucket_path": "",
+	"caption": "Select one or more countries to process.",
+	"multiple": true
+}
+```
+
 ### System Menu
 
 A "system menu" is a dynamically populated menu, similar to a [Bucket Menu](#bucket-menu), but the menu items are pulled from xyOps itself.  This is useful when a Plugin needs the user to select an existing xyOps object, such as an event, category, server, server group, plugin, user, role, web hook or monitor.
@@ -1116,13 +1243,62 @@ API Keys and Secrets are intentionally not offered as system menu sources.
 
 Note that if you check the "Multi-Select" checkbox when configuring the system menu field, your parameter value will be an array of selected values, as opposed to a string for a single-select menu.
 
+Example system menu parameter definition:
+
+```json
+{
+	"id": "target_event",
+	"title": "Target Event",
+	"type": "system",
+	"list_id": "events",
+	"caption": "Select an event from the system.",
+	"multiple": false
+}
+```
+
+Example multi-select system menu parameter definition:
+
+```json
+{
+	"id": "notify_users",
+	"title": "Notify Users",
+	"type": "system",
+	"list_id": "users",
+	"caption": "Select one or more users to notify.",
+	"multiple": true
+}
+```
+
 ### Checkbox
 
 A checkbox is displayed with a label, and the "checked" state is stored as a Boolean parameter value (`true` or `false`).
 
+Example checkbox parameter definition:
+
+```json
+{
+	"id": "dry_run",
+	"title": "Dry Run",
+	"type": "checkbox",
+	"value": true,
+	"caption": "Preview changes without applying them."
+}
+```
+
 ### Hidden
 
 A hidden type is not shown in the UI.  Instead, it's just a hidden, pre-populated key/value pair that is passed to the Plugin as a parameter.  The value is specified when the hidden field is added.
+
+Example hidden parameter definition:
+
+```json
+{
+	"id": "api_version",
+	"title": "API Version",
+	"type": "hidden",
+	"value": "v2"
+}
+```
 
 ### Toolset
 
@@ -1132,63 +1308,128 @@ The toolset "data" is entered in JSON format, and describes all the tools and su
 
 ```json
 {
-	"tools": [
-		{
-			"id": "uploadFiles",
-			"title": "Upload Files",
-			"description": "Upload local files to S3",
-			"fields": [
-				{
-					"id": "localPath",
-					"title": "Local Path",
-					"type": "text",
-					"value": ".",
-					"caption": "The base filesystem path to find files under. Should resolve to a folder."
-				},
-				{
-					"id": "filespec",
-					"title": "Filename Pattern",
-					"type": "text",
-					"value": ".+",
-					"caption": "Optionally filter the local files using a regular expression, applied to the filenames."
-				},
-				{
-					"id": "remotePath",
-					"title": "Remote Path",
-					"type": "text",
-					"value": "",
-					"caption": "The base S3 path to store files under."
-				},
-			]
-		},
-		{
-			"id": "listFiles",
-			"title": "List Files",
-			"description": "Generate a file listing of an S3 prefix",
-			"fields": [
-				{
-					"id": "remotePath",
-					"title": "Remote Path",
-					"type": "text",
-					"value": "",
-					"caption": "The base S3 path to look for files under."
-				},
-				{
-					"id": "filespec",
-					"title": "Filename Pattern",
-					"type": "text",
-					"value": ".+",
-					"caption": "Optionally filter the result files using a regular expression, matched on the filenames."
-				}
-			]
-		}
-	]
+	"id": "s3_action",
+	"title": "S3 Action",
+	"type": "toolset",
+	"caption": "Select which S3 operation to perform.",
+	"data": {
+		"default": "uploadFiles",
+		"tools": [
+			{
+				"id": "uploadFiles",
+				"title": "Upload Files",
+				"description": "Upload local files to S3",
+				"fields": [
+					{
+						"id": "localPath",
+						"title": "Local Path",
+						"type": "text",
+						"value": ".",
+						"caption": "The base filesystem path to find files under."
+					},
+					{
+						"id": "filespec",
+						"title": "Filename Pattern",
+						"type": "text",
+						"value": ".+",
+						"caption": "Optionally filter the local files using a regular expression, applied to the filenames."
+					},
+					{
+						"id": "remotePath",
+						"title": "Remote Path",
+						"type": "text",
+						"value": "",
+						"caption": "The base S3 path to store files under.",
+						"required": true
+					}
+				]
+			},
+			{
+				"id": "listFiles",
+				"title": "List Files",
+				"description": "Generate a file listing of an S3 prefix",
+				"fields": [
+					{
+						"id": "remotePath",
+						"title": "Remote Path",
+						"type": "text",
+						"value": "",
+						"caption": "The base S3 path to look for files under.",
+						"required": true
+					}
+				]
+			}
+		]
+	}
 }
 ```
 
-In this fictional example, the toolset menu would show two tools: "Upload Files" and "List Files".  When "Upload Files" was selected in the menu, three new sub-parameters would appear in a box under the menu: "Local Path", "Filename Pattern" and "Remote Path".  If the user selected a different tool, e.g. "List Files", then the sub-parameters would change, and a different set would be shown.
+Here the toolset menu would show two tools: "Upload Files" and "List Files".  When "Upload Files" was selected in the menu, three new sub-parameters would appear in a box under the menu: "Local Path", "Filename Pattern" and "Remote Path".  If the user selected a different tool, e.g. "List Files", then the sub-parameters would change, and a different set would be shown.
 
-Note that when all the parameter values are collected from the user, they are "flattened" into a single-level object.
+Tool fields use the same internal format as plugin parameters, but only [checkbox](#checkbox), [code](#code), [json](#json), [hidden](#hidden), [select](#select), [text](#text) and [textarea](#textarea) field types are allowed inside a toolset.  Here is another example showing all the available field types in a single tool:
+
+```json
+{
+	"type": "toolset",
+	"id": "tool",
+	"title": "Tool Select",
+	"caption": "",
+	"data": {
+		"tools": [
+			{
+				"id": "sample",
+				"title": "Sample Tool",
+				"fields": [
+					{
+						"id": "txt",
+						"title": "Text Field",
+						"type": "text",
+						"value": ""
+					},
+					{
+						"id": "txta",
+						"title": "Text Area",
+						"type": "textarea",
+						"value": ""
+					},
+					{
+						"id": "cbox",
+						"title": "Checkbox",
+						"type": "checkbox",
+						"value": false
+					},
+					{
+						"id": "sel",
+						"title": "Select",
+						"type": "select",
+						"value": "Frog,Toad,Cat,Dog"
+					},
+					{
+						"id": "cod",
+						"title": "Code Editor",
+						"type": "code",
+						"value": "#!/usr/bin/something"
+					},
+					{
+						"id": "jos",
+						"title": "JSON Editor",
+						"type": "json",
+						"value": { "foo": "bar" }
+					},
+					{
+						"id": "hid",
+						"title": "Hidden",
+						"type": "hidden",
+						"value": "boo"
+					}
+				]
+			}
+		]
+	}
+}
+```
+
+Note that when all the parameter values are collected from the user, they are "flattened" into a single-level object, and they share the namespace with all the other plugin parameters.  As such, field IDs must be unique, and not collide with any other plugin parameters defined outside the toolset.  The same field IDs can be used across tools, however, as only one tool will be selected at a time.
 
 ### Group
 
