@@ -45,7 +45,7 @@ In addition to the standard JEXL operators, the following custom functions are a
 |----------|-------|-------------|
 | `find` | `find(array, key, value)` | Finds objects in an array using a named property and a substring match. |
 | `includes` | `includes(array, key)` | Find a substring in a string, or an element in an array. |
-| `match` | `match(string, pattern)` | Perform a regex match on a string.  The pattern itself must also be a string. |
+| `match` | `match(string, pattern)` | Perform a regex match on a string.  The pattern itself must also be specified as a string. |
 
 ### String Formatting
 
@@ -63,7 +63,8 @@ In addition to the standard JEXL operators, the following custom functions are a
 |----------|-------|-------------|
 | `encode` | `encode("a b") == "a%20b` | Calls [encodeURIComponent](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/encodeURIComponent) to encode a string. |
 | `stringify` | `stringify(obj) == "{...}"` | Calls [JSON.stringify](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify) to serialize an object into a string. |
-| `server` | `server("smog7ph67nvh6891z") == "myhostname.domain.com"` | Resolve a server ID to a label or hostname. |
+| `server` | `server("smog7ph67nvh6891z") == "myhostname.domain.com"` | Resolve a server ID to its label (or hostname if no label is set). |
+| `event` | `event("emq3y5434ggm74ezk") == "Backup Database"` | Resolve an Event ID or Job ID to the event title. |
 
 ## See Also
 
