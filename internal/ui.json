@@ -515,7 +515,7 @@
 				"placeholder": "Select Plugin for node..."
 			},
 			"d_wfdj_title": {
-				"label": "Custom Title:",
+				"label": "Title:",
 				"caption": "Optionally customize the title for the node (defaults to the Plugin name)."
 			},
 			"d_wfdj_cat": {

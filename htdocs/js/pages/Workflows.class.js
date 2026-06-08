@@ -1674,18 +1674,6 @@ Page.Workflows = class Workflows extends Page.Events {
 		
 		var html = '<div class="dialog_box_content scroll maximize">';
 		
-		// plugin
-		html += this.getFormRow({
-			id: 'd_wfdj_plugin',
-			content: this.getFormMenuSingle({
-				id: 'fe_wfdj_plugin',
-				options: app.plugins.filter( function(plugin) { return plugin.type == 'event'; } ),
-				value: node.data.plugin || '',
-				default_icon: 'power-plug-outline'
-				// 'data-shrinkwrap': 1
-			})
-		});
-		
 		// title
 		html += this.getFormRow({
 			id: 'd_wfdj_title',
@@ -1705,6 +1693,18 @@ Page.Workflows = class Workflows extends Page.Events {
 				options: app.categories,
 				value: node.data.category || '',
 				default_icon: 'folder-open-outline',
+				// 'data-shrinkwrap': 1
+			})
+		});
+		
+		// tags
+		html += this.getFormRow({
+			id: 'd_wfdj_tags',
+			content: this.getFormMenuMulti({
+				id: 'fe_wfdj_tags',
+				options: app.tags,
+				values: node.data.tags || [],
+				default_icon: 'tag-outline',
 				// 'data-shrinkwrap': 1
 			})
 		});
@@ -1751,14 +1751,14 @@ Page.Workflows = class Workflows extends Page.Events {
 			})
 		});
 		
-		// tags
+		// plugin
 		html += this.getFormRow({
-			id: 'd_wfdj_tags',
-			content: this.getFormMenuMulti({
-				id: 'fe_wfdj_tags',
-				options: app.tags,
-				values: node.data.tags || [],
-				default_icon: 'tag-outline',
+			id: 'd_wfdj_plugin',
+			content: this.getFormMenuSingle({
+				id: 'fe_wfdj_plugin',
+				options: app.plugins.filter( function(plugin) { return plugin.type == 'event'; } ),
+				value: node.data.plugin || '',
+				default_icon: 'power-plug-outline'
 				// 'data-shrinkwrap': 1
 			})
 		});
