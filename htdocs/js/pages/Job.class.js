@@ -14,6 +14,7 @@ Page.Job = class Job extends Page.PageUtils {
 		// throttle this API call for dealing with heavy jobs
 		this.getWorkflowQueueSummaryDebounce = debounce( this.getWorkflowQueueSummary.bind(this), 1000 );
 		this.getAdditionalJobsDebounce = debounce( this.getAdditionalJobs.bind(this), 1000 );
+		this.renderWorkflowJobsDebounce = debounce( this.renderWorkflowJobs.bind(this), 1000 );
 	}
 	
 	onActivate(args) {
@@ -1013,6 +1014,13 @@ Page.Job = class Job extends Page.PageUtils {
 			empty_msg: 'No workflow jobs found.'
 		};
 		
+		// sanity chop (while job is in progress)
+		if (!this.job.final && (rows.length > config.items_per_page)) {
+			var chopped = rows.length - config.items_per_page;
+			rows.splice( config.items_per_page );
+			grid_args.below = `<ul class="grid_row_more"><div style="grid-column: 1 / -1;">(${commify(chopped)} more ${pluralize('job', chopped)} hidden until workflow completion.)</div></ul>`;
+		}
+		
 		html += this.getBasicGrid( grid_args, function(job, idx) {
 			var actions = [];
 			var tds = [];
@@ -1273,7 +1281,11 @@ Page.Job = class Job extends Page.PageUtils {
 		var $cont = this.wfGetContainer();
 		if (!workflow || !workflow.nodes || !$cont.length) return; // more sanity checks
 		
+		if (this.wjsInProgress) return; // only allow one of these in flight at a time
+		this.wjsInProgress = true;
+		
 		app.api.get( 'app/get_workflow_job_summary', { 'workflow.job': this.job.id, state: 'queued' }, function(resp) {
+			self.wjsInProgress = false;
 			if (!self.active || !resp || !resp.nodes || !self.job || self.job.final) return; // even more sanity checks
 			
 			workflow.nodes.filter( function(node) { return !!node.type.match(/^(event|job)$/); } ).forEach( function(node) {
@@ -1284,6 +1296,10 @@ Page.Job = class Job extends Page.PageUtils {
 				if (count) $div.show().html( `<i class="mdi mdi-tray-full"></i><span>${commify(count)}</span>` );
 				else $div.hide().html('');
 			} );
+		}, 
+		function() {
+			// suppress error
+			self.wjsInProgress = false;
 		}); // api.get
 	}
 	
@@ -3269,7 +3285,7 @@ Page.Job = class Job extends Page.PageUtils {
 		}
 		
 		// for workflows, if jobs changed, redraw our special table
-		if (this.isWorkflow && data.jobsChanged) this.renderWorkflowJobs();
+		if (this.isWorkflow && data.jobsChanged) this.renderWorkflowJobsDebounce();
 		
 		// if jobs changed, update suspension status
 		if (data.jobsChanged) this.updateSuspensionStatus();
@@ -3364,6 +3380,7 @@ Page.Job = class Job extends Page.PageUtils {
 		delete this.slides;
 		delete this.slideIdx;
 		delete this.files;
+		delete this.wjsInProgress;
 		
 		// destroy charts if applicable
 		if (this.charts) {
