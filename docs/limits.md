@@ -266,6 +266,9 @@ Example:
 }
 ```
 
+> [!IMPORTANT]
+> If you include a max queue limit with a non-zero amount you must also include a [Max Concurrent Jobs](#max-concurrent-jobs) limit.
+
 ### Max File Limit
 
 Soft limit that prunes incoming files (from job input) before launch. It can cap the number of files, the total combined size, and restrict file types by extension. This limit never aborts the job; it prunes and logs what was removed.

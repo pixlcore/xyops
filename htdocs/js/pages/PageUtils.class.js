@@ -1736,7 +1736,7 @@ Page.PageUtils = class PageUtils extends Page.Base {
 				break;
 				
 				case 'job':
-					limit.amount = parseInt( $('#fe_erl_raw_amount').val() );
+					limit.amount = parseInt( $('#fe_erl_raw_amount').val() ) || 1;
 					limit.weight = parseInt( $('#fe_erl_job_weight').val() );
 				break;
 				
