@@ -981,7 +981,7 @@ Page.WebHooks = class WebHooks extends Page.PageUtils {
 		if (!web_hook.title.length) {
 			return app.badField('#fe_ewh_title', "Please enter a title for the web hook.");
 		}
-		if (!web_hook.url.match(/^(?:https?:\/\/\S+$|\{\{)/i)) {
+		if (!web_hook.url.match(/^(?:https?:\/\/|\{\{)/i)) {
 			return app.badField('#fe_ewh_url', "Please enter a fully-qualified URL or template expression for the web hook.");
 		}
 		
