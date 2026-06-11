@@ -1,5 +1,12 @@
 # xyOps Changelog
 
+## Version v1.0.67
+
+> June 10, 2026
+
+- [`6a41a1d2`](https://github.com/pixlcore/xyops/commit/6a41a1d2fafd43901926296886452213fc08a480): Version 1.0.67
+- [`858ea8a5`](https://github.com/pixlcore/xyops/commit/858ea8a5982321452056e3a68947c89da3be49c3): Bug Fix: Critical crasher bug in Plugin API and Event API in toolset validation.  Regression from v1.0.64.
+
 ## Version v1.0.66
 
 > June 10, 2026
