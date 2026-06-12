@@ -516,6 +516,7 @@ Page.Search = class Search extends Page.PageUtils {
 			rows: [],
 			cols: ['Job ID', 'Event', 'File', 'Preview', 'Matches', 'Job Completed'],
 			data_type: 'file',
+			class: 'data_grid file_search_grid'
 			// grid_template_columns: 'min-content' + ' auto'.repeat( cols.length - 1 )
 		};
 		
