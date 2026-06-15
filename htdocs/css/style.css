@@ -2089,6 +2089,10 @@ div.progress_bar_container.status > div.progress_bar_status {
 	display: block;
 }
 
+#d_job_user_html div.markdown-body pre code {
+	padding: 0 !important;
+}
+
 /* Snapshots Page */
 
 div.data_grid > ul.grid_row_header > div.st_col_header {
