@@ -641,7 +641,7 @@ Page.System = class System extends Page.PageUtils {
 	do_optimize_db() {
 		// optimize database manually (sqlite)
 		var self = this;
-		var html = "This optimizes the local database by compacting it.  You should only need this if you delete a large amount of data and need to reclaim unused space.  It also runs an integrity check, and you will be sent an email report with all results.  <br><br>Please note that the database will be locked while the compaction and integrity check processes running, so it is highly recommended that you stop all jobs and pause the scheduler before running this job.";
+		var html = "This optimizes the database by running a compaction (a.k.a vacuum).  You should only need this if you delete a large amount of data and need to reclaim unused space.  It also runs an integrity check (for applicable databases), and you will be sent an email report with all results.  <br><br>Please note that the database will be locked while the compaction and integrity check processes running, so it is highly recommended that you stop all jobs and pause the scheduler before running this job.";
 		
 		Dialog.confirm( 'Optimize Database', html, ['database-refresh', 'Optimize Now'], function(result) {
 			if (!result) return;
