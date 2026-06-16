@@ -333,7 +333,12 @@ Example setup:
 		"host": "redis.internal.mycompany.com",
 		"port": 6379,
 		"keyPrefix": "xyops/",
-		"keyTemplate": ""
+		"keyTemplate": "",
+		"cache": {
+			"enabled": true,
+			"maxItems": 100000,
+			"maxBytes": 104857600
+		}
 	},
 
 	"Filesystem": {
@@ -379,7 +384,12 @@ Example setup:
 		"host": "redis.internal.mycompany.com",
 		"port": 6379,
 		"keyPrefix": "xyops/",
-		"keyTemplate": ""
+		"keyTemplate": "",
+		"cache": {
+			"enabled": true,
+			"maxItems": 100000,
+			"maxBytes": 104857600
+		}
 	},
 
 	"AWS": {
@@ -398,11 +408,6 @@ Example setup:
 		"fileExtensions": true,
 		"params": {
 			"Bucket": "YOUR_S3_BUCKET_ID"
-		},
-		"cache": {
-			"enabled": true,
-			"maxItems": 100000,
-			"maxBytes": 104857600
 		}
 	}
 }
@@ -531,11 +536,6 @@ Example setup:
 		"fileExtensions": true,
 		"params": {
 			"Bucket": "YOUR_S3_BUCKET_ID"
-		},
-		"cache": {
-			"enabled": true,
-			"maxItems": 100000,
-			"maxBytes": 104857600
 		}
 	}
 }
