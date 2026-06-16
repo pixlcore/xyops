@@ -410,6 +410,18 @@
 			}
 		},
 		
+		"Redis": {
+			"host": "localhost",
+			"port": 6379,
+			"keyPrefix": "xyops/",
+			"keyTemplate": "",
+			"cache": {
+				"enabled": true,
+				"maxItems": 100000,
+				"maxBytes": 104857600
+			}
+		},
+		
 		"Postgres": {
 			"min": 1,
 			"max": 32,
