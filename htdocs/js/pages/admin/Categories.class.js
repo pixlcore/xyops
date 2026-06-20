@@ -470,57 +470,15 @@ Page.Categories = class Categories extends Page.PageUtils {
 		});
 		
 		// color
-		var color_items = [
-			{
-				id: 'plain',
-				title: 'Plain',
-				class: 'clr_plain'
-			},
-			{
-				id: 'red',
-				title: 'Red',
-				class: 'clr_red'
-			},
-			{
-				id: 'green',
-				title: 'Green',
-				class: 'clr_green'
-			},
-			{
-				id: 'blue',
-				title: 'Blue',
-				class: 'clr_blue'
-			},
-			{
-				id: 'skyblue',
-				title: 'Sky Blue',
-				class: 'clr_skyblue'
-			},
-			{
-				id: 'yellow',
-				title: 'Yellow',
-				class: 'clr_yellow'
-			},
-			{
-				id: 'purple',
-				title: 'Purple',
-				class: 'clr_purple'
-			},
-			{
-				id: 'orange',
-				title: 'Orange',
-				class: 'clr_orange'
-			}
-		];
 		html += this.getFormRow({
-			label: 'Highlight Color:',
+			label: 'Tint Color:',
 			content: this.getFormMenuSingle({
 				id: 'fe_ec_color',
-				title: "Select Highlight Color",
-				options: color_items,
+				title: "Select Tint Color",
+				options: config.ui.category_colors,
 				value: category.color
 			}),
-			caption: 'Optionally select a highlight color for the category, which will show on the schedule.'
+			caption: 'Optionally select a tint color for the category, which will show on applicable event and job lists.'
 		});
 		
 		// actions

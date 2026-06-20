@@ -1024,16 +1024,66 @@ body.dark .fr_caption code {
 
 /* Swatch / Table Row Colors */
 
-.clr_red, ul.clr_red > div { background-color: rgba(255, 0, 0, 0.1) !important; }
-.clr_green, ul.clr_green > div { background-color: rgba(0, 255, 0, 0.1) !important; }
-.clr_blue, ul.clr_blue > div { background-color: rgba(0, 0, 255, 0.1) !important; }
-.clr_skyblue, ul.clr_skyblue > div { background-color: rgba(0, 255, 255, 0.1) !important; }
-.clr_yellow, ul.clr_yellow > div { background-color: rgba(255, 255, 0, 0.1) !important; }
-.clr_purple, ul.clr_purple > div { background-color: rgba(255, 0, 255, 0.1) !important; }
-.clr_orange, ul.clr_orange > div { background-color: rgba(255, 128, 0, 0.1) !important; }
+.clr_red, ul.clr_red > div { background: color-mix(in oklch, var(--color-red-500) 20%, transparent) !important; }
+.clr_fire, ul.clr_fire > div { background: color-mix(in oklch, var(--color-fire-500) 20%, transparent) !important; }
+.clr_orange, ul.clr_orange > div { background: color-mix(in oklch, var(--color-orange-500) 20%, transparent) !important; }
+.clr_tangerine, ul.clr_tangerine > div { background: color-mix(in oklch, var(--color-tangerine-500) 20%, transparent) !important; }
+.clr_amber, ul.clr_amber > div { background: color-mix(in oklch, var(--color-amber-500) 20%, transparent) !important; }
+.clr_gold, ul.clr_gold > div { background: color-mix(in oklch, var(--color-gold-500) 20%, transparent) !important; }
+.clr_yellow, ul.clr_yellow > div { background: color-mix(in oklch, var(--color-yellow-500) 20%, transparent) !important; }
+.clr_lemon, ul.clr_lemon > div { background: color-mix(in oklch, var(--color-lemon-500) 20%, transparent) !important; }
+.clr_lime, ul.clr_lime > div { background: color-mix(in oklch, var(--color-lime-500) 20%, transparent) !important; }
+.clr_grass, ul.clr_grass > div { background: color-mix(in oklch, var(--color-grass-500) 20%, transparent) !important; }
+.clr_green, ul.clr_green > div { background: color-mix(in oklch, var(--color-green-500) 20%, transparent) !important; }
+.clr_mint, ul.clr_mint > div { background: color-mix(in oklch, var(--color-mint-500) 20%, transparent) !important; }
+.clr_emerald, ul.clr_emerald > div { background: color-mix(in oklch, var(--color-emerald-500) 20%, transparent) !important; }
+.clr_aqua, ul.clr_aqua > div { background: color-mix(in oklch, var(--color-aqua-500) 20%, transparent) !important; }
+.clr_teal, ul.clr_teal > div { background: color-mix(in oklch, var(--color-teal-500) 20%, transparent) !important; }
+.clr_turquoise, ul.clr_turquoise > div { background: color-mix(in oklch, var(--color-turquoise-500) 20%, transparent) !important; }
+.clr_cyan, ul.clr_cyan > div { background: color-mix(in oklch, var(--color-cyan-500) 20%, transparent) !important; }
+.clr_ice, ul.clr_ice > div { background: color-mix(in oklch, var(--color-ice-500) 20%, transparent) !important; }
+.clr_skyblue, ul.clr_skyblue > div { background: color-mix(in oklch, var(--color-sky-500) 20%, transparent) !important; }
+.clr_azure, ul.clr_azure > div { background: color-mix(in oklch, var(--color-azure-500) 20%, transparent) !important; }
+.clr_blue, ul.clr_blue > div { background: color-mix(in oklch, var(--color-blue-500) 20%, transparent) !important; }
+.clr_sapphire, ul.clr_sapphire > div { background: color-mix(in oklch, var(--color-sapphire-500) 20%, transparent) !important; }
+.clr_indigo, ul.clr_indigo > div { background: color-mix(in oklch, var(--color-indigo-500) 20%, transparent) !important; }
+.clr_lavender, ul.clr_lavender > div { background: color-mix(in oklch, var(--color-lavender-500) 20%, transparent) !important; }
+.clr_violet, ul.clr_violet > div { background: color-mix(in oklch, var(--color-violet-500) 20%, transparent) !important; }
+.clr_orchid, ul.clr_orchid > div { background: color-mix(in oklch, var(--color-orchid-500) 20%, transparent) !important; }
+.clr_purple, ul.clr_purple > div { background: color-mix(in oklch, var(--color-purple-500) 20%, transparent) !important; }
+.clr_magenta, ul.clr_magenta > div { background: color-mix(in oklch, var(--color-magenta-500) 20%, transparent) !important; }
+.clr_fuchsia, ul.clr_fuchsia > div { background: color-mix(in oklch, var(--color-fuchsia-500) 20%, transparent) !important; }
+.clr_hotpink, ul.clr_hotpink > div { background: color-mix(in oklch, var(--color-hotpink-500) 20%, transparent) !important; }
+.clr_pink, ul.clr_pink > div { background: color-mix(in oklch, var(--color-pink-500) 20%, transparent) !important; }
+.clr_blush, ul.clr_blush > div { background: color-mix(in oklch, var(--color-blush-500) 20%, transparent) !important; }
+.clr_rose, ul.clr_rose > div { background: color-mix(in oklch, var(--color-rose-500) 20%, transparent) !important; }
 
-body.dark .clr_blue, body.dark ul.clr_blue > div { background-color: rgba(64, 64, 255, 0.3) !important; }
-body.dark .clr_red, body.dark ul.clr_red > div { background-color: rgba(255, 64, 64, 0.2) !important; }
+.clr_slate, ul.clr_slate > div { background: var(--color-slate-300) !important; }
+body.dark .clr_slate, body.dark ul.clr_slate > div { background: var(--color-slate-800) !important; }
+
+.clr_gray, ul.clr_gray > div { background: var(--color-gray-300) !important; }
+body.dark .clr_gray, body.dark ul.clr_gray > div { background: var(--color-gray-800) !important; }
+
+.clr_zinc, ul.clr_zinc > div { background: var(--color-zinc-300) !important; }
+body.dark .clr_zinc, body.dark ul.clr_zinc > div { background: var(--color-zinc-800) !important; }
+
+.clr_neutral, ul.clr_neutral > div { background: var(--color-neutral-300) !important; }
+body.dark .clr_neutral, body.dark ul.clr_neutral > div { background: var(--color-neutral-800) !important; }
+
+.clr_stone, ul.clr_stone > div { background: var(--color-stone-300) !important; }
+body.dark .clr_stone, body.dark ul.clr_stone > div { background: var(--color-stone-800) !important; }
+
+.clr_mauve, ul.clr_mauve > div { background: var(--color-mauve-300) !important; }
+body.dark .clr_mauve, body.dark ul.clr_mauve > div { background: var(--color-mauve-800) !important; }
+
+.clr_olive, ul.clr_olive > div { background: var(--color-olive-300) !important; }
+body.dark .clr_olive, body.dark ul.clr_olive > div { background: var(--color-olive-800) !important; }
+
+.clr_mist, ul.clr_mist > div { background: var(--color-mist-300) !important; }
+body.dark .clr_mist, body.dark ul.clr_mist > div { background: var(--color-mist-800) !important; }
+
+.clr_taupe, ul.clr_taupe > div { background: var(--color-taupe-300) !important; }
+body.dark .clr_taupe, body.dark ul.clr_taupe > div { background: var(--color-taupe-800) !important; }
 
 /* Box Grid */
 

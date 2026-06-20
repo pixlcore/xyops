@@ -1265,6 +1265,224 @@
 		{ "id": "wait", "title": "Wait", "icon": "watch" }
 	],
 	
+	"category_colors": [
+		{
+			"id": "plain",
+			"title": "Plain",
+			"class": "clr_plain"
+		},
+		{
+			"id": "red",
+			"title": "Red",
+			"class": "clr_red"
+		},
+		{
+			"id": "fire",
+			"title": "Fire",
+			"class": "clr_fire"
+		},
+		{
+			"id": "orange",
+			"title": "Orange",
+			"class": "clr_orange"
+		},
+		{
+			"id": "tangerine",
+			"title": "Tangerine",
+			"class": "clr_tangerine"
+		},
+		{
+			"id": "amber",
+			"title": "Amber",
+			"class": "clr_amber"
+		},
+		{
+			"id": "gold",
+			"title": "Gold",
+			"class": "clr_gold"
+		},
+		{
+			"id": "yellow",
+			"title": "Yellow",
+			"class": "clr_yellow"
+		},
+		{
+			"id": "lemon",
+			"title": "Lemon",
+			"class": "clr_lemon"
+		},
+		{
+			"id": "lime",
+			"title": "Lime",
+			"class": "clr_lime"
+		},
+		{
+			"id": "grass",
+			"title": "Grass",
+			"class": "clr_grass"
+		},
+		{
+			"id": "green",
+			"title": "Green",
+			"class": "clr_green"
+		},
+		{
+			"id": "mint",
+			"title": "Mint",
+			"class": "clr_mint"
+		},
+		{
+			"id": "emerald",
+			"title": "Emerald",
+			"class": "clr_emerald"
+		},
+		{
+			"id": "aqua",
+			"title": "Aqua",
+			"class": "clr_aqua"
+		},
+		{
+			"id": "teal",
+			"title": "Teal",
+			"class": "clr_teal"
+		},
+		{
+			"id": "turquoise",
+			"title": "Turquoise",
+			"class": "clr_turquoise"
+		},
+		{
+			"id": "cyan",
+			"title": "Cyan",
+			"class": "clr_cyan"
+		},
+		{
+			"id": "ice",
+			"title": "Ice",
+			"class": "clr_ice"
+		},
+		{
+			"id": "skyblue",
+			"title": "Sky",
+			"class": "clr_skyblue"
+		},
+		{
+			"id": "azure",
+			"title": "Azure",
+			"class": "clr_azure"
+		},
+		{
+			"id": "blue",
+			"title": "Blue",
+			"class": "clr_blue"
+		},
+		{
+			"id": "sapphire",
+			"title": "Sapphire",
+			"class": "clr_sapphire"
+		},
+		{
+			"id": "indigo",
+			"title": "Indigo",
+			"class": "clr_indigo"
+		},
+		{
+			"id": "lavender",
+			"title": "Lavender",
+			"class": "clr_lavender"
+		},
+		{
+			"id": "violet",
+			"title": "Violet",
+			"class": "clr_violet"
+		},
+		{
+			"id": "orchid",
+			"title": "Orchid",
+			"class": "clr_orchid"
+		},
+		{
+			"id": "purple",
+			"title": "Purple",
+			"class": "clr_purple"
+		},
+		{
+			"id": "magenta",
+			"title": "Magenta",
+			"class": "clr_magenta"
+		},
+		{
+			"id": "fuchsia",
+			"title": "Fuchsia",
+			"class": "clr_fuchsia"
+		},
+		{
+			"id": "hotpink",
+			"title": "Hot Pink",
+			"class": "clr_hotpink"
+		},
+		{
+			"id": "pink",
+			"title": "Pink",
+			"class": "clr_pink"
+		},
+		{
+			"id": "blush",
+			"title": "Blush",
+			"class": "clr_blush"
+		},
+		{
+			"id": "rose",
+			"title": "Rose",
+			"class": "clr_rose"
+		},
+		{
+			"id": "slate",
+			"title": "Slate",
+			"class": "clr_slate"
+		},
+		{
+			"id": "gray",
+			"title": "Gray",
+			"class": "clr_gray"
+		},
+		{
+			"id": "zinc",
+			"title": "Zinc",
+			"class": "clr_zinc"
+		},
+		{
+			"id": "neutral",
+			"title": "Neutral",
+			"class": "clr_neutral"
+		},
+		{
+			"id": "stone",
+			"title": "Stone",
+			"class": "clr_stone"
+		},
+		{
+			"id": "mauve",
+			"title": "Mauve",
+			"class": "clr_mauve"
+		},
+		{
+			"id": "olive",
+			"title": "Olive",
+			"class": "clr_olive"
+		},
+		{
+			"id": "mist",
+			"title": "Mist",
+			"class": "clr_mist"
+		},
+		{
+			"id": "taupe",
+			"title": "Taupe",
+			"class": "clr_taupe"
+		}
+	],
+	
 	"ticket_types": [
 		{ "id": "issue", "title": "Issue", "icon": "bug-outline" },
 		{ "id": "feature", "title": "Feature", "icon": "lightbulb-outline" },
