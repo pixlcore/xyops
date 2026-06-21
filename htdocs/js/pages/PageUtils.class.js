@@ -512,7 +512,7 @@ Page.PageUtils = class PageUtils extends Page.Base {
 		var self = this;
 		var $file = $('#fe_file_import');
 		if ($file.length) $file.remove();
-		$file = $('<input type="file" id="fe_file_import" accept=".json" style="display:none">').appendTo('body');
+		$file = $('<input type="file" id="fe_file_import" accept=".json,.gz" style="display:none">').appendTo('body');
 		
 		$file.on('change', function() {
 			if (this.files && this.files.length) self.doPrepImportFile( this.files[0] );
@@ -525,7 +525,6 @@ Page.PageUtils = class PageUtils extends Page.Base {
 	doPrepImportFile(file) {
 		// start importing a file from a upload or drop
 		var self = this;
-		var reader = new FileReader();
 		
 		var hasEnabledTriggers = function(event) {
 			return (event.triggers || []).find( function(trigger) {
@@ -722,9 +721,9 @@ Page.PageUtils = class PageUtils extends Page.Base {
 			self.highlightCodeBlocks('#dialog .markdown-body');
 		}; // doImportMultiple
 		
-		reader.onload = function(e) {
+		var processImportText = function(text) {
 			var json = null;
-			try { json = JSON.parse(e.target.result); } 
+			try { json = JSON.parse(text); } 
 			catch (err) { return app.doError("Failed to parse JSON in uploaded file: " + err); }
 			
 			if (!json.version || (json.version !== '1.0') || !json.type || (json.type !== 'xypdf') || !json.items || !json.items[0]) {
@@ -736,9 +735,21 @@ Page.PageUtils = class PageUtils extends Page.Base {
 			
 			if (json.items.length > 1) doImportMultiple(json);
 			else doImportSingle(json);
-		}; // onload
+		}; // processImportText
 		
-		reader.readAsText(file);
+		if (file.name.match(/\.json\.gz$/i)) {
+			// gunzip file
+			var stream = file.stream().pipeThrough( new DecompressionStream('gzip') );
+			new Response(stream).text().then( processImportText ).catch( function(err) {
+				app.doError("Failed to decompress gzip file: " + err);
+			});
+		}
+		else {
+			// plain text file
+			file.text().then( processImportText ).catch( function(err) {
+				app.doError("Failed to read uploaded file: " + err);
+			});
+		}
 	}
 	
 	// Chart Size Selector
