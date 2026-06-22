@@ -148,57 +148,55 @@ body.dark.lowcon {
 
 /* Color Accessibility Mode */
 
-body.coloracc {
-	a, span.link, button.link {
-		-webkit-text-decoration: dashed underline;
-		text-decoration: dashed underline;
-	}
-	a:hover, span.link:hover, button.link:hover {
-		-webkit-text-decoration: solid underline !important;
-		text-decoration: solid underline !important;
-	}
-	
-	.checkbox_container > input ~ label {
-		-webkit-text-decoration: dashed underline;
-		text-decoration: dashed underline;
-	}
-	.checkbox_container > input:hover ~ label {
-		-webkit-text-decoration: solid underline !important;
-		text-decoration: solid underline !important;
-	}
-	
-	.button:hover {
-		text-decoration: underline !important;
-		border-style: dashed !important;
-	}
-	
-	.diff_removed {
-		text-decoration: line-through;
-	}
-	
-	.diff_added {
-		-webkit-text-decoration: dashed underline;
-		text-decoration: dashed underline;
-	}
-	
-	.header_widget:hover {
-		text-decoration: underline !important;
-		border-style: dashed !important;
-	}
-	
-	input:focus, textarea:focus {
-		border-color: var(--theme-color) !important;
-		border-style: dashed !important;
-	}
-	
-	.multiselect:hover {
-		border-color: var(--theme-color) !important;
-		border-style: dashed !important;
-	}
-	
-	.sel_dialog_item:hover {
-		text-decoration: underline !important;
-	}
+body.coloracc a, body.coloracc span.link, body.coloracc button.link {
+	-webkit-text-decoration: dashed underline;
+	text-decoration: dashed underline;
+}
+body.coloracc a:hover, body.coloracc span.link:hover, body.coloracc button.link:hover {
+	-webkit-text-decoration: solid underline !important;
+	text-decoration: solid underline !important;
+}
+
+body.coloracc .checkbox_container > input ~ label {
+	-webkit-text-decoration: dashed underline;
+	text-decoration: dashed underline;
+}
+body.coloracc .checkbox_container > input:hover ~ label {
+	-webkit-text-decoration: solid underline !important;
+	text-decoration: solid underline !important;
+}
+
+body.coloracc .button:hover {
+	text-decoration: underline !important;
+	border-style: dashed !important;
+}
+
+body.coloracc .diff_removed {
+	text-decoration: line-through;
+}
+
+body.coloracc .diff_added {
+	-webkit-text-decoration: dashed underline;
+	text-decoration: dashed underline;
+}
+
+body.coloracc .header_widget:hover {
+	text-decoration: underline !important;
+	border-style: dashed !important;
+}
+
+body.coloracc input:focus, body.coloracc textarea:focus {
+	border-color: var(--theme-color) !important;
+	border-style: dashed !important;
+}
+
+body.coloracc .multiselect:hover {
+	border-color: var(--theme-color) !important;
+	border-style: dashed !important;
+}
+
+body.coloracc .sel_dialog_item:hover {
+	text-decoration: underline !important;
 }
 
 /* Privacy Mode */
@@ -258,239 +256,276 @@ button.link:focus-visible, button.editor_toolbar_button:focus-visible {
 
 /* Category Colors */
 
-body.highcon, body.coloracc {
+body.highcon .clr_red,
+	body.highcon ul.clr_red > div,
+	body.coloracc .clr_red,
+	body.coloracc ul.clr_red > div,
+	body.highcon .clr_fire,
+	body.highcon ul.clr_fire > div,
+	body.coloracc .clr_fire,
+	body.coloracc ul.clr_fire > div,
+	body.highcon .clr_orange,
+	body.highcon ul.clr_orange > div,
+	body.coloracc .clr_orange,
+	body.coloracc ul.clr_orange > div,
+	body.highcon .clr_tangerine,
+	body.highcon ul.clr_tangerine > div,
+	body.coloracc .clr_tangerine,
+	body.coloracc ul.clr_tangerine > div,
+	body.highcon .clr_amber,
+	body.highcon ul.clr_amber > div,
+	body.coloracc .clr_amber,
+	body.coloracc ul.clr_amber > div,
+	body.highcon .clr_gold,
+	body.highcon ul.clr_gold > div,
+	body.coloracc .clr_gold,
+	body.coloracc ul.clr_gold > div,
+	body.highcon .clr_yellow,
+	body.highcon ul.clr_yellow > div,
+	body.coloracc .clr_yellow,
+	body.coloracc ul.clr_yellow > div,
+	body.highcon .clr_lemon,
+	body.highcon ul.clr_lemon > div,
+	body.coloracc .clr_lemon,
+	body.coloracc ul.clr_lemon > div,
+	body.highcon .clr_lime,
+	body.highcon ul.clr_lime > div,
+	body.coloracc .clr_lime,
+	body.coloracc ul.clr_lime > div,
+	body.highcon .clr_grass,
+	body.highcon ul.clr_grass > div,
+	body.coloracc .clr_grass,
+	body.coloracc ul.clr_grass > div,
+	body.highcon .clr_green,
+	body.highcon ul.clr_green > div,
+	body.coloracc .clr_green,
+	body.coloracc ul.clr_green > div,
+	body.highcon .clr_mint,
+	body.highcon ul.clr_mint > div,
+	body.coloracc .clr_mint,
+	body.coloracc ul.clr_mint > div,
+	body.highcon .clr_emerald,
+	body.highcon ul.clr_emerald > div,
+	body.coloracc .clr_emerald,
+	body.coloracc ul.clr_emerald > div,
+	body.highcon .clr_aqua,
+	body.highcon ul.clr_aqua > div,
+	body.coloracc .clr_aqua,
+	body.coloracc ul.clr_aqua > div,
+	body.highcon .clr_teal,
+	body.highcon ul.clr_teal > div,
+	body.coloracc .clr_teal,
+	body.coloracc ul.clr_teal > div,
+	body.highcon .clr_turquoise,
+	body.highcon ul.clr_turquoise > div,
+	body.coloracc .clr_turquoise,
+	body.coloracc ul.clr_turquoise > div,
+	body.highcon .clr_cyan,
+	body.highcon ul.clr_cyan > div,
+	body.coloracc .clr_cyan,
+	body.coloracc ul.clr_cyan > div,
+	body.highcon .clr_ice,
+	body.highcon ul.clr_ice > div,
+	body.coloracc .clr_ice,
+	body.coloracc ul.clr_ice > div,
+	body.highcon .clr_skyblue,
+	body.highcon ul.clr_skyblue > div,
+	body.coloracc .clr_skyblue,
+	body.coloracc ul.clr_skyblue > div,
+	body.highcon .clr_azure,
+	body.highcon ul.clr_azure > div,
+	body.coloracc .clr_azure,
+	body.coloracc ul.clr_azure > div,
+	body.highcon .clr_blue,
+	body.highcon ul.clr_blue > div,
+	body.coloracc .clr_blue,
+	body.coloracc ul.clr_blue > div,
+	body.highcon .clr_sapphire,
+	body.highcon ul.clr_sapphire > div,
+	body.coloracc .clr_sapphire,
+	body.coloracc ul.clr_sapphire > div,
+	body.highcon .clr_indigo,
+	body.highcon ul.clr_indigo > div,
+	body.coloracc .clr_indigo,
+	body.coloracc ul.clr_indigo > div,
+	body.highcon .clr_lavender,
+	body.highcon ul.clr_lavender > div,
+	body.coloracc .clr_lavender,
+	body.coloracc ul.clr_lavender > div,
+	body.highcon .clr_violet,
+	body.highcon ul.clr_violet > div,
+	body.coloracc .clr_violet,
+	body.coloracc ul.clr_violet > div,
+	body.highcon .clr_orchid,
+	body.highcon ul.clr_orchid > div,
+	body.coloracc .clr_orchid,
+	body.coloracc ul.clr_orchid > div,
+	body.highcon .clr_purple,
+	body.highcon ul.clr_purple > div,
+	body.coloracc .clr_purple,
+	body.coloracc ul.clr_purple > div,
+	body.highcon .clr_magenta,
+	body.highcon ul.clr_magenta > div,
+	body.coloracc .clr_magenta,
+	body.coloracc ul.clr_magenta > div,
+	body.highcon .clr_fuchsia,
+	body.highcon ul.clr_fuchsia > div,
+	body.coloracc .clr_fuchsia,
+	body.coloracc ul.clr_fuchsia > div,
+	body.highcon .clr_hotpink,
+	body.highcon ul.clr_hotpink > div,
+	body.coloracc .clr_hotpink,
+	body.coloracc ul.clr_hotpink > div,
+	body.highcon .clr_pink,
+	body.highcon ul.clr_pink > div,
+	body.coloracc .clr_pink,
+	body.coloracc ul.clr_pink > div,
+	body.highcon .clr_blush,
+	body.highcon ul.clr_blush > div,
+	body.coloracc .clr_blush,
+	body.coloracc ul.clr_blush > div,
+	body.highcon .clr_rose,
+	body.highcon ul.clr_rose > div,
+	body.coloracc .clr_rose,
+	body.coloracc ul.clr_rose > div { 
+	color: var(--label-color); 
+	--link-color: var(--link-color); 
+	--theme-color: color-mix(in oklch, var(--link-color) 80%, white); 
+}
 
-	.clr_red, ul.clr_red > div { 
-		color: var(--label-color); 
-		--link-color: var(--link-color); 
-		--theme-color: color-mix(in oklch, var(--link-color) 80%, white); 
-	}
-	.clr_fire, ul.clr_fire > div { 
-		color: var(--label-color); 
-		--link-color: var(--link-color); 
-		--theme-color: color-mix(in oklch, var(--link-color) 80%, white); 
-	}
-	.clr_orange, ul.clr_orange > div { 
-		color: var(--label-color); 
-		--link-color: var(--link-color); 
-		--theme-color: color-mix(in oklch, var(--link-color) 80%, white); 
-	}
-	.clr_tangerine, ul.clr_tangerine > div { 
-		color: var(--label-color); 
-		--link-color: var(--link-color); 
-		--theme-color: color-mix(in oklch, var(--link-color) 80%, white); 
-	}
-	.clr_amber, ul.clr_amber > div { 
-		color: var(--label-color); 
-		--link-color: var(--link-color); 
-		--theme-color: color-mix(in oklch, var(--link-color) 80%, white); 
-	}
-	.clr_gold, ul.clr_gold > div { 
-		color: var(--label-color); 
-		--link-color: var(--link-color); 
-		--theme-color: color-mix(in oklch, var(--link-color) 80%, white); 
-	}
-	.clr_yellow, ul.clr_yellow > div { 
-		color: var(--label-color); 
-		--link-color: var(--link-color); 
-		--theme-color: color-mix(in oklch, var(--link-color) 80%, white); 
-	}
-	.clr_lemon, ul.clr_lemon > div { 
-		color: var(--label-color); 
-		--link-color: var(--link-color); 
-		--theme-color: color-mix(in oklch, var(--link-color) 80%, white); 
-	}
-	.clr_lime, ul.clr_lime > div { 
-		color: var(--label-color); 
-		--link-color: var(--link-color); 
-		--theme-color: color-mix(in oklch, var(--link-color) 80%, white); 
-	}
-	.clr_grass, ul.clr_grass > div { 
-		color: var(--label-color); 
-		--link-color: var(--link-color); 
-		--theme-color: color-mix(in oklch, var(--link-color) 80%, white); 
-	}
-	.clr_green, ul.clr_green > div { 
-		color: var(--label-color); 
-		--link-color: var(--link-color); 
-		--theme-color: color-mix(in oklch, var(--link-color) 80%, white); 
-	}
-	.clr_mint, ul.clr_mint > div { 
-		color: var(--label-color); 
-		--link-color: var(--link-color); 
-		--theme-color: color-mix(in oklch, var(--link-color) 80%, white); 
-	}
-	.clr_emerald, ul.clr_emerald > div { 
-		color: var(--label-color); 
-		--link-color: var(--link-color); 
-		--theme-color: color-mix(in oklch, var(--link-color) 80%, white); 
-	}
-	.clr_aqua, ul.clr_aqua > div { 
-		color: var(--label-color); 
-		--link-color: var(--link-color); 
-		--theme-color: color-mix(in oklch, var(--link-color) 80%, white); 
-	}
-	.clr_teal, ul.clr_teal > div { 
-		color: var(--label-color); 
-		--link-color: var(--link-color); 
-		--theme-color: color-mix(in oklch, var(--link-color) 80%, white); 
-	}
-	.clr_turquoise, ul.clr_turquoise > div { 
-		color: var(--label-color); 
-		--link-color: var(--link-color); 
-		--theme-color: color-mix(in oklch, var(--link-color) 80%, white); 
-	}
-	.clr_cyan, ul.clr_cyan > div { 
-		color: var(--label-color); 
-		--link-color: var(--link-color); 
-		--theme-color: color-mix(in oklch, var(--link-color) 80%, white); 
-	}
-	.clr_ice, ul.clr_ice > div { 
-		color: var(--label-color); 
-		--link-color: var(--link-color); 
-		--theme-color: color-mix(in oklch, var(--link-color) 80%, white); 
-	}
-	.clr_skyblue, ul.clr_skyblue > div { 
-		color: var(--label-color); 
-		--link-color: var(--link-color); 
-		--theme-color: color-mix(in oklch, var(--link-color) 80%, white); 
-	}
-	.clr_azure, ul.clr_azure > div { 
-		color: var(--label-color); 
-		--link-color: var(--link-color); 
-		--theme-color: color-mix(in oklch, var(--link-color) 80%, white); 
-	}
-	.clr_blue, ul.clr_blue > div { 
-		color: var(--label-color); 
-		--link-color: var(--link-color); 
-		--theme-color: color-mix(in oklch, var(--link-color) 80%, white); 
-	}
-	.clr_sapphire, ul.clr_sapphire > div { 
-		color: var(--label-color); 
-		--link-color: var(--link-color); 
-		--theme-color: color-mix(in oklch, var(--link-color) 80%, white); 
-	}
-	.clr_indigo, ul.clr_indigo > div { 
-		color: var(--label-color); 
-		--link-color: var(--link-color); 
-		--theme-color: color-mix(in oklch, var(--link-color) 80%, white); 
-	}
-	.clr_lavender, ul.clr_lavender > div { 
-		color: var(--label-color); 
-		--link-color: var(--link-color); 
-		--theme-color: color-mix(in oklch, var(--link-color) 80%, white); 
-	}
-	.clr_violet, ul.clr_violet > div { 
-		color: var(--label-color); 
-		--link-color: var(--link-color); 
-		--theme-color: color-mix(in oklch, var(--link-color) 80%, white); 
-	}
-	.clr_orchid, ul.clr_orchid > div { 
-		color: var(--label-color); 
-		--link-color: var(--link-color); 
-		--theme-color: color-mix(in oklch, var(--link-color) 80%, white); 
-	}
-	.clr_purple, ul.clr_purple > div { 
-		color: var(--label-color); 
-		--link-color: var(--link-color); 
-		--theme-color: color-mix(in oklch, var(--link-color) 80%, white); 
-	}
-	.clr_magenta, ul.clr_magenta > div { 
-		color: var(--label-color); 
-		--link-color: var(--link-color); 
-		--theme-color: color-mix(in oklch, var(--link-color) 80%, white); 
-	}
-	.clr_fuchsia, ul.clr_fuchsia > div { 
-		color: var(--label-color); 
-		--link-color: var(--link-color); 
-		--theme-color: color-mix(in oklch, var(--link-color) 80%, white); 
-	}
-	.clr_hotpink, ul.clr_hotpink > div { 
-		color: var(--label-color); 
-		--link-color: var(--link-color); 
-		--theme-color: color-mix(in oklch, var(--link-color) 80%, white); 
-	}
-	.clr_pink, ul.clr_pink > div { 
-		color: var(--label-color); 
-		--link-color: var(--link-color); 
-		--theme-color: color-mix(in oklch, var(--link-color) 80%, white); 
-	}
-	.clr_blush, ul.clr_blush > div { 
-		color: var(--label-color); 
-		--link-color: var(--link-color); 
-		--theme-color: color-mix(in oklch, var(--link-color) 80%, white); 
-	}
-	.clr_rose, ul.clr_rose > div { 
-		color: var(--label-color); 
-		--link-color: var(--link-color); 
-		--theme-color: color-mix(in oklch, var(--link-color) 80%, white); 
-	}
-
-	.cat_red { color: var(--label-color); }
-	.cat_red:hover { color: color-mix(in oklch, var(--link-color) 90%, white); }
-	.cat_fire { color: var(--label-color); }
-	.cat_fire:hover { color: color-mix(in oklch, var(--link-color) 90%, white); }
-	.cat_orange { color: var(--label-color); }
-	.cat_orange:hover { color: color-mix(in oklch, var(--link-color) 90%, white); }
-	.cat_tangerine { color: var(--label-color); }
-	.cat_tangerine:hover { color: color-mix(in oklch, var(--link-color) 90%, white); }
-	.cat_amber { color: var(--label-color); }
-	.cat_amber:hover { color: color-mix(in oklch, var(--link-color) 90%, white); }
-	.cat_gold { color: var(--label-color); }
-	.cat_gold:hover { color: color-mix(in oklch, var(--link-color) 90%, white); }
-	.cat_yellow { color: var(--label-color); }
-	.cat_yellow:hover { color: color-mix(in oklch, var(--link-color) 90%, white); }
-	.cat_lemon { color: var(--label-color); }
-	.cat_lemon:hover { color: color-mix(in oklch, var(--link-color) 90%, white); }
-	.cat_lime { color: var(--label-color); }
-	.cat_lime:hover { color: color-mix(in oklch, var(--link-color) 90%, white); }
-	.cat_grass { color: var(--label-color); }
-	.cat_grass:hover { color: color-mix(in oklch, var(--link-color) 90%, white); }
-	.cat_green { color: var(--label-color); }
-	.cat_green:hover { color: color-mix(in oklch, var(--link-color) 90%, white); }
-	.cat_mint { color: var(--label-color); }
-	.cat_mint:hover { color: color-mix(in oklch, var(--link-color) 90%, white); }
-	.cat_emerald { color: var(--label-color); }
-	.cat_emerald:hover { color: color-mix(in oklch, var(--link-color) 90%, white); }
-	.cat_aqua { color: var(--label-color); }
-	.cat_aqua:hover { color: color-mix(in oklch, var(--link-color) 90%, white); }
-	.cat_teal { color: var(--label-color); }
-	.cat_teal:hover { color: color-mix(in oklch, var(--link-color) 90%, white); }
-	.cat_turquoise { color: var(--label-color); }
-	.cat_turquoise:hover { color: color-mix(in oklch, var(--link-color) 90%, white); }
-	.cat_cyan { color: var(--label-color); }
-	.cat_cyan:hover { color: color-mix(in oklch, var(--link-color) 90%, white); }
-	.cat_ice { color: var(--label-color); }
-	.cat_ice:hover { color: color-mix(in oklch, var(--link-color) 90%, white); }
-	.cat_skyblue { color: var(--label-color); }
-	.cat_skyblue:hover { color: color-mix(in oklch, var(--link-color) 90%, white); }
-	.cat_azure { color: var(--label-color); }
-	.cat_azure:hover { color: color-mix(in oklch, var(--link-color) 90%, white); }
-	.cat_blue { color: var(--label-color); }
-	.cat_blue:hover { color: color-mix(in oklch, var(--link-color) 90%, white); }
-	.cat_sapphire { color: var(--label-color); }
-	.cat_sapphire:hover { color: color-mix(in oklch, var(--link-color) 90%, white); }
-	.cat_indigo { color: var(--label-color); }
-	.cat_indigo:hover { color: color-mix(in oklch, var(--link-color) 90%, white); }
-	.cat_lavender { color: var(--label-color); }
-	.cat_lavender:hover { color: color-mix(in oklch, var(--link-color) 90%, white); }
-	.cat_violet { color: var(--label-color); }
-	.cat_violet:hover { color: color-mix(in oklch, var(--link-color) 90%, white); }
-	.cat_orchid { color: var(--label-color); }
-	.cat_orchid:hover { color: color-mix(in oklch, var(--link-color) 90%, white); }
-	.cat_purple { color: var(--label-color); }
-	.cat_purple:hover { color: color-mix(in oklch, var(--link-color) 90%, white); }
-	.cat_magenta { color: var(--label-color); }
-	.cat_magenta:hover { color: color-mix(in oklch, var(--link-color) 90%, white); }
-	.cat_fuchsia { color: var(--label-color); }
-	.cat_fuchsia:hover { color: color-mix(in oklch, var(--link-color) 90%, white); }
-	.cat_hotpink { color: var(--label-color); }
-	.cat_hotpink:hover { color: color-mix(in oklch, var(--link-color) 90%, white); }
-	.cat_pink { color: var(--label-color); }
-	.cat_pink:hover { color: color-mix(in oklch, var(--link-color) 90%, white); }
-	.cat_blush { color: var(--label-color); }
-	.cat_blush:hover { color: color-mix(in oklch, var(--link-color) 90%, white); }
-	.cat_rose { color: var(--label-color); }
-	.cat_rose:hover { color: color-mix(in oklch, var(--link-color) 90%, white); }
-	
+body.highcon .cat_red,
+	body.coloracc .cat_red,
+	body.highcon .cat_fire,
+	body.coloracc .cat_fire,
+	body.highcon .cat_orange,
+	body.coloracc .cat_orange,
+	body.highcon .cat_tangerine,
+	body.coloracc .cat_tangerine,
+	body.highcon .cat_amber,
+	body.coloracc .cat_amber,
+	body.highcon .cat_gold,
+	body.coloracc .cat_gold,
+	body.highcon .cat_yellow,
+	body.coloracc .cat_yellow,
+	body.highcon .cat_lemon,
+	body.coloracc .cat_lemon,
+	body.highcon .cat_lime,
+	body.coloracc .cat_lime,
+	body.highcon .cat_grass,
+	body.coloracc .cat_grass,
+	body.highcon .cat_green,
+	body.coloracc .cat_green,
+	body.highcon .cat_mint,
+	body.coloracc .cat_mint,
+	body.highcon .cat_emerald,
+	body.coloracc .cat_emerald,
+	body.highcon .cat_aqua,
+	body.coloracc .cat_aqua,
+	body.highcon .cat_teal,
+	body.coloracc .cat_teal,
+	body.highcon .cat_turquoise,
+	body.coloracc .cat_turquoise,
+	body.highcon .cat_cyan,
+	body.coloracc .cat_cyan,
+	body.highcon .cat_ice,
+	body.coloracc .cat_ice,
+	body.highcon .cat_skyblue,
+	body.coloracc .cat_skyblue,
+	body.highcon .cat_azure,
+	body.coloracc .cat_azure,
+	body.highcon .cat_blue,
+	body.coloracc .cat_blue,
+	body.highcon .cat_sapphire,
+	body.coloracc .cat_sapphire,
+	body.highcon .cat_indigo,
+	body.coloracc .cat_indigo,
+	body.highcon .cat_lavender,
+	body.coloracc .cat_lavender,
+	body.highcon .cat_violet,
+	body.coloracc .cat_violet,
+	body.highcon .cat_orchid,
+	body.coloracc .cat_orchid,
+	body.highcon .cat_purple,
+	body.coloracc .cat_purple,
+	body.highcon .cat_magenta,
+	body.coloracc .cat_magenta,
+	body.highcon .cat_fuchsia,
+	body.coloracc .cat_fuchsia,
+	body.highcon .cat_hotpink,
+	body.coloracc .cat_hotpink,
+	body.highcon .cat_pink,
+	body.coloracc .cat_pink,
+	body.highcon .cat_blush,
+	body.coloracc .cat_blush,
+	body.highcon .cat_rose,
+	body.coloracc .cat_rose { 
+	color: var(--label-color); 
+}
+body.highcon .cat_red:hover,
+	body.coloracc .cat_red:hover,
+	body.highcon .cat_fire:hover,
+	body.coloracc .cat_fire:hover,
+	body.highcon .cat_orange:hover,
+	body.coloracc .cat_orange:hover,
+	body.highcon .cat_tangerine:hover,
+	body.coloracc .cat_tangerine:hover,
+	body.highcon .cat_amber:hover,
+	body.coloracc .cat_amber:hover,
+	body.highcon .cat_gold:hover,
+	body.coloracc .cat_gold:hover,
+	body.highcon .cat_yellow:hover,
+	body.coloracc .cat_yellow:hover,
+	body.highcon .cat_lemon:hover,
+	body.coloracc .cat_lemon:hover,
+	body.highcon .cat_lime:hover,
+	body.coloracc .cat_lime:hover,
+	body.highcon .cat_grass:hover,
+	body.coloracc .cat_grass:hover,
+	body.highcon .cat_green:hover,
+	body.coloracc .cat_green:hover,
+	body.highcon .cat_mint:hover,
+	body.coloracc .cat_mint:hover,
+	body.highcon .cat_emerald:hover,
+	body.coloracc .cat_emerald:hover,
+	body.highcon .cat_aqua:hover,
+	body.coloracc .cat_aqua:hover,
+	body.highcon .cat_teal:hover,
+	body.coloracc .cat_teal:hover,
+	body.highcon .cat_turquoise:hover,
+	body.coloracc .cat_turquoise:hover,
+	body.highcon .cat_cyan:hover,
+	body.coloracc .cat_cyan:hover,
+	body.highcon .cat_ice:hover,
+	body.coloracc .cat_ice:hover,
+	body.highcon .cat_skyblue:hover,
+	body.coloracc .cat_skyblue:hover,
+	body.highcon .cat_azure:hover,
+	body.coloracc .cat_azure:hover,
+	body.highcon .cat_blue:hover,
+	body.coloracc .cat_blue:hover,
+	body.highcon .cat_sapphire:hover,
+	body.coloracc .cat_sapphire:hover,
+	body.highcon .cat_indigo:hover,
+	body.coloracc .cat_indigo:hover,
+	body.highcon .cat_lavender:hover,
+	body.coloracc .cat_lavender:hover,
+	body.highcon .cat_violet:hover,
+	body.coloracc .cat_violet:hover,
+	body.highcon .cat_orchid:hover,
+	body.coloracc .cat_orchid:hover,
+	body.highcon .cat_purple:hover,
+	body.coloracc .cat_purple:hover,
+	body.highcon .cat_magenta:hover,
+	body.coloracc .cat_magenta:hover,
+	body.highcon .cat_fuchsia:hover,
+	body.coloracc .cat_fuchsia:hover,
+	body.highcon .cat_hotpink:hover,
+	body.coloracc .cat_hotpink:hover,
+	body.highcon .cat_pink:hover,
+	body.coloracc .cat_pink:hover,
+	body.highcon .cat_blush:hover,
+	body.coloracc .cat_blush:hover,
+	body.highcon .cat_rose:hover,
+	body.coloracc .cat_rose:hover { 
+	color: color-mix(in oklch, var(--link-color) 90%, white); 
 }
