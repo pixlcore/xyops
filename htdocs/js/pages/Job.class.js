@@ -3054,7 +3054,17 @@ Page.Job = class Job extends Page.PageUtils {
 		var job = this.job;
 		if (!app.requirePrivilege('delete_jobs')) return;
 		
-		Dialog.confirmDanger( 'Delete Job', "Are you sure you want to permanently delete the current job, including all logs and files?  There is no way to undo this operation.", ['trash-can', 'Delete'], function(result) {
+		var title = "Delete Job";
+		var text = "Are you sure you want to permanently delete the current job, including all logs and files?  There is no way to undo this operation.";
+		var btn = ['trash-can', 'Delete'];
+		
+		if (job.type == 'workflow') {
+			title = "Delete Workflow Job";
+			text += "<br><br>Also, since this is a workflow, note that all sub-jobs will be deleted as well.";
+			btn = ['trash-can', 'Delete All'];
+		}
+		
+		Dialog.confirmDanger( title, text, btn, function(result) {
 			if (!result) return;
 			app.clearError();
 			Dialog.showProgress( 1.0, "Deleting Job..." );
