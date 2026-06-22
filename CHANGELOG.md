@@ -1,5 +1,12 @@
 # xyOps Changelog
 
+## Version v1.0.73
+
+> June 22, 2026
+
+- [`b40d2de9`](https://github.com/pixlcore/xyops/commit/b40d2de975358cb5194510663c507ef3f1be9d22): Version 1.0.73
+- [`78ec5358`](https://github.com/pixlcore/xyops/commit/78ec5358e8f9ccca83e0bc5cdeae217ee2324065): Emergency CSS Fix: Our CSS minifier does not support nesting.
+
 ## Version v1.0.72
 
 > June 22, 2026
