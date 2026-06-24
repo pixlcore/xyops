@@ -2249,6 +2249,17 @@ Page.PageUtils = class PageUtils extends Page.Base {
 			caption: 'Enter values for all the Event-defined parameters here.'
 		});
 		
+		// start delay
+		html += this.getFormRow({
+			id: 'd_eja_start_delay',
+			label: 'Start Delay:',
+			content: this.getFormRelativeTime({
+				id: 'fe_eja_start_delay',
+				value: action.start_delay || 0
+			}),
+			caption: 'Optionally set a starting delay for the custom job.'
+		});
+		
 		// clear alert on success (alert-specific)
 		if (opts.alert) {
 			html += this.getFormRow({
@@ -2442,6 +2453,7 @@ Page.PageUtils = class PageUtils extends Page.Base {
 					}
 					var event = find_object( app.events, { id: action.event_id } );
 					if (!event) return app.badField('#fe_eja_event', "Event not found.");
+					action.start_delay = parseInt( $('#fe_eja_start_delay').val() );
 					action.params = self.getParamValues( event.fields || [] );
 					if (!action.params) return false; // invalid
 				break;
@@ -2492,7 +2504,7 @@ Page.PageUtils = class PageUtils extends Page.Base {
 		} ); // Dialog.confirm
 		
 		var change_action_type = function(new_type) {
-			$('#d_eja_email, #d_eja_users, #d_eja_body, #d_eja_web_hook, #d_eja_web_hook_text, #d_eja_run_job, #d_eja_target_server, #d_eja_clear_alert, #d_eja_event_params, #d_eja_channel, #d_eja_bucket, #d_eja_bucket_sync, #d_eja_bucket_glob, #d_nt_type, #d_nt_assignees, #d_nt_tags, #d_eja_tags, #d_eja_suspend_sources, #d_eja_plugin, #d_eja_plugin_params').hide();
+			$('#d_eja_email, #d_eja_users, #d_eja_body, #d_eja_web_hook, #d_eja_web_hook_text, #d_eja_run_job, #d_eja_target_server, #d_eja_clear_alert, #d_eja_event_params, #d_eja_start_delay, #d_eja_channel, #d_eja_bucket, #d_eja_bucket_sync, #d_eja_bucket_glob, #d_nt_type, #d_nt_assignees, #d_nt_tags, #d_eja_tags, #d_eja_suspend_sources, #d_eja_plugin, #d_eja_plugin_params').hide();
 			
 			switch (new_type) {
 				case 'email':
@@ -2508,6 +2520,7 @@ Page.PageUtils = class PageUtils extends Page.Base {
 				
 				case 'run_event':
 					$('#d_eja_run_job').show();
+					$('#d_eja_start_delay').show();
 					if (opts.alert) {
 						$('#d_eja_target_server').show();
 						$('#d_eja_clear_alert').show();
@@ -2583,6 +2596,7 @@ Page.PageUtils = class PageUtils extends Page.Base {
 		
 		MultiSelect.init( $('#fe_eja_users, #fe_nt_assignees, #fe_nt_tags, #fe_eja_tags, #fe_eja_suspend_sources') );
 		SingleSelect.init( $('#fe_eja_condition, #fe_eja_type, #fe_eja_event, #fe_eja_channel, #fe_eja_web_hook, #fe_eja_plugin, #fe_eja_bucket, #fe_eja_bucket_sync, #fe_nt_type') );
+		RelativeTime.init( $('#fe_eja_start_delay') );
 		
 		Dialog.autoResize();
 	}
