@@ -123,6 +123,8 @@ bin/debug.sh
 
 # Security
 
+Read our **[Trust Guide](https://docs.xyops.io/trust)** for xyOps self-hosting, privacy, telemetry, outbound requests, and enterprise security posture.
+
 Read our **[Security Guide](https://docs.xyops.io/security)** to learn how to report security vulnerabilities to the xyOps team.
 
 Please do **not** submit vulnerabilities as GitHub issues!

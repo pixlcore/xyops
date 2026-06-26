@@ -4,6 +4,8 @@
 
 The xyOps team takes security very seriously. Due to the nature of how xyOps is installed on large server fleets a lot of decisions are made with security being the priority, and we always aim to implement security by design.
 
+For a broader overview of xyOps self-hosting, privacy, telemetry, outbound requests, and enterprise security posture, see the [Trust](trust.md) guide.
+
 ## Coordinated vulnerability disclosure
 
 xyOps follows the [coordinated vulnerability disclosure](https://en.wikipedia.org/wiki/Coordinated_vulnerability_disclosure) model when dealing with security vulnerabilities. This was previously known as responsible disclosure. We strongly urge anyone reporting vulnerabilities to xyOps or any other project to follow this model as it is considered as a best practice by many in the security industry.
