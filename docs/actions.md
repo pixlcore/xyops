@@ -128,7 +128,6 @@ If the `body` property is provided, this is used instead of a standard template 
 In addition, special metadata key/value pairs may be specified using [HTML Comments](https://developer.mozilla.org/en-US/docs/Web/HTML/Guides/Comments) (which are ignored by the markdown parser) for things such as the email subject line.  The syntax is: `<!-- KEY: VALUE -->`.  Example use:
 
 ```
-<!-- To: {{email_to}} -->
 <!-- Subject: ✅ {{config.client.name}} Job Completed Successfully: {{event.title}} -->
 <!-- Title: Job Successful -->
 <!-- Button: View Details | {{links.job_details}} -->
@@ -138,7 +137,6 @@ Here is the list of supported comment properties you can include:
 
 | Comment Key | Description |
 |-------------|-------------|
-| `To` | Becomes the email "To" header.  Use `{{email_to}}` for the combined list of recipients from the action. |
 | `From` | Becomes the email "From" header.  Defaults to the [email_from](config.md#email_from) global configuration property. |
 | `Subject` | Becomes the email "Subject" header. |
 | `Title` | Displayed in large bold text inside the HTML email header.  Usually less verbose than the subject. |
@@ -150,7 +148,6 @@ Here is the list of supported comment properties you can include:
 Here is the full template used when jobs complete successfully:
 
 ```
-	<!-- To: {{email_to}} -->
 	<!-- Subject: ✅ {{config.client.name}} Job Completed Successfully: {{event.title}} -->
 	<!-- Title: Job Successful -->
 	<!-- Button: View Details | {{links.job_details}} -->

@@ -2197,7 +2197,7 @@ Page.PageUtils = class PageUtils extends Page.Base {
 				value: action.body || '',
 				style: 'display:none'
 			}) + `<div class="button small secondary" onClick="$P().edit_eja_body()"><i class="mdi mdi-text-box-edit-outline">&nbsp;</i>Edit Email Content...</div>`,
-			caption: 'Optionally provide a custom email subject and body, using Markdown source.  See [Custom Email](#Docs/actions/custom-email) for details.'
+			caption: 'Optionally provide a custom email body, using Markdown source.  See [Custom Email](#Docs/actions/custom-email) for details.'
 		});
 		
 		// web hook
@@ -2445,7 +2445,6 @@ Page.PageUtils = class PageUtils extends Page.Base {
 					action.users = $('#fe_eja_users').val();
 					action.email = $('#fe_eja_email').val();
 					action.body = $('#fe_eja_body').val().trim();
-					// if (!action.email) return app.badField('#fe_eja_email', "Please enter one or more email addresses for the action.");
 					if (!action.users.length && !action.email) {
 						return app.doError("Please select one or more users, or enter one or more custom email addresses.");
 					}
