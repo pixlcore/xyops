@@ -551,11 +551,11 @@ Page.Job = class Job extends Page.PageUtils {
 			this.getJobSnapshots();
 			this.renderPluginParams('#d_job_params');
 			this.renderEventParams();
-			this.renderJobActions();
 			this.renderJobTags();
 			this.renderMediaSlideshow();
 		}
 		
+		this.renderJobActions();
 		this.setupCharts();
 		this.updateUserContent();
 		this.getJobAlerts();
@@ -1524,7 +1524,7 @@ Page.Job = class Job extends Page.PageUtils {
 		// we're only interested in actions that actually fired (and aren't hidden)
 		var actions = this.actions = (job.actions || []).filter( function(action) { return !!(action.date && !action.hidden); } );
 		
-		// for workflows, some actions may be 'orphaned' and not attached to any sub-job
+		// for workflows, include all sub-job actions as well
 		if (workflow && workflow.state && workflow.nodes) {
 			find_objects( workflow.nodes, { type: 'action' } ).forEach( function(node) {
 				var state = workflow.state[node.id];
@@ -1533,6 +1533,9 @@ Page.Job = class Job extends Page.PageUtils {
 				actions.push( state );
 			} );
 		}
+		
+		// sort actions by date ascending
+		sort_by( actions, 'date', { type: 'number', dir: 1 } );
 		
 		// decorate actions with idx, for linking
 		actions.forEach( function(action, idx) { action.idx = idx; } );
@@ -1546,7 +1549,7 @@ Page.Job = class Job extends Page.PageUtils {
 		var html = '';
 		
 		var grid_args = {
-			rows: sort_by(actions, 'condition'), // sort in place, so idx works below
+			rows: actions,
 			cols: cols,
 			data_type: 'action'
 		};
@@ -1564,7 +1567,7 @@ Page.Job = class Job extends Page.PageUtils {
 			return [
 				'<button class="link nowrap" onClick="' + link + '"><b><i class="mdi mdi-' + disp.condition.icon + '"></i>' + disp.condition.title + '</b></button>',
 				'<i class="mdi mdi-' + disp.icon + '">&nbsp;</i>' + disp.type,
-				self.getNiceActionSource(item.source || 'event'),
+				self.getNiceActionSource(item.source || 'event') + ((item.count > 1) ? ` (x${commify(item.count)})` : ''),
 				disp.desc,
 				self.getRelativeDateTime(item.date, true),
 				'<i class="mdi mdi-clock-check-outline">&nbsp;</i>' + get_text_from_ms_round( Math.floor(item.elapsed_ms), true),
@@ -1583,12 +1586,15 @@ Page.Job = class Job extends Page.PageUtils {
 		var action = this.actions[idx];
 		var disp = self.getJobActionDisplayArgs(action); // condition, type, text, desc, icon
 		var details = action.details || "";
-		var nice_date = this.getRelativeDateTime(action.date).replace(/\&nbsp;<\/i>/g, '</i>');
+		var nice_date = this.getRelativeDateTime(action.date, true).replace(/\&nbsp;<\/i>/g, '</i>');
 		
 		var header = "";
 		header += `- **Action Type:** ${disp.type}\n`;
+		header += `- **Description:** ${disp.desc}\n`;
 		header += `- **Condition:** ${disp.condition.title}\n`;
 		header += `- **Source:** ${ucfirst(action.source || 'event')}\n`;
+		if (action.id) header += `- **Node ID:** \`${action.id}\`\n`;
+		if (action.count && (action.count > 1)) header += `- **Invocations:** \`${commify(action.count)}\`\n`;
 		header += `- **Date/Time:** ${nice_date}\n`;
 		header += `- **Result:** ${action.description || 'OK'}\n`;
 		
@@ -1596,6 +1602,10 @@ Page.Job = class Job extends Page.PageUtils {
 		if (!details.match(/^\s*\-\s+/)) header += `\n`;
 		
 		details = header + details;
+		
+		if (action.count && (action.count > 1)) {
+			details = details.trim() + `\n\n**Note:** This action was invoked ${commify(action.count)} separate times, but only the latest invocation details are displayed here.  See the workflow sub-jobs for each individual action invocation details.`;
+		}
 		
 		var title = "Job Action Details: " + disp.type;
 		if (action.code) title = '<span style="color:var(--red);">' + title + '</span>';
@@ -3471,6 +3481,13 @@ Page.Job = class Job extends Page.PageUtils {
 				this.job.limits = pdata.limits;
 				this.renderJobLimits();
 				this.getJobSnapshots();
+			break;
+			
+			case 'action_append':
+				var action = pdata.action;
+				if (!this.job.actions) this.job.actions = [];
+				this.job.actions.push( action );
+				this.renderJobActions();
 			break;
 		} // switch
 	}

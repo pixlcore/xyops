@@ -46,7 +46,7 @@ Notes:
 - Tag IDs must exist; define them first in the UI or via API.
 - Duplicate tags are removed automatically.
 
-For details on plugin I/O, see [Plugins → Tags](plugins.md#tags).
+For details on plugin I/O, see [Plugins → Tags](plugins.md#job-tags).
 
 
 ## Tag-Driven Actions

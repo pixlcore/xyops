@@ -1729,6 +1729,7 @@ Page.Base = class Base extends Page {
 		var title = ucfirst(source);
 		
 		switch (source) {
+			case 'job': icon = 'timer-outline'; break;
 			case 'event': icon = 'file-clock-outline'; break;
 			case 'workflow': icon = 'clipboard-flow-outline'; break;
 			case 'alert': icon = 'bell-outline'; break;

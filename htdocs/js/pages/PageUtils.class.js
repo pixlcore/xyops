@@ -1892,6 +1892,9 @@ Page.PageUtils = class PageUtils extends Page.Base {
 			disp.condition = { title: "On " + tag.title };
 			disp.condition.icon = tag.icon || 'tag-outline';
 		}
+		else if (!disp.condition && (action.condition == 'instant')) {
+			disp.condition = { title: "Instant", icon: 'creation' };
+		}
 		
 		switch (action.type) {
 			case 'email':

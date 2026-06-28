@@ -2890,6 +2890,7 @@ Each action has a `condition` property which specifies when it should fire.  The
 | `tag:TAGID` | Fires on job completion only when a specific tag is present on the job. |
 | `alert_new` | Fires when a new alert is triggered on a server. |
 | `alert_cleared` | Fires when an active alert has cleared. |
+| `instant` | Special condition used for firing dynamic actions on-demand during a job. |
 
 #### Action.type
 

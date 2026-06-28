@@ -424,7 +424,7 @@ If you want to have xyOps delete the files for you after uploading, specify an o
 
 Note that if you send multiple messages with `files` properties, the previous list is overwritten (i.e. the latter prevails).
 
-##### Tags
+##### Job Tags
 
 To **add** tags to the current job, use the following "push" message format:
 
@@ -439,7 +439,7 @@ To **add** tags to the current job, use the following "push" message format:
 
 The `push` object is used here to instruct xyOps to "push" (append) tags onto the existing set (you cannot replace or delete tags).  The tags themselves should be valid [Tag.id](data.md#tag-id)s, and duplicates are automatically removed.
 
-##### Actions
+##### Job Actions
 
 To **add** actions to the current job, use the following "push" message format.  This example would send an email to a specific address when the job completes:
 
@@ -448,7 +448,7 @@ To **add** actions to the current job, use the following "push" message format. 
 	"xy": 1,
 	"push": {
 		"actions": [
-			{ "condition": "complete", "type": "email", "email": "admin@mycompany.com", "enabled": true }
+			{ "condition": "complete", "type": "email", "email": "admin@mycompany.com", "users": [], "enabled": true }
 		]
 	}
 }
@@ -462,6 +462,19 @@ Here is another example which will launch a subsequent job when the current job 
 	"push": {
 		"actions": [
 			{ "condition": "success", "type": "run_event", "event_id": "emi2d3f42zy", "params": {}, "enabled": true }
+		]
+	}
+}
+```
+
+And if you want the action to run *instantly* (i.e. do not wait for the job to complete), use the special `instant` condition, like this:
+
+```json
+{
+	"xy": 1,
+	"push": {
+		"actions": [
+			{ "condition": "instant", "type": "channel", "channel_id": "sev1", "enabled": true }
 		]
 	}
 }
