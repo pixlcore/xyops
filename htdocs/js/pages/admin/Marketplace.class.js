@@ -453,7 +453,7 @@ Page.Marketplace = class Marketplace extends Page.PageUtils {
 						html += '<div class="button right icon ' + install_btn_class + '" title="' + install_btn_text + '" onClick="$P().do_install_select_version()"><i class="mdi mdi-package-up"></i></div>';
 					}
 					
-					html += '<div class="button right secondary icon" title="Clone for editing..." onClick="$P().do_clone()"><i class="mdi mdi-file-edit-outline"></i></div>';
+					html += '<div class="button right secondary icon" title="Edit Plugin..." onClick="$P().do_edit()"><i class="mdi mdi-file-edit-outline"></i></div>';
 					if (show_vault) html += '<div class="button right secondary icon" title="Secret Vault..." onClick="$P().go_vault()"><i class="mdi mdi-shield-lock-outline"></i></div>';
 				}
 				else {
