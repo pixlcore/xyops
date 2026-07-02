@@ -519,6 +519,21 @@ Page.Marketplace = class Marketplace extends Page.PageUtils {
 			html += '</div>'; // box content
 		html += '</div>'; // box
 		
+		if (show_vault && app.isAdmin()) {
+			var secret = app.secrets.find( function(secret) {
+				return secret.plugins && secret.plugins.includes(installed.id);
+			} );
+			if (!secret) {
+				html += '<div class="box message inline info" onClick="$P().go_vault()">';
+					html += '<div class="message_inner" style="cursor:pointer">';
+						html += `<div style="float:right"><i class="mdi mdi-play">&nbsp;</i>Setup Vault...</div>`;
+						html += '<i class="mdi mdi-shield-lock-outline">&nbsp;&nbsp;&nbsp;</i>';
+						html += encode_entities( `Click here to create a secret vault for the Plugin.` );
+					html += '</div>';
+				html += '</div>';
+			}
+		}
+		
 		// markdown
 		html += '<div class="box">';
 		
