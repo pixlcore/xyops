@@ -776,6 +776,7 @@ Page.ServerUtils = class ServerUtils extends Page.PageUtils {
 	getProcessTable(snapshot) {
 		// get initial html for sortable proc table
 		var self = this;
+		if (this.dummy) return '';
 		
 		var proc_opts = {
 			id: 't_snap_procs',
@@ -804,6 +805,7 @@ Page.ServerUtils = class ServerUtils extends Page.PageUtils {
 	getConnectionTable(snapshot) {
 		// get initial html for sortable conn table
 		var self = this;
+		if (this.dummy) return '';
 		
 		var conn_opts = {
 			id: 't_snap_conns',
@@ -833,6 +835,7 @@ Page.ServerUtils = class ServerUtils extends Page.PageUtils {
 	getInterfaceTable(snapshot) {
 		// get initial html for sortable iface table
 		var self = this;
+		if (this.dummy) return '';
 		
 		var iface_opts = {
 			id: 't_snap_ifaces',
@@ -866,6 +869,7 @@ Page.ServerUtils = class ServerUtils extends Page.PageUtils {
 	getMountTable(snapshot) {
 		// get initial html for sortable mount table
 		var self = this;
+		if (this.dummy) return '';
 		
 		var fs_opts = {
 			id: 't_snap_fs',
@@ -1845,6 +1849,7 @@ Page.ServerUtils = class ServerUtils extends Page.PageUtils {
 			
 			var snapshot = server.snapshot || {};
 			if (!snapshot.data || !snapshot.data.docker) return;
+			if (snapshot.data.dummy) return;
 			
 			snapshot.data.docker.containers.forEach( function(cont) {
 				cont_list.push({ ...cont,
