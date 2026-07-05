@@ -331,7 +331,7 @@ Page.Search = class Search extends Page.PageUtils {
 		// get form values, return search args object
 		var args = {};
 		
-		var match = this.div.find('#fe_s_match').val().trim()
+		var match = this.div.find('#fe_s_match').val().trim();
 		if (match.length) {
 			args.match = match;
 			
@@ -388,6 +388,12 @@ Page.Search = class Search extends Page.PageUtils {
 		if (!args) {
 			// args = { query: '*' };
 			Nav.go( this.selfNav({}) );
+			return;
+		}
+		
+		if (args.match && (num_keys(args) == 1) && String(args.match).match(/^j[a-z0-9]{15}$/)) {
+			// looks like Job ID -- jump directly to it
+			Nav.go('Job?id=' + args.match);
 			return;
 		}
 		
