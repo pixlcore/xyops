@@ -3203,11 +3203,12 @@ Page.Base = class Base extends Page {
 			html += '<div class="CodeMirror ' + (is_maxed ? 'maximize' : '') + '"></div>';
 		html += '</div>';
 		
+		var btn = opts.button || ['check-circle', 'Accept'];
 		var buttons_html = "";
 		buttons_html += '<div class="button phone_collapse" onClick="CodeEditor.hide()"><i class="mdi mdi-close-circle-outline">&nbsp;</i><span>Cancel</span></div>';
 		buttons_html += '<div class="button phone_collapse" title="Copy to Clipboard" onClick="$P().copyCodeToClipboard()"><i class="mdi mdi-clipboard-text-outline">&nbsp;</i><span>Copy</span></div>';
 		buttons_html += '<div class="button phone_collapse" title="Upload File..." onClick="$P().uploadCodeFile()"><i class="mdi mdi-cloud-upload-outline">&nbsp;</i><span>Upload...</span></div>';
-		buttons_html += '<div id="btn_ceditor_confirm" class="button primary"><i class="mdi mdi-check-circle">&nbsp;</i><span>Accept</span></div>';
+		buttons_html += `<div id="btn_ceditor_confirm" class="button primary"><i class="mdi mdi-${btn[0]}">&nbsp;</i><span>${btn[1]}</span></div>`;
 		
 		title += ' <div class="dialog_title_widget mobile_hide"><button class="link" onClick="$P().toggleDialogCodeEditorSize(this)">';
 		if (is_maxed) title += 'Minimize<i style="padding-left:3px" class="mdi mdi-arrow-bottom-left-thick"></i></button></div>';
@@ -3356,7 +3357,7 @@ Page.Base = class Base extends Page {
 				}
 			} // json
 			
-			CodeEditor.hide();
+			if (!opts.no_hide) CodeEditor.hide();
 			callback(value);
 		});
 		

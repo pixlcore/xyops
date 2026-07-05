@@ -1093,7 +1093,58 @@ Page.Events = class Events extends Page.PageUtils {
 	
 	do_edit_from_view() {
 		// jump to edit from view page
-		Nav.go( (this.event.workflow ? '#Workflows' : '#Events') + '?sub=edit&id=' + this.event.id );
+		if (app.lastClick.altKey) this.do_edit_event_json();
+		else Nav.go( (this.event.workflow ? '#Workflows' : '#Events') + '?sub=edit&id=' + this.event.id );
+	}
+	
+	do_edit_event_json() {
+		// edit raw event json
+		var self = this;
+		var event = deep_copy_object(this.event);
+		
+		delete event.created;
+		delete event.modified;
+		delete event.revision;
+		
+		this.editCodeAuto({
+			title: this.event.workflow ? 'Edit Workflow JSON' : 'Edit Event JSON', 
+			code: JSON.stringify(event, null, "\t"), 
+			format: 'json',
+			button: ['floppy', 'Save Changes'],
+			no_hide: true,
+			
+			callback: function(new_value) {
+				var new_event = JSON.parse(new_value);
+				new_event.created = self.event.created;
+				new_event.modified = self.event.modified;
+				new_event.revision = self.event.revision;
+				
+				self.saving = true;
+				
+				Dialog.showProgress( 1.0, new_event.workflow ? "Saving Workflow..." : "Saving Event..." );
+				app.api.post( 'app/update_event', new_event, self.quick_save_event_finish.bind(self), self.save_event_error.bind(self) );
+			}
+		});
+	}
+	
+	quick_save_event_finish(resp) {
+		// save complete
+		app.cacheBust = hires_time_now();
+		delete this.saving;
+		
+		Dialog.hideProgress();
+		CodeEditor.hide();
+		
+		if (!this.active) return; // sanity
+		
+		// update in-memory copies and remove saving flag
+		this.event = resp.event;
+		this.workflow = this.event.workflow || null;
+		var idx = find_object_idx( app.events, { id: this.event.id } );
+		if (idx > -1) app.events[idx] = this.event;
+		
+		app.showMessage('success', "The " + (this.workflow ? 'workflow' : 'event') + " was saved successfully.");
+		this.gosub_view(this.args);
 	}
 	
 	do_flush_queue() {
