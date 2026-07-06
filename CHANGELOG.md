@@ -1,5 +1,19 @@
 # xyOps Changelog
 
+## Version v1.0.78
+
+> July 6, 2026
+
+- [`64883ecf`](https://github.com/pixlcore/xyops/commit/64883ecf714d4b08fff7016b23477c020e381ca2): Version 1.0.78
+- [`34eee691`](https://github.com/pixlcore/xyops/commit/34eee6910d9ee5084a8a6fb0d1f73e8435af8f68): Feature: New core event algorithm: "Fewest Active Jobs".  Fixes #360
+- [`f8b474bb`](https://github.com/pixlcore/xyops/commit/f8b474bb9fdbd3d489555644c381acb47f96d4f0): Feature: Allow event user fields to override Plugin parameters, unless they are admin-locked.  Fixes #359
+- [`921cd442`](https://github.com/pixlcore/xyops/commit/921cd442f38fe25aec4966ecf320105cd941c7aa): Feature: Hold Alt/Opt when clicking "Edit Event" or "Edit Workflow" to edit the raw JSON.
+- [`e09f23bf`](https://github.com/pixlcore/xyops/commit/e09f23bfccd54b976811c6fcd58ba59433bed404): UI Tweak: Job Search: If user enters a Job ID with no other search options, nav directly to that job's detail page.
+- [`3115a6e6`](https://github.com/pixlcore/xyops/commit/3115a6e60de03fdec06f5b1d27ee3250b95bc460): Feature: Add custom workflow note highlight colors.
+- [`77f1c22c`](https://github.com/pixlcore/xyops/commit/77f1c22c4e2ed9fe6b113aaa2d04ee878ed33d15): Meta: Move CS colors to their own file, for organization.
+- [`5a942014`](https://github.com/pixlcore/xyops/commit/5a94201439db55a9fce0c23f07b9b8136b9993b6): Feature: Allow nested workflows to be multiplexed.  Fixes #358
+- [`642c3a46`](https://github.com/pixlcore/xyops/commit/642c3a460a5281fe43efff1bd0c6861d31b7bc86): API: Multi/Satellite release APIs: Add better sanity checks for GitHub partial outages.
+
 ## Version v1.0.77
 
 > July 2, 2026
