@@ -49,6 +49,34 @@ if [ -z "$CURL" ]; then
 	exit 1;
 fi
 
+# Download large files to disk before decomp
+download_file() {
+	URL="$1"
+	OUT_FILE="$2"
+	ATTEMPT=1
+	MAX_ATTEMPTS=5
+	
+	while [ "$ATTEMPT" -le "$MAX_ATTEMPTS" ]; do
+		rm -f "$OUT_FILE"
+		echo "Download attempt $ATTEMPT of $MAX_ATTEMPTS..."
+		
+		if type curl >/dev/null 2>&1; then
+			curl -fsSL --connect-timeout 10 -o "$OUT_FILE" "$URL" && return 0
+		else
+			wget -q -O "$OUT_FILE" --connect-timeout 10 "$URL" && return 0
+		fi
+		
+		ATTEMPT=$((ATTEMPT + 1))
+		if [ "$ATTEMPT" -le "$MAX_ATTEMPTS" ]; then
+			echo "Download failed, retrying in 5 seconds..."
+			sleep 5
+		fi
+	done
+	
+	echo "Error: Download failed after $MAX_ATTEMPTS attempts." >&2
+	return 1
+}
+
 # See if we can even reach the master server
 TEST_URL="${BASE_URL}/api/app/ping"
 RC=0
@@ -69,7 +97,13 @@ mkdir -p $INSTALL_DIR
 cd $INSTALL_DIR
 
 # Download satellite package
-$CURL "${BASE_URL}/api/app/satellite/core?t=${AUTH_TOKEN}&os=${OS}&arch=${ARCH}" | tar zxf -
+echo "Fetching package from $BASE_URL..."
+CORE_TGZ="./.satellite-core.tgz.$$"
+download_file "${BASE_URL}/api/app/satellite/core?t=${AUTH_TOKEN}&os=${OS}&arch=${ARCH}" "$CORE_TGZ"
+
+echo "Decompressing archive..."
+tar zxf "$CORE_TGZ"
+rm -f "$CORE_TGZ"
 
 # Fetch custom config for satellite
 $CURL "${BASE_URL}/api/app/satellite/config?t=${AUTH_TOKEN}" > config.json
