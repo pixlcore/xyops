@@ -148,7 +148,7 @@ if [ "$USE_SYSTEMD" -eq 1 ]; then
 	echo "Linux systemd detected -- restarting via systemctl."
 	if systemctl is-active --quiet xysat.service 2>/dev/null; then
 		echo "xySat is active under systemd -- restarting via systemd-run handoff."
-		systemd-run --quiet --collect --unit=xysat-upgrade-restart --property=StandardOutput=append:"$LOG_FILE" --property=StandardError=append:"$LOG_FILE" /bin/sh -c '/bin/systemctl restart xysat.service'
+		systemd-run --quiet --collect --unit=xysat-upgrade-restart /bin/sh -c "/bin/systemctl restart xysat.service >>$LOG_FILE 2>&1"
 		exit 0;
 	fi
 	echo "xySat is NOT active under systemd -- stopping manually, then starting under systemd."
