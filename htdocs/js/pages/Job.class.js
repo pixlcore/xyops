@@ -1051,7 +1051,7 @@ Page.Job = class Job extends Page.PageUtils {
 			var event = node.data.event ? find_object(app.events, { id: node.data.event }) : null;
 			
 			workflow.jobs[node_id].forEach( function(job) {
-				var stub = { ...job, state: 'complete', final: true, workflow: { node: node_id } };
+				var stub = { ...job, state: 'complete', final: true, workflow: { node: node_id, job: self.job.id } };
 				if (event) {
 					stub.event = node.data.event;
 					stub.category = event.category;

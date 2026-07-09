@@ -1315,6 +1315,7 @@ Page.Base = class Base extends Page {
 		else if (job.workflow) icon = '<i class="mdi mdi-clipboard-clock-outline"></i>';
 		
 		var html = '<span class="nowrap">';
+		if (job.workflow && job.workflow.job) html += '<i class="mdi mdi-arrow-right-bottom-bold" title="Workflow Sub-Job"></i>';
 		if (link) {
 			html += '<a href="#Job?id=' + job.id + '">';
 			html += icon + '<span>' + nice_id + '</span></a>';

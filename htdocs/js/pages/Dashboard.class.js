@@ -316,6 +316,10 @@ Page.Dashboard = class Dashboard extends Page.PageUtils {
 		var self = this;
 		var html = '';
 		var rows = Object.values(app.activeJobs).sort( function(a, b) {
+			// keep workflow parent jobs directly above their sub-jobs
+			if (b.workflow && (b.workflow.job == a.id)) return -1;
+			if (a.workflow && (a.workflow.job == b.id)) return 1;
+
 			return (a.started < b.started) ? 1 : -1;
 		} );
 		
