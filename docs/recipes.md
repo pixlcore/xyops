@@ -308,3 +308,9 @@ The following event configuration runs at 2:30 AM local time, with a safe second
 	- Max Daily Amount: 1
 
 You can apply the same pattern to [Workflows](workflows.md) since workflows support limits as well. If you prefer to centralize the cap, you can also define this as a category limit so multiple events inherit the one-per-day rule.
+
+## More Recipes
+
+Check out more recipes in the xyOps Wiki:
+
+https://github.com/pixlcore/xyops/wiki
