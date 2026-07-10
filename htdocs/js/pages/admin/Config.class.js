@@ -354,6 +354,18 @@ Page.Config = class Config extends Page.PageUtils {
 		app.api.post( 'app/admin_update_config', overrides, function(resp) {
 			app.cacheBust = hires_time_now();
 			Dialog.hideProgress();
+			
+			// update local client config
+			for (var key in overrides) {
+				if (key.match(/^client\.(\S+)$/)) {
+					var sub_key = RegExp.$1;
+					set_path( config, sub_key, overrides[key] );
+				}
+				else if (key.match(/^(base_app_url|debug|email_from|https_port|quick_monitors|hostname_display_strip|ip_display_strip|default_user_privileges|default_user_prefs|job_universal_limits|job_universal_actions|log_columns)$/)) {
+					set_path( config, key, overrides[key] );
+				}
+			}
+			
 			self.triggerSaveComplete();
 			app.showMessage('success', "Your changes were saved successfully.");
 		});
