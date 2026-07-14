@@ -30,7 +30,6 @@
 		{ "id": "abort_jobs", "title": "Abort Jobs", "icon": "timer-outline" },
 		{ "id": "delete_jobs", "title": "Delete Jobs", "icon": "timer-outline" },
 		{ "id": "tag_jobs", "title": "Job Tags", "icon": "timer-outline" },
-		{ "id": "comment_jobs", "title": "Job Comments", "icon": "timer-outline" },
 		
 		{ "id": "create_monitors", "title": "Create Monitors", "icon": "chart-areaspline" },
 		{ "id": "edit_monitors", "title": "Edit Monitors", "icon": "chart-areaspline" },

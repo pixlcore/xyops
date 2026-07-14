@@ -70,6 +70,14 @@ The number of consecutive times the expression must evaluate to `true` before th
 
 If set to `true` the alert will not inherit group or universal actions.
 
+### Alert.limit_jobs
+
+If set to `true`, new jobs will not start on a server while this alert is active.
+
+### Alert.abort_jobs
+
+If set to `true`, all running jobs on the server will be aborted when this alert fires.
+
 ### Alert.notes
 
 Optional notes or comments about the alert.
@@ -267,7 +275,7 @@ An optional icon ID for the category, displayed in the UI.  Icons are sourced fr
 
 ### Category.color
 
-A visual color for the category, displayed in the UI for all events assigned to the category.  The available color values are: `plain`,  `red`, `green`, `blue`, `skyblue`, `yellow`, `purple`, and `orange`.
+A visual color for the category, displayed in the UI for all events assigned to the category.  The available color values are: `plain`, `red`, `fire`, `orange`, `tangerine`, `amber`, `gold`, `yellow`, `lemon`, `lime`, `grass`, `green`, `mint`, `emerald`, `aqua`, `teal`, `turquoise`, `cyan`, `ice`, `skyblue`, `azure`, `blue`, `sapphire`, `indigo`, `lavender`, `violet`, `orchid`, `purple`, `magenta`, `fuchsia`, `hotpink`, `pink`, `blush`, and `rose`.
 
 ### Category.notes
 
@@ -370,6 +378,18 @@ An optional maximum number of times the channel can be triggered per day.
 ### Channel.notes
 
 Optional notes or comments about the channel.
+
+### Channel.username
+
+The user or API Key who created the channel.
+
+### Channel.modified
+
+The Unix timestamp when the channel was last modified.
+
+### Channel.created
+
+The Unix timestamp when the channel was created.
 
 ### Channel.revision
 
@@ -526,6 +546,18 @@ An array of [Trigger](#trigger) items to schedule future job runs and set rules,
 
 If the event is a workflow, this contains detailed information about the nodes and connections.  See the [Workflow](#workflow) section for details.
 
+### Event.username
+
+The user or API Key who created the event.
+
+### Event.modified
+
+The Unix timestamp when the event was last modified.
+
+### Event.created
+
+The Unix timestamp when the event was created.
+
 ### Event.revision
 
 An internal revision number for the event, incremented with each change.
@@ -571,6 +603,18 @@ A set of [Actions](#action) to perform when **any** alert fires and/or clears on
 
 Optional notes for the group, which are included in email notifications for group actions.
 
+### Group.username
+
+The user or API Key who created the group.
+
+### Group.modified
+
+The Unix timestamp when the group was last modified.
+
+### Group.created
+
+The Unix timestamp when the group was created.
+
 ### Group.revision
 
 An internal revision number for the group, incremented with each change.
@@ -595,6 +639,7 @@ A job is a running (or previously ran) instance of an event.  The job structure 
 | `enabled` | Removed from job structure when event is copied. |
 | `created` | Removed from job structure when event is copied. |
 | `modified` | Removed from job structure when event is copied. |
+| `revision` | Removed from job structure when event is copied. |
 | `triggers` | Removed from job structure when event is copied. |
 
 And these additions:
@@ -635,6 +680,18 @@ The script which, if present, is written and cached on disk, and then appended o
 ### Job.uid
 
 Which UID (User ID) to run the job process as.  This cannot be set -- it is copied from the [Plugin](#plugin).
+
+### Job.gid
+
+Which GID (Group ID) to run the job process as.  This cannot be set.  For standard jobs, it is copied from [Plugin.gid](#plugin-gid) when the job is launched.  It is not part of workflow jobs.
+
+### Job.kill
+
+The process termination strategy to use when the job is aborted.  This cannot be set.  For standard jobs, it is copied from [Plugin.kill](#plugin-kill) when the job is launched.  It is not part of workflow jobs.  See [Plugin.kill](#plugin-kill) for the supported values.
+
+### Job.runner
+
+If set to `true`, process monitoring and file management are delegated to a remote runner.  This cannot be set.  For standard jobs, it is copied from [Plugin.runner](#plugin-runner) when the job is launched.  It is not part of workflow jobs.  See [Plugin.runner](#plugin-runner) for details.
 
 ### Job.cwd
 
@@ -1016,6 +1073,18 @@ This should be set to `false` for disabled, or a any valid number to enable it, 
 
 Optional notes or comments about the monitor's purpose or configuration.
 
+### Monitor.username
+
+The user or API Key who created the monitor.
+
+### Monitor.modified
+
+The Unix timestamp when the monitor was last modified.
+
+### Monitor.created
+
+The Unix timestamp when the monitor was created.
+
 ### Monitor.revision
 
 An internal revision number for the monitor, incremented with each change.
@@ -1032,7 +1101,7 @@ Plugins are used to extend xyOps in a variety of ways, including custom event ac
 {
 	"id": "shellplug",
 	"title": "Shell Script",
-	"enabled": 1,
+	"enabled": true,
 	"command": "[shell-plugin]",
 	"username": "admin",
 	"type": "event",
@@ -1101,6 +1170,7 @@ A set of custom parameters to pass to the plugin when it is executed (for non-mo
 | `title` | String | A visual title for the parameter, displayed in the UI. |
 | `type` | String | The parameter type ID, which should be one of: `text`, `textarea`, `code`, `json`, `checkbox`, `select`, `bucket`, `system`, `hidden`, `toolset`, or `group`. |
 | `variant` | String | For `text` type controls, you can optionally set a UI input variant: `color`, `date`, `datetime-local`, `email`, `number`, `text`, `time`, `tel`, or `url`. |
+| `regex` | String | For `text` and `textarea` types, this optional regex string will validate the user value. |
 | `value` | Mixed | The default value for the parameter. |
 | `data` | Object | Specifically for the `toolset` type, this contains all the tool details. |
 | `caption` | String | Optionally display a caption under the UI control. |
@@ -1137,9 +1207,29 @@ This boolean, when `true`, indicates that the job will be running remotely (i.e.
 
 The idea is that when a job is running remotely, we cannot monitor system resources for it.  Also, input and output files simply do not work in these cases (because xySat expects them to be on the local filesystem where it is running).  The `runner` property tells xyOps (and ultimately xySat) that the job is running remotely out if its reach, and it should not perform the usual process and network monitoring, and file management.  Those duties get delegated to a tool such as [xyRun](https://github.com/pixlcore/xyrun).
 
+### Plugin.quick
+
+For monitor Plugins only, this boolean causes the Plugin to run every second as part of the [QuickMon](monitors.md#quickmon) system, in addition to its normal monitoring interval.
+
+### Plugin.stock
+
+A boolean flag identifying a built-in Plugin installed with xyOps itself.
+
 ### Plugin.notes
 
 Optional notes or comments about the plugin's purpose or configuration.
+
+### Plugin.username
+
+The user or API Key who created the plugin.
+
+### Plugin.modified
+
+The Unix timestamp when the plugin was last modified.
+
+### Plugin.created
+
+The Unix timestamp when the plugin was created.
 
 ### Plugin.revision
 
@@ -1199,7 +1289,7 @@ An optional icon ID for the role, displayed in the UI.  Icons are sourced from [
 
 ### Role.privileges
 
-A list of privileges assigned to the role.  Each privilege is represented as a key-value pair, where the key is the privilege name and the value is unused.  See [Privileges](privileges.md) for more information.
+A list of privileges assigned to the role.  Each granted privilege is represented as a key-value pair, where the key is the privilege name and the value must be `true`.  Do not include privileges with falsey values such as `false`, `0`, `null`, or an empty string, as this can cause incorrect permission behavior.  A privilege must either be set to `true` or omitted entirely.  See [Privileges](privileges.md) for more information.
 
 ### Role.categories
 
@@ -1274,7 +1364,7 @@ A boolean flag indicating if the secret is enabled or not.
 
 ### Secret.icon
 
-An optional icon ID for the role, displayed in the UI.  Icons are sourced from [Material Design Icons](https://materialdesignicons.com/).
+An optional icon ID for the Secret Vault item, displayed in the UI.  Icons are sourced from [Material Design Icons](https://materialdesignicons.com/).
 
 ### Secret.fields
 
@@ -1471,7 +1561,7 @@ An optional limit to place on the server for maximum concurrent running jobs.  N
 
 ### Server.keywords
 
-A list of keywords associated with the server, used for search and filtering.
+A generated comma-separated string of keywords associated with the server, used for search and filtering.
 
 ### Server.socket_id
 
@@ -1492,7 +1582,8 @@ A tag is a user-defined label that can be assigned to jobs for the purpose of or
 	"icon": "alert-rhombus", 
 	"username": "admin", 
 	"modified": 1611173740, 
-	"created": 1611173740 
+	"created": 1611173740,
+	"revision": 1
 }
 ```
 
@@ -1523,6 +1614,10 @@ The Unix timestamp (in seconds) when the tag was created.
 ### Tag.modified
 
 The Unix timestamp (in seconds) when the tag was last modified.
+
+### Tag.revision
+
+An internal revision number for the tag, incremented with each change.  Legacy built-in Tags may not include this property until they are updated.
 
 ## Ticket
 
@@ -1646,7 +1741,7 @@ This array contains a list of all the changes made to the ticket, including thin
 
 | Property Name | Type | Description |
 |---------------|------|-------------|
-| `id` | String | A unique lowercase alphanumeric ID for the change. |
+| `id` | String | An optional unique lowercase alphanumeric ID for the change.  The initial system-generated `created` entry and the audit entry created when a comment is deleted do not include an ID. |
 | `type` | String | The change type, which should be one of: `change` or `comment`. |
 | `username` | String | The username of the user who made the change. |
 | `date` | Number | The Unix timestamp of the change. |
@@ -1932,6 +2027,18 @@ The maximum number of times the web hook can be triggered in a single day (i.e. 
 ### WebHook.notes
 
 An optional field for adding notes or comments about the web hook.
+
+### WebHook.username
+
+The user or API Key who created the web hook.
+
+### WebHook.modified
+
+The Unix timestamp when the web hook was last modified.
+
+### WebHook.created
+
+The Unix timestamp when the web hook was created.
 
 ### WebHook.revision
 
@@ -2742,7 +2849,7 @@ An array of [Server](#server) objects for the group.
 
 ### GroupSnapshot.snapshots
 
-An array of [ServerMonitorData](#servermonitordata)s for the group, with indices matching up with [GroupSnapshot.servers](#groupsnapshot-servers).
+An array of stored host records for the group, with indices matching up with [GroupSnapshot.servers](#groupsnapshot-servers).  Each host record contains the [ServerMonitorData](#servermonitordata) under its `data` property, and may also include top-level properties such as `date`, `ip`, `hostname`, `groups`, and `alerts`.
 
 ### GroupSnapshot.alerts
 
@@ -3080,7 +3187,7 @@ Here is a list of all the `schedule` type trigger object properties and their de
 |-----------------|-------|-------------|
 | `years` | ∞ | One or more years in YYYY format. |
 | `months` | 1 - 12 | One or more months, where January is 1 and December is 12. |
-| `days` | 1 - 31 | One or more month days, from 1 to 31. |
+| `days` | -7 - -1, 1 - 31 | One or more month days.  Positive values count forward from the start of the month.  Negative values count backward from the end, where `-1` is the last day of the month and `-7` is the seventh-to-last day.  Zero is not allowed. |
 | `weekdays` | 0 - 6 | One or more weekdays, where Sunday is 0, and Saturday is 6. |
 | `hours` | 0 - 23 | One or more hours in 24-hour time, from 0 to 23. |
 | `minutes` | 0 - 59 | One or more minutes, from 0 to 59. |
@@ -3589,10 +3696,12 @@ A file object is used to represent a file in storage.  It is used for [Job.files
 
 | Property Path | Type | Description |
 |---------------|------|-------------|
+| `id` | String | A unique lowercase alphanumeric ID for the file. |
 | `path` | String | A normalized path to the file in storage, which can also be used as a URI path for viewing / downloading. |
 | `filename` | String | The filename of the file. |
 | `size` | Number | The size of the file in bytes. |
 | `date` | Number | The file's creation date as Unix seconds. |
+| `username` | String | The user or API Key associated with the upload. |
 | `job` | String | If the file was created from a job, this will contain the [Job.id](#job-id). |
 | `server` | String | If the file was created on a server, this will contain the [Server.id](#server-id). |
 | `ticket` | String | If the file was created for a ticket, this will contain the [Ticket.id](#ticket-id). |
