@@ -7,6 +7,9 @@ on:
 permissions:
   contents: read
   packages: write
+  # Required for GitHub's keyless Sigstore artifact attestation.
+  id-token: write
+  attestations: write
 
 jobs:
   build-and-push:
@@ -38,6 +41,7 @@ jobs:
             type=sha
 
       - name: Build and push (multi-arch)
+        id: push
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -48,3 +52,11 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      # Sign the exact multi-platform image digest that Buildx pushed to GHCR.
+      - name: Generate build provenance attestation
+        uses: actions/attest@v4
+        with:
+          subject-name: ghcr.io/${{ github.repository_owner }}/xyops
+          subject-digest: ${{ steps.push.outputs.digest }}
+          push-to-registry: true
