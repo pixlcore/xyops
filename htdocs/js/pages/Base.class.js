@@ -2716,8 +2716,15 @@ Page.Base = class Base extends Page {
 							if (variant_def) elem_icon = variant_def.icon;
 							if ((param.variant == 'number') && (elem_value === null)) elem_value = '(None)';
 						}
-						html += '<i class="link mdi mdi-' + elem_icon + '" onClick="$P().copyPluginParamValue(this)" title="Copy to Clipboard">&nbsp;</i>';
-						html += '<span class="data_value">' + encode_entities(elem_value) + '</span>';
+						if (param.variant === 'password') {
+							html += '<i class="link mdi mdi-' + elem_icon + '" onClick="$P().copyPluginParamValue(this)" title="Copy to Clipboard">&nbsp;</i>';
+							html += '<button class="link" onClick="$P().viewPluginParamValue(this)">Click to View...</button>';
+							html += '<span class="data_value" style="display:none" data-title="' + encode_attrib_entities(param.title) + '">' + encode_entities(elem_value) + '</span>';
+						}
+						else {
+							html += '<i class="link mdi mdi-' + elem_icon + '" onClick="$P().copyPluginParamValue(this)" title="Copy to Clipboard">&nbsp;</i>';
+							html += '<span class="data_value">' + encode_entities(elem_value) + '</span>';
+						}
 					}
 					else html += none;
 				break;
