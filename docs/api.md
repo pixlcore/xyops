@@ -6697,3 +6697,100 @@ hello world
 In addition to the [Standard Response Format](#standard-response-format), this will include a `description` containing the successful recipient summary or delivery error, and a `details` property containing the mailer debug log (useful for troubleshooting).
 
 **Note:** This API is rate-limited by the [max_emails_per_day](config.md#max_emails_per_day) configuration property.  If exceeded, it will fail with an error.
+
+### get_multiple
+
+```
+GET /api/app/get_multiple/v1
+POST /api/app/get_multiple/v1
+```
+
+Fetch multiple in-memory data lists from the primary conductor in a single request.  This is useful when a client needs several types of configuration data at once and wants to avoid making a separate API call for each one.  No specific privilege is required, besides a valid user session or API Key.
+
+For a GET request, pass parameters in the query string.  For a POST request, send them in a JSON body.  The input parameters are as follows:
+
+| Property Name | Type | Description |
+|---------------|------|-------------|
+| `lists` | Array or String | **(Required)** A list of data set names to fetch.  This may be a JSON array, a comma-separated string, or the string `all`. |
+| `jobs` | Boolean | Optional.  Include the current non-queued, visible active jobs, keyed by Job ID. |
+| `state` | Boolean | Optional.  Include the current global application state. |
+| `servers` | Boolean | Optional.  Include the current online servers, keyed by Server ID. |
+| `serverCache` | Boolean | Optional.  Include cached information for recently disconnected servers, keyed by Server ID. |
+
+The following values are accepted in `lists`:
+
+| List Name | Contents |
+|-----------|----------|
+| `api_keys` | [API Key](data.md#api-key) definitions. |
+| `groups` | [Group](data.md#group) definitions. |
+| `plugins` | [Plugin](data.md#plugin) definitions. |
+| `categories` | [Category](data.md#category) definitions. |
+| `events` | [Event](data.md#event) definitions. |
+| `channels` | [Channel](data.md#channel) definitions. |
+| `web_hooks` | [Web Hook](data.md#webhook) definitions. |
+| `buckets` | [Bucket](data.md#bucket) definitions. |
+| `secrets` | [Secret](data.md#secret) definitions. |
+| `monitors` | [Monitor](data.md#monitor) definitions. |
+| `alerts` | [Alert](data.md#alert) definitions. |
+| `tags` | [Tag](data.md#tag) definitions. |
+| `roles` | [Role](data.md#role) definitions. |
+
+To fetch every available list, set `lists` to the string `all`.  List names are case-sensitive.  The optional live data properties are independent of `lists`, so they may be requested alongside any list selection.
+
+Example request:
+
+```json
+{
+	"lists": ["events", "categories", "plugins"],
+	"jobs": true,
+	"state": true,
+	"servers": true
+}
+```
+
+Example GET request using a comma-separated list:
+
+```
+GET /api/app/get_multiple/v1?lists=events,categories,plugins&jobs=1
+```
+
+In addition to the [Standard Response Format](#standard-response-format), the response contains one property for each requested list and optional live data set.  List properties contain arrays.  The `jobs`, `servers`, and `serverCache` properties contain objects keyed by their respective IDs.
+
+Example response (abbreviated):
+
+```json
+{
+	"code": 0,
+	"events": [
+		{
+			"id": "nightly_backup",
+			"title": "Nightly Backup"
+		}
+	],
+	"categories": [
+		{
+			"id": "maintenance",
+			"title": "Maintenance"
+		}
+	],
+	"plugins": [],
+	"jobs": {
+		"j1234567890": {
+			"id": "j1234567890",
+			"event": "nightly_backup"
+		}
+	},
+	"state": {
+		"scheduler": {
+			"enabled": true
+		}
+	},
+	"servers": {
+		"s1234567890": {
+			"id": "s1234567890",
+			"hostname": "worker01.example.com"
+		}
+	}
+}
+```
+
