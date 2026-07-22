@@ -1305,11 +1305,23 @@ Page.Workflows = class Workflows extends Page.Events {
 		
 		// actions
 		html += this.getFormRow({
-			id: 'd_ete_actions',
-			content: this.getFormCheckbox({
-				id: 'fe_ete_actions',
-				checked: true
-			})
+			label: 'Action Conditions:',
+			content: this.getFormMenuMulti({
+				id: 'fe_ete_conditions',
+				title: 'Select Conditions',
+				placeholder: '(None)',
+				options: [ 
+					...config.ui.action_condition_menu.filter( function(item) { return item.id != 'continue'; } )
+				].concat(
+					this.buildOptGroup( app.tags, "On Custom Tag:", 'tag-outline', 'tag:' )
+				),
+				values: ['start', 'complete', 'success'],
+				'data-hold': 1,
+				'data-shrinkwrap': 1,
+				'data-select-all': 1
+				// 'data-compact': 1
+			}),
+			caption: "Select which action conditions to enable for the test job."
 		});
 		
 		// limits
@@ -1361,6 +1373,7 @@ Page.Workflows = class Workflows extends Page.Events {
 			job.label = "Test";
 			job.icon = "test-tube";
 			job.workflow.start = node.id; // set starting node
+			job.test_conditions = $('#fe_ete_conditions').val();
 			
 			var scope = $('#fe_ete_scope').val();
 			if (scope == 'single') {
@@ -1369,14 +1382,6 @@ Page.Workflows = class Workflows extends Page.Events {
 				job.workflow.connections = [];
 			}
 			
-			if (!$('#fe_ete_actions').is(':checked')) {
-				// disable both workflow actions and action nodes
-				job.actions = [];
-				job.test_actions = false;
-				if (scope != 'single') find_objects( job.workflow.nodes, { type: 'action' } ).forEach( function(action) {
-					action.enabled = false;
-				} );
-			}
 			if (!$('#fe_ete_limits').is(':checked')) {
 				// disable both workflow limits and limit nodes
 				job.limits = [];
@@ -1442,6 +1447,7 @@ Page.Workflows = class Workflows extends Page.Events {
 			delete self.dialogFiles;
 		};
 		
+		MultiSelect.init( $('#fe_ete_conditions') );
 		Dialog.autoResize();
 	}
 	

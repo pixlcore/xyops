@@ -2346,13 +2346,23 @@ Page.Events = class Events extends Page.PageUtils {
 		
 		// actions
 		html += this.getFormRow({
-			label: 'Actions:',
-			content: this.getFormCheckbox({
-				id: 'fe_ete_actions',
-				label: 'Enable All Actions',
-				checked: true
+			label: 'Action Conditions:',
+			content: this.getFormMenuMulti({
+				id: 'fe_ete_conditions',
+				title: 'Select Conditions',
+				placeholder: '(None)',
+				options: [ 
+					...config.ui.action_condition_menu.filter( function(item) { return item.id != 'continue'; } )
+				].concat(
+					this.buildOptGroup( app.tags, "On Custom Tag:", 'tag-outline', 'tag:' )
+				),
+				values: ['start', 'complete', 'success'],
+				'data-hold': 1,
+				'data-shrinkwrap': 1,
+				'data-select-all': 1
+				// 'data-compact': 1
 			}),
-			caption: 'Enable all event actions for the test run.'
+			caption: "Select which action conditions to enable for the test job."
 		});
 		
 		// limits
@@ -2406,11 +2416,8 @@ Page.Events = class Events extends Page.PageUtils {
 			job.test_limits = true;
 			job.label = "Test";
 			job.icon = "test-tube";
+			job.test_conditions = $('#fe_ete_conditions').val();
 			
-			if (!$('#fe_ete_actions').is(':checked')) {
-				job.actions = [];
-				job.test_actions = false;
-			}
 			if (!$('#fe_ete_limits').is(':checked')) {
 				job.limits = [];
 				job.test_limits = false;
@@ -2470,6 +2477,7 @@ Page.Events = class Events extends Page.PageUtils {
 			delete self.dialogFiles;
 		};
 		
+		MultiSelect.init( $('#fe_ete_conditions') );
 		Dialog.autoResize();
 	}
 	
