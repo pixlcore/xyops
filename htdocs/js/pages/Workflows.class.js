@@ -1315,7 +1315,7 @@ Page.Workflows = class Workflows extends Page.Events {
 				].concat(
 					this.buildOptGroup( app.tags, "On Custom Tag:", 'tag-outline', 'tag:' )
 				),
-				values: ['start', 'complete', 'success'],
+				values: app.getPref('test_conds') ?? ['start', 'complete', 'success'],
 				'data-hold': 1,
 				'data-shrinkwrap': 1,
 				'data-select-all': 1
@@ -1329,7 +1329,7 @@ Page.Workflows = class Workflows extends Page.Events {
 			id: 'd_ete_limits',
 			content: this.getFormCheckbox({
 				id: 'fe_ete_limits',
-				checked: true
+				checked: app.getPref('test_limits') ?? true
 			})
 		});
 		
@@ -1445,6 +1445,10 @@ Page.Workflows = class Workflows extends Page.Events {
 			// cleanup
 			// FUTURE: If self.dialogFiles still exists here, delete in background (user canceled job)
 			delete self.dialogFiles;
+			
+			// save settings in user prefs
+			app.setPref('test_conds', $('#fe_ete_conditions').val());
+			app.setPref('test_limits', $('#fe_ete_limits').is(':checked'));
 		};
 		
 		MultiSelect.init( $('#fe_ete_conditions') );

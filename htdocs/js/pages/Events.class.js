@@ -2363,7 +2363,7 @@ Page.Events = class Events extends Page.PageUtils {
 				].concat(
 					this.buildOptGroup( app.tags, "On Custom Tag:", 'tag-outline', 'tag:' )
 				),
-				values: ['start', 'complete', 'success'],
+				values: app.getPref('test_conds') ?? ['start', 'complete', 'success'],
 				'data-hold': 1,
 				'data-shrinkwrap': 1,
 				'data-select-all': 1
@@ -2378,7 +2378,7 @@ Page.Events = class Events extends Page.PageUtils {
 			content: this.getFormCheckbox({
 				id: 'fe_ete_limits',
 				label: 'Enable All Limits',
-				checked: true
+				checked: app.getPref('test_limits') ?? true
 			}),
 			caption: 'Enable all resource limits for the test run.'
 		});
@@ -2482,6 +2482,10 @@ Page.Events = class Events extends Page.PageUtils {
 			// cleanup
 			// FUTURE: If self.dialogFiles still exists here, delete in background (user canceled job)
 			delete self.dialogFiles;
+			
+			// save settings in user prefs
+			app.setPref('test_conds', $('#fe_ete_conditions').val());
+			app.setPref('test_limits', $('#fe_ete_limits').is(':checked'));
 		};
 		
 		MultiSelect.init( $('#fe_ete_conditions') );
