@@ -89,7 +89,8 @@ Page.Job = class Job extends Page.PageUtils {
 		else {
 			// in progress
 			this.live = true;
-			icon = is_workflow ? 'clipboard-play-outline' : 'timer-play-outline';
+			if (job.invisible) icon = 'selection-ellipse';
+			else icon = is_workflow ? 'clipboard-play-outline' : 'timer-play-outline';
 			// app.setHeaderTitle( '<i class="mdi mdi-timer-play-outline">&nbsp;</i>Live Job Progress' );
 			app.setWindowTitle( "Live Job Progress: #" + job.id );
 		}

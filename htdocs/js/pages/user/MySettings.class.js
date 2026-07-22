@@ -442,6 +442,17 @@ Page.MySettings = class MySettings extends Page.Base {
 				caption: 'Check this box to show notifications for user activity, including every time a user makes a change.'
 			});
 			
+			html += this.getFormRow({
+				label: 'Show Invisibles:',
+				content: this.getFormCheckbox({
+					id: 'fe_ms_admin_show_invisibles',
+					label: 'Show Invisible Jobs',
+					checked: !!user.admin_show_invisibles,
+					onChange: '$P().saveChanges()'
+				}),
+				caption: 'Check this box to show all invisible jobs (those running with the [Quiet Modifier](#Docs/triggers/quiet) and "Invisible Jobs" mode set).'
+			});
+			
 			html += '</div>'; // box_content
 			html += '</div>'; // box
 		} // admin
@@ -773,6 +784,7 @@ Page.MySettings = class MySettings extends Page.Base {
 		if (app.isAdmin()) {
 			settings.admin_hide_notify_sys = !this.div.find('#fe_ms_admin_notify_sys').is(':checked');
 			settings.admin_hide_notify_user = !this.div.find('#fe_ms_admin_notify_user').is(':checked');
+			settings.admin_show_invisibles = this.div.find('#fe_ms_admin_show_invisibles').is(':checked');
 		}
 		
 		return settings;

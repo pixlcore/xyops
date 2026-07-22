@@ -865,7 +865,7 @@ Page.PageUtils = class PageUtils extends Page.Base {
 			nice_skip = app.hasPrivilege('edit_events') ? `<button class="link danger" onClick="$P().doSkipUpcomingJob(${idx})"><b>Skip Job...</b></button>` : '-';
 			
 			var tds = [
-				'<b>' + self.getNiceEvent(job.event, true) + '</b>',
+				'<b>' + self.getNiceEvent(job.event, true, job.invisible ? 'selection-ellipse' : '') + '</b>',
 				self.getNiceCategory(event.category, true),
 				self.getNiceTargetList(event.targets),
 				nice_source,

@@ -1011,15 +1011,19 @@ app.extend({
 		this.pruneGroups();
 		this.pruneServers();
 		this.pruneActiveAlerts();
+		this.pruneActiveJobs();
 	},
 	
 	pruneActiveJobs: function() {
 		// remove active jobs that the user should not see, due to category/group privs
-		if (!this.activeJobs || this.isAdmin()) return;
+		if (!this.activeJobs) return;
 		
 		for (var id in this.activeJobs) {
 			var job = this.activeJobs[id];
-			if (!this.hasCategoryAccess(job.category) || !this.hasGroupAccessAll(job.targets)) {
+			if (!this.isAdmin() && (!this.hasCategoryAccess(job.category) || !this.hasGroupAccessAll(job.targets))) {
+				delete this.activeJobs[id];
+			}
+			else if (job.invisible && (!this.isAdmin() || !this.user.admin_show_invisibles)) {
 				delete this.activeJobs[id];
 			}
 		}

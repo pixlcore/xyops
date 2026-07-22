@@ -399,7 +399,7 @@ Page.Base = class Base extends Page {
 		return html;
 	}
 	
-	getNiceEvent(item, link) {
+	getNiceEvent(item, link, icon_override = '') {
 		// get formatted event with icon, plus optional link
 		if (typeof(item) == 'string') item = find_object(app.events, { id: item });
 		if (!item) return '(None)';
@@ -426,7 +426,7 @@ Page.Base = class Base extends Page {
 		}
 		
 		var html = '<span class="nowrap ' + cat_class + '" title="' + encode_attrib_entities(item.title) + '">';
-		var icon = '<i class="mdi mdi-' + (item.icon || default_icon) + '"></i>';
+		var icon = '<i class="mdi mdi-' + (icon_override || item.icon || default_icon) + '"></i>';
 		if (link) {
 			html += '<a href="' + loc + '?id=' + item.id + '" class="' + cat_class + '">';
 			html += icon + '<span>' + item.title + '</span></a>';
@@ -2134,7 +2134,10 @@ Page.Base = class Base extends Page {
 			
 			// quiet (invisible) mode
 			var quiet = find_object( triggers, { type: 'quiet' } );
-			if (quiet && quiet.invisible) return false;
+			if (quiet && quiet.invisible) {
+				if (!app.isAdmin() || !app.user.admin_show_invisibles) return false;
+				event.invisible = true;
+			}
 			
 			// setup all unique timezones (intl formatters)
 			schedules.forEach( function(trigger) {
@@ -2290,6 +2293,9 @@ Page.Base = class Base extends Page {
 				
 				// add plugin modifier if applicable
 				if (event.plugin_trigger) extras.plugin = event.plugin_trigger.plugin_id;
+				
+				// add invisible flag if applicable
+				if (event.invisible) extras.invisible = true;
 				
 				// add job!
 				opts.jobs.push({ event: event.id, epoch: opts.epoch, type: scheduled, ...extras });
