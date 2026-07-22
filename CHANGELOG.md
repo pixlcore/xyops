@@ -1,5 +1,19 @@
 # xyOps Changelog
 
+## Version v1.0.85
+
+> July 22, 2026
+
+- [`cb8d5423`](https://github.com/pixlcore/xyops/commit/cb8d54235560d74c62467697ba19f7819203ed7f): Version 1.0.85
+- [`74445b30`](https://github.com/pixlcore/xyops/commit/74445b30181c429909867957aa81dcb151219de0): UI Tweak: More adjustments to disabled grid rows in dark mode.
+- [`9a3299ae`](https://github.com/pixlcore/xyops/commit/9a3299aea9f59e7b2711cc6fc278c9ad9ce1061c): Feature: Test dialog should save default user prefs regarding action condition and limit selection.
+- [`e3b0e15e`](https://github.com/pixlcore/xyops/commit/e3b0e15e2a07bfd0d8abe953c38ff5127efed5c6): Feature: Allow administrators to optionally see invisible jobs (upcoming and running).  Fixes #380.
+- [`837793f1`](https://github.com/pixlcore/xyops/commit/837793f18b26027400cd390f5ac14214a1d21130): Feature: Add new "T" keyboard shortcut to test event from the view page.
+- [`0d784edc`](https://github.com/pixlcore/xyops/commit/0d784edc3fa2ee1a3f78dd4c618249a134b94bab): Feature: Allow test jobs to specify exactly which action conditions should fire.  Fixes #378.
+- [`a5914e09`](https://github.com/pixlcore/xyops/commit/a5914e09910cb9ede62df60daec1007f3641c033): Bug Fix: UI: Opacity on disabled data grid elements is too faded in some cases.
+- [`b3dd53ca`](https://github.com/pixlcore/xyops/commit/b3dd53cab10b97c3f6a89a002f986468e19162a7): Feature: Scheduler can now launch multiple jobs for the same event on the same minute with varying params.
+- [`5f27b726`](https://github.com/pixlcore/xyops/commit/5f27b726d28755a703c7a97fc108c722f7368798): Bug Fix: Filtering event list by a single server target fails when workflows are present.
+
 ## Version v1.0.84
 
 > July 20, 2026
