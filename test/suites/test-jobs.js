@@ -184,7 +184,7 @@ exports.tests = [
 	async function test_job_retry_preserves_workflow_isolation(test) {
 		// Retry construction must retain the workflow's own options and bubbling.
 		// Complete a child in each new attempt to verify behavior, not just the copy.
-		const opts = ['first_abort', 'isolate_data', 'isolate_files', 'isolate_tags', 'isolate_content'];
+		const opts = ['preserve_sev', 'first_abort', 'isolate_data', 'isolate_files', 'isolate_tags', 'isolate_content'];
 		let job = { id: 'original', type: 'workflow', bubble: 'leaf', opts, code: 1, actions: [], tags: [],
 			workflow: { nodes: [{ id: 'leaf', type: 'job' }], connections: [], state: {}, jobs: {} },
 			limits: [{ type: 'retry', enabled: true, amount: 2 }]

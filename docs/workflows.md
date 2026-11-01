@@ -374,6 +374,50 @@ Select **First Fail Aborts** (`first_abort`) to abort the workflow when one of i
 
 This option prevents the failed job's normal downstream paths, including error-handler jobs and controller continuations, from launching.  Completion actions attached to the sub-job still follow that job's normal lifecycle.  A superseded attempt that is being retried does not trigger the workflow abort; a final failed attempt does.
 
+### Preserve Severity
+
+Select **Preserve Severity** (`preserve_sev`) to set the workflow's final result to the highest severity reported by its completed sub-jobs.  This is useful for checks across many hosts: findings can remain warnings, while a failed check remains an error even when other hosts are healthy.
+
+The option is disabled by default.  Without it, xyOps keeps its existing calculation: all successful jobs produce success, a mixture of successful and failed jobs produces a warning, and all failed jobs produce an error.  Warnings count as failures in that default calculation.
+
+With **Preserve Severity** enabled, the priority order is:
+
+```text
+Success (0) < Warning < Custom error codes < Abort < Critical
+```
+
+Custom error codes include nonzero numeric codes and other error strings besides `warning`, `abort`, and `critical`.  They all have the same priority; a larger numeric code does not imply higher severity.  The selected sub-job's actual code is preserved, rather than converted to a generic error.
+
+| Sub-job Results | Default Workflow Result | With Preserve Severity |
+|----------------|-------------------------|------------------------|
+| All successful | Success | Success |
+| All warnings | Error (`1`) | Warning |
+| Successes and warnings | Warning | Warning |
+| Three successes and one error `42` | Warning | Error (`42`) |
+| Error `42` and an aborted job | Error (`1`) | Abort |
+| An aborted job and a critical error | Error (`1`) | Critical |
+
+The description identifies a sub-job at the selected severity, for example `Job #j123: Pending upgrades`.  When multiple sub-jobs share the highest severity, the last completed job supplies the code and description, based on its `completed` timestamp.  This applies across all nodes, regardless of node or job-list order.  If timestamps are identical, the first matching job encountered is retained.  The description is not a summary of every finding.
+
+The calculation excludes superseded retry attempts and includes intermediate jobs, regardless of **Workflow Bubbling** or isolation settings.  Adding a successful housekeeping job does not reduce a failure's severity.  Controller/node errors retain their existing handling: if all launched jobs succeeded, or no jobs were launched, a node error produces a warning instead of success.
+
+Each workflow uses its own option.  Enable **Preserve Severity** on every level where you want this policy, including sub-workflows.  A parent sees the sub-workflow's final code, so it cannot recover a severity that the inner workflow already converted using the default calculation.  With the option enabled at both levels, a warning stays a warning, and attribution can read `Job #jouter123: Job #jinner456: Pending upgrades`.
+
+This option controls final result aggregation.  It does not make warnings successful for **On Any Error**, retries, controller Continue Percentage thresholds, or **First Fail Aborts**:
+
+- Explicit cancellation of the workflow always produces `abort`, even if a child reported `critical`.
+- If **First Fail Aborts** is also enabled, the first final sub-job failure still cancels the workflow.  The workflow finishes with `abort` rather than waiting to select a severity from normally completed work.
+- An inherited `abort` code follows normal abort behavior for completion actions and retries.  In particular, ordinary retry limits skip an aborted workflow unless a forced retry or other existing retry permission applies.  Reporting an inherited abort does not itself cancel sibling jobs; **First Fail Aborts** controls that behavior.
+- [Custom Job Overrides](recipes.md#custom-job-overrides) still run after aggregation and may change the final workflow code or description.
+
+For API creation or updates, include `preserve_sev` in the workflow event's `opts` array alongside any other desired options:
+
+```json
+{
+	"opts": ["preserve_sev", "isolate_files"]
+}
+```
+
 ### Data Isolation
 
 [Workflow output rules](#workflow-output) determine which sub-job outputs are eligible to bubble up.  To further suppress selected output, choose one or more isolation settings from **Workflow Options**:

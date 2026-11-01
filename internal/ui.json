@@ -592,6 +592,7 @@
 				"title": "Select Options",
 				"options": [
 					{ "id": "first_abort", "icon": "bus-alert", "title": "First Fail Aborts" },
+					{ "id": "preserve_sev", "icon": "fire-alert", "title": "Preserve Severity" },
 					{ "id": "isolate_data", "icon": "code-json", "title": "Isolate Data" },
 					{ "id": "isolate_files", "icon": "file-cabinet", "title": "Isolate Files" },
 					{ "id": "isolate_tags", "icon": "tag-hidden", "title": "Isolate Tags" },

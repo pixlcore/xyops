@@ -66,18 +66,221 @@ function getWorkflowEngine(job, details) {
 	});
 }
 
+// helper: finish a workflow with recorded child outcomes using the real calculator.
+// Keep this independent of storage and the satellite so edge cases are inexpensive.
+function getWorkflowResult(codes, opts = ['preserve_sev'], extra = {}) {
+	const jobs = codes.map(function(code, idx) {
+		return typeof(code) == 'object' ? code : { id: 'child' + idx, code, completed: idx + 1, description: 'Result ' + code };
+	});
+	const job = Object.assign({ id: 'parent', type: 'workflow', opts,
+		workflow: { nodes: [], connections: [], state: {}, jobs: { worker: jobs } }
+	}, extra);
+	// A null fixture option represents a legacy workflow with no opts property.
+	if (opts === null) delete job.opts;
+	
+	const engine = getWorkflowEngine(job, { workflowData: {}, wfJobData: {} });
+	engine.tickWorkflow(job);
+	return engine.finished;
+}
+
 exports.tests = [
+	
+	async function test_workflow_preserve_severity_results(test) {
+		// Cover the reported Multiplex cases, each severity boundary, arbitrary
+		// custom codes, and superseded retries. Legacy classification must survive.
+		const cases = [
+			{ name: 'all healthy', codes: [0, 0], code: 0, legacy: 0 },
+			{ name: 'all warnings', codes: ['warning', 'warning', 'warning', 'warning'], code: 'warning', legacy: 1 },
+			{ name: 'mixed warning', codes: [0, 'warning'], code: 'warning', legacy: 'warning' },
+			{ name: 'failed host', codes: [0, 0, 0, 42], code: 42, legacy: 'warning' },
+			{ name: 'custom string', codes: ['warning', 'check_failed'], code: 'check_failed', legacy: 1 },
+			{ name: 'negative code', codes: ['warning', -1], code: -1, legacy: 1 },
+			{ name: 'abort beats custom error', codes: [42, 'abort'], code: 'abort', legacy: 1 },
+			{ name: 'critical beats abort', codes: ['abort', 'critical'], code: 'critical', legacy: 1 },
+			{ name: 'critical beats all', codes: ['critical', 'abort', 42, 'warning', 0], code: 'critical', legacy: 'warning' },
+			{ name: 'constructor is custom', codes: ['constructor', 'warning'], code: 'constructor', legacy: 1 },
+			{ name: 'prototype name is custom', codes: ['__proto__'], code: '__proto__', legacy: 1 },
+			{ name: 'successful retry', codes: [{ id: 'old', code: 'critical', retried: true }, { id: 'new', code: 0 }], code: 0, legacy: 0 },
+			{ name: 'warning after retry', codes: [{ id: 'old', code: 'critical', retried: true }, { id: 'new', code: 'warning' }], code: 'warning', legacy: 1 },
+			{ name: 'no executed jobs', codes: [], code: 0, legacy: 0 }
+		];
+		
+		for (const opts of [null, [], ['preserve_sev']]) {
+			for (const item of cases) {
+				const result = getWorkflowResult(item.codes, opts);
+				assert.equal(result.code, opts && opts.length ? item.code : item.legacy, item.name + ': opts=' + opts);
+			}
+		}
+		
+		// Output selection must not hide failures, even on intermediate nodes.
+		// A successful housekeeping job on another node cannot dilute severity.
+		for (const bubble of ['', 'leaf']) {
+			const result = getWorkflowResult([], ['preserve_sev', 'isolate_data', 'isolate_tags'], {
+				bubble, workflow: { nodes: [], connections: [], state: {}, jobs: {
+					checks: [{ id: 'failed', code: 42, leaf: false, description: 'Check crashed' }],
+					housekeeping: [{ id: 'noop', code: 0, leaf: true }]
+				} }
+			});
+			assert.equal(result.code, 42, bubble + ': intermediate error survives a successful leaf');
+			assert.equal(result.description, 'Job #failed: Check crashed', 'description identifies the selected job');
+		}
+	},
+	
+	async function test_workflow_preserve_severity_latest_completion(test) {
+		// Node insertion order and job array order must not decide which equally
+		// severe failure supplies the result. Fractional timestamps matter too.
+		for (const [earlier_code, latest_code] of [
+			['warning', 'warning'], [999, 42], ['abort', 'abort'],
+			['critical', 'critical'], ['constructor', '__proto__']
+		]) {
+			for (const reverse_nodes of [false, true]) {
+				for (const reverse_jobs of [false, true]) {
+					const first_node = [
+						{ id: 'earliest', code: earlier_code, completed: 100.1, description: 'Earliest finding' },
+						{ id: 'latest', code: latest_code, completed: 100.3, description: 'Latest finding' }
+					];
+					const second_node = [{ id: 'middle', code: earlier_code, completed: 100.2, description: 'Middle finding' }];
+					if (reverse_jobs) first_node.reverse();
+					const jobs = reverse_nodes ? { second: second_node, first: first_node } : { first: first_node, second: second_node };
+					
+					// Later successes and superseded attempts must not displace the
+					// latest final failure, even if the old attempt was critical.
+					jobs.other = [
+						{ id: 'retried', code: 'critical', completed: 101, retried: true },
+						{ id: 'healthy', code: 0, completed: 102 }
+					];
+					const result = getWorkflowResult([], ['preserve_sev'], {
+						workflow: { nodes: [], connections: [], state: {}, jobs }
+					});
+					assert.equal(result.code, latest_code, 'latest completion supplies the exact code within its severity class');
+					assert.equal(result.description, 'Job #latest: Latest finding', 'attribution follows completion time, not traversal order');
+				}
+			}
+		}
+		
+		// Recency breaks severity ties only. A newer, less severe result must
+		// never replace an older result from a higher severity class.
+		for (const [higher, lower] of [['critical', 'abort'], ['abort', 42], [42, 'warning']]) {
+			const result = getWorkflowResult([
+				{ id: 'higher', code: higher, completed: 100, description: 'Higher severity' },
+				{ id: 'lower', code: lower, completed: 200, description: 'Later lower severity' }
+			]);
+			assert.equal(result.code, higher, 'severity takes precedence over completion time');
+			assert.equal(result.description, 'Job #higher: Higher severity', 'description comes from the higher severity job');
+		}
+	},
+	
+	async function test_workflow_preserve_severity_equal_timestamps(test) {
+		// Identical timestamps provide no chronological ordering. Keep the first
+		// encountered candidate, including its own code and fallback description.
+		for (const reverse of [false, true]) {
+			const children = [
+				{ id: 'first', code: 42, completed: 100, description: 'First finding' },
+				{ id: 'second', code: 'check_failed', completed: 100, description: '' }
+			];
+			if (reverse) children.reverse();
+			const result = getWorkflowResult(children);
+			assert.equal(result.code, children[0].code, 'an equal timestamp does not replace the selected job');
+			assert.equal(result.description, 'Job #' + children[0].id + ': ' + (children[0].description || 'No description provided.'),
+				'attribution and fallback remain attached to the selected job');
+		}
+	},
+	
+	async function test_workflow_preserve_severity_descriptions(test) {
+		// All result classes provide attribution, including custom codes which
+		// happen to share names with Object.prototype properties.
+		for (const code of ['warning', 42, 'abort', 'critical', 'constructor', '__proto__']) {
+			for (const description of [undefined, null, '', 'Pending upgrades']) {
+				const result = getWorkflowResult([{ id: 'hostcheck', code, description }]);
+				assert.equal(result.code, code, 'the exact selected code is retained');
+				assert.equal(result.description, 'Job #hostcheck: ' + (description || 'No description provided.'),
+					code + ': original description or fallback follows the job ID');
+			}
+		}
+	},
+	
+	async function test_workflow_preserve_severity_cancellation(test) {
+		// Explicit workflow cancellation always wins, even over a critical child.
+		const cancelled = getWorkflowResult([], ['preserve_sev'], { workflow: {
+			nodes: [], connections: [], state: {}, aborted: 'Cancelled by operator',
+			jobs: { worker: [{ id: 'critical', code: 'critical', description: 'Disk failed' }] }
+		} });
+		assert.equal(cancelled.code, 'abort', 'workflow cancellation overrides child severity');
+		assert.equal(cancelled.description, 'Cancelled by operator', 'cancellation retains its own reason');
+		
+		// Controllers can fail without launching a job. These must not be hidden
+		// by the new option, either alone or alongside successful child jobs.
+		for (const jobs of [[], [{ id: 'healthy', code: 0 }]]) {
+			const result = getWorkflowResult([], ['preserve_sev'], { workflow: {
+				nodes: [], connections: [], state: { controller: { error: true } }, jobs: { worker: jobs }
+			} });
+			assert.equal(result.code, 'warning', 'controller errors retain their existing warning classification');
+			assert.match(result.description, /nodes generated warnings/, 'controller problem remains visible');
+		}
+		
+		// An inherited abort is a real abort result for downstream conditions and
+		// retry policy. Only forced retries should retry an ordinary child abort.
+		for (const force of [false, true]) {
+			const job = getWorkflowResult(['abort']);
+			job.limits = [{ type: 'retry', enabled: true, amount: 1, force }];
+			let retry;
+			const engine = Object.assign(new Jobs(), {
+				jobDetails: {}, appendMetaLog() {}, logJob() {},
+				launchJob(next, callback) { retry = next; callback(null, 'retry'); }
+			});
+			assert.deepEqual(engine.getCompletedJobConditions(job), ['complete', 'error', 'abort'], 'abort conditions apply');
+			engine.checkRetryJob(job);
+			assert.equal(!!retry, force, 'inherited abort respects forced-retry policy');
+			if (retry) assert.deepEqual(retry.opts, ['preserve_sev'], 'forced retry retains the option');
+		}
+	},
+	
+	async function test_workflow_preserve_severity_nested(test) {
+		// Pass completed inner workflows through the actual parent notification
+		// path. Both levels must opt in; a parent's flag cannot repair an inner
+		// workflow that already collapsed warnings or custom errors to code 1.
+		for (const inner_enabled of [false, true]) {
+			for (const outer_enabled of [false, true]) {
+				for (const code of ['warning', 42, 'critical']) {
+					const parent = { id: 'outer', type: 'workflow', opts: outer_enabled ? ['preserve_sev'] : [],
+						workflow: { nodes: [{ id: 'inner_node', type: 'event' }], connections: [], state: {}, jobs: { inner_node: [] } } };
+					const engine = getWorkflowEngine(parent, { workflowData: {}, wfJobData: {} });
+					const child = { id: 'inner', type: 'workflow', opts: inner_enabled ? ['preserve_sev'] : [], workflow: {
+						job: parent.id, node: 'inner_node', nodes: [], connections: [], state: {},
+						jobs: { checks: [{ id: 'hostcheck', code, description: 'Host finding' }] }
+					} };
+					engine.activeJobs.inner = child;
+					engine.jobDetails.inner = { workflowData: {}, wfJobData: {} };
+					const finished = {};
+					engine.finishJob = function(job) {
+						const completed = finished[job.id] = Tools.mergeHashes(job, this.jobDetails[job.id]);
+						delete this.activeJobs[job.id];
+						delete this.jobDetails[job.id];
+						if (job.workflow.job) this.finishWorkflowJob(completed);
+					};
+					engine.tickWorkflow(child);
+					await new Promise(resolve => setImmediate(resolve));
+					assert.equal(finished.inner.code, inner_enabled ? code : 1, 'inner policy determines its own result');
+					assert.equal(finished.outer.code, inner_enabled && outer_enabled ? code : 1, 'each level applies its own policy');
+					if (inner_enabled && outer_enabled) {
+						assert.equal(finished.outer.description, 'Job #inner: Job #hostcheck: Host finding', 'attribution survives nesting');
+					}
+				}
+			}
+		}
+	},
 	
 	async function test_workflow_first_abort(test) {
 		// Drive the real workflow abort lifecycle. A final failure cancels sibling
 		// work and controllers before normal error wires or continuations can run.
 		// Successful jobs and superseded retry attempts must not abort the workflow.
 		for (const bubble of ['', 'leaf']) {
-			for (const enabled of [false, true]) {
+			for (const opts of [[], ['first_abort'], ['preserve_sev'], ['first_abort', 'preserve_sev']]) {
+				const enabled = opts.includes('first_abort');
 				for (const retried of [false, true]) {
 					for (const code of [0, 1, 'warning', 'critical', 'abort']) {
-						const label = 'bubble=' + bubble + ', enabled=' + enabled + ', retried=' + retried + ', code=' + code;
-						const parent = { id: 'parent', type: 'workflow', state: 'active', bubble, opts: enabled ? ['first_abort'] : [],
+						const label = 'bubble=' + bubble + ', opts=' + opts + ', retried=' + retried + ', code=' + code;
+						const parent = { id: 'parent', type: 'workflow', state: 'active', bubble, opts,
 							workflow: {
 								nodes: [{ id: 'worker', type: 'job' }, { id: 'handler', type: 'job' }, { id: 'controller', type: 'controller' }],
 								connections: [{ source: 'worker', dest: 'handler', condition: 'error' }],
@@ -468,7 +671,9 @@ exports.tests = [
 			{ name: 'overlapping options', parent: ['isolate_data', 'isolate_tags', 'isolate_content'],
 				child: ['isolate_data', 'isolate_files'] },
 			{ name: 'parent abort policy', parent: ['first_abort'], child: [] },
-			{ name: 'child abort policy', parent: [], child: ['first_abort'] }
+			{ name: 'child abort policy', parent: [], child: ['first_abort'] },
+			{ name: 'parent severity policy', parent: ['preserve_sev'], child: [] },
+			{ name: 'child severity policy', parent: [], child: ['preserve_sev'] }
 		];
 		
 		for (const parent_bubble of [undefined, '', 'leaf']) {
@@ -519,7 +724,7 @@ exports.tests = [
 		const workflow = getWorkflow('decision');
 		workflow.id = 'eisolationopts';
 		workflow.bubble = 'leaf';
-		workflow.opts = ['first_abort', 'isolate_data', 'isolate_files', 'isolate_tags', 'isolate_content'];
+		workflow.opts = ['preserve_sev', 'first_abort', 'isolate_data', 'isolate_files', 'isolate_tags', 'isolate_content'];
 		let { data: created } = await this.request.json(this.api_url + '/app/create_event/v1', workflow);
 		assert.equal(created.code, 0, 'workflow with isolation options is accepted');
 		assert.deepEqual(created.event.opts, workflow.opts, 'create preserves isolation options');

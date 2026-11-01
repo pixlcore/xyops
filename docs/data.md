@@ -553,6 +553,7 @@ An optional array of option IDs for workflow events only, selected using **Workf
 | Option | Description |
 |--------|-------------|
 | `first_abort` | Abort the workflow when a sub-job completes with a failure, including warning, critical, and abort results.  Superseded retry attempts do not trigger this; a final failed attempt does. |
+| `preserve_sev` | Preserve the highest sub-job severity: success, warning, custom error codes, abort, then critical.  Excludes superseded retry attempts and breaks severity ties using the latest `completed` timestamp.  Preserves the selected code and identifies the selected sub-job in the description.  Explicit workflow cancellation still takes precedence.  See [Preserve Severity](workflows.md#preserve-severity) for details. |
 | `isolate_data` | Exclude sub-job output data from the workflow's collected output data. |
 | `isolate_files` | Exclude sub-job output files from the workflow's output files. |
 | `isolate_tags` | Prevent sub-job user tags from being added to the workflow's tags. |
