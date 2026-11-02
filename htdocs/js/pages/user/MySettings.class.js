@@ -31,8 +31,11 @@ Page.MySettings = class MySettings extends Page.Base {
 		var user = resp.user;
 		
 		var ropts = Intl.DateTimeFormat().resolvedOptions();
-		var lang = ropts.locale.match(/\-/) ? ropts.locale.split(/\-/).shift() : ropts.locale.toLowerCase();
-		var reg = ropts.locale.match(/\-/) ? ropts.locale.split(/\-/).pop() : ropts.locale.toUpperCase();
+		
+		// Show the detected language and region without mistaking scripts or extensions for regions.
+		var locale = new Intl.Locale(ropts.locale);
+		var lang = locale.language;
+		var reg = locale.region || locale.maximize().region;
 		
 		html += '<div class="box">';
 		html += '<div class="box_title">';
@@ -547,11 +550,11 @@ Page.MySettings = class MySettings extends Page.Base {
 		// update date/time preview
 		var json = this.get_settings_form_json();
 		var ropts = Intl.DateTimeFormat().resolvedOptions();
-		var lang = ropts.locale.match(/\-/) ? ropts.locale.split(/\-/).shift() : ropts.locale.toLowerCase();
-		var reg = ropts.locale.match(/\-/) ? ropts.locale.split(/\-/).pop() : ropts.locale.toUpperCase();
 		
-		lang = json.language || lang;
-		reg = json.region || reg;
+		// Match the app's locale handling while previewing the current form preferences.
+		var locale = new Intl.Locale(ropts.locale);
+		var reg = json.region || locale.region || locale.maximize().region;
+		locale = new Intl.Locale(json.language || locale.toString(), { region: reg });
 		
 		var opts = {
 			year: 'numeric',
@@ -562,7 +565,7 @@ Page.MySettings = class MySettings extends Page.Base {
 			minute: '2-digit',
 			second: '2-digit',
 			fractionalSecondDigits: json.milliseconds ? 3 : undefined,
-			locale: lang + '-' + reg,
+			locale: locale.toString(),
 			timeZone: json.timezone || ropts.timeZone,
 			numberingSystem: json.num_format || ropts.numberingSystem,
 			hourCycle: json.hour_cycle

@@ -1043,14 +1043,16 @@ app.extend({
 		// get combined date/time options with user locale settings
 		var user = this.user;
 		var ropts = Intl.DateTimeFormat().resolvedOptions();
-		var [lang, reg] = ropts.locale.split(/\-/);
-		if (!reg) reg = lang.toUpperCase();
 		
-		lang = user.language || lang;
-		reg = user.region || reg;
+		// Parse scripts and extensions correctly, and infer a region if the browser omits it.
+		var locale = new Intl.Locale(ropts.locale);
+		var reg = user.region || locale.region || locale.maximize().region;
+		
+		// Keep language and region preferences independent, preserving the detected locale when automatic.
+		locale = new Intl.Locale(user.language || locale.toString(), { region: reg });
 		
 		if (opts.locale === false) delete opts.locale;
-		else if (!opts.locale) opts.locale = lang + '-' + reg;
+		else if (!opts.locale) opts.locale = locale.toString();
 		
 		if (opts.timeZone === false) delete opts.timeZone;
 		else if (!opts.timeZone) opts.timeZone = user.timezone || ropts.timeZone;
