@@ -1,5 +1,18 @@
 # xyOps Changelog
 
+## Version v1.1.13
+
+> November 3, 2026
+
+- [`e56906d8`](https://github.com/pixlcore/xyops/commit/e56906d820586053c6928b672a68cf0eb30136cf): Version 1.1.13
+- [`5f8296be`](https://github.com/pixlcore/xyops/commit/5f8296bece7d696f73453883fa0a80785a354606): Feature: Allow email "From" header to be overridden in the send_mail API.  Fixes #492
+- [`c8018277`](https://github.com/pixlcore/xyops/commit/c8018277ba12f58e829682b862c1a0f54e045dbc): Fix: Use proper Intl.Locale API for parsing user language and region selections.
+- [`42bb64fb`](https://github.com/pixlcore/xyops/commit/42bb64fbaf6bb30c25f9013e2583c8321ac97846): Feature: Add optional Preserve Severity workflow result policy
+- [`e9395006`](https://github.com/pixlcore/xyops/commit/e93950062015a3eb6ab9b58a8a4115499ef3c944): Doc: README: Add badges and shields, reformatted a bit.
+- [`7dd72fb5`](https://github.com/pixlcore/xyops/commit/7dd72fb59039f85131c01a45684692e14c885bf0): Meta: Add flag to force fresh pull of base docker image on GH actions build.
+- [`75d64f67`](https://github.com/pixlcore/xyops/commit/75d64f676f631d3282e278a5f36df810606fafda): Doc: SSO: Add MCP login exclusions, Bearer-token passthrough, and streaming requirements for both MCP and the stream_job API.
+- [`29880ab3`](https://github.com/pixlcore/xyops/commit/29880ab300b1ea8df2e4783a7079417c00ac4edc): Fix: Add SSE buffering for job streams with Nginx proxies.
+
 ## Version v1.1.12
 
 > October 29, 2026
