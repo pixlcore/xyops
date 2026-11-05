@@ -432,6 +432,7 @@ Page.Marketplace = class Marketplace extends Page.PageUtils {
 		var show_vault = false;
 		var full_install_btn = false;
 		var is_plugin = (product.type == 'plugin');
+		var is_ext = (product.type == 'extension');
 		
 		if (installed) {
 			if (installed.marketplace.version == product.versions[0]) install_btn_class = 'secondary';
@@ -551,6 +552,9 @@ Page.Marketplace = class Marketplace extends Page.PageUtils {
 			// buttons at bottom
 			html += '<div class="box_buttons">';
 				html += `<div class="box_buttons_badge_left mobile_hide" style="color:var(--green)"><i class="mdi mdi-check-circle-outline"></i>Installed</div>`;
+				if (is_ext) {
+					html += `<div class="button secondary mobile_collapse" data-id="${installed.id}" onClick="$P().configureExtension(this)"><i class="mdi mdi-code-json">&nbsp;</i><span>Configure...</span></div>`;
+				}
 				html += '<div class="button danger mobile_collapse" onClick="$P().do_delete_product()"><i class="mdi mdi-trash-can-outline">&nbsp;</i><span>Uninstall...</span></div>';
 				if (is_plugin) {
 					html += '<div class="button secondary mobile_collapse" onClick="$P().do_clone_plugin()"><i class="mdi mdi-content-copy">&nbsp;</i><span>Clone...</span></div>';
