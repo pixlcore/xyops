@@ -477,7 +477,8 @@ Page.System = class System extends Page.PageUtils {
 			var url = '#Marketplace?id=' + encodeURIComponent(ext.marketplace.id);
 			var icon = ext.pkg.icon || 'puzzle-outline';
 			var actions = [
-				`<a href="${url}"><b>View</b></a>`,
+				// `<a href="${url}"><b>View</b></a>`,
+				`<span class="link" data-id="${ext.id}" onClick="$P().configureExtension(this)"><b>Configure</b></span>`,
 				`<span class="link danger" data-id="${ext.id}" onClick="$P().removeExtension(this)"><b>Remove</b></span>`
 			];
 			var cols = [
@@ -493,6 +494,62 @@ Page.System = class System extends Page.PageUtils {
 		
 		this.div.find('#d_sys_exts').show();
 		this.div.find('#d_sys_exts > .box_content').removeClass('loading').html(html);
+	}
+	
+	configureExtension(elem) {
+		// show dialog with extension's JSON configuration, save to main config overrides
+		var self = this;
+		var ext_id = $(elem).data('id');
+		var ext = find_object( app.extensions, { id: ext_id } );
+		var ext_base_config = null;
+		
+		var meta = find_object( app.marketRows || [], { id: ext.marketplace.id } );
+		if (!meta) meta = { title: ext.marketplace.id };
+		
+		var finish = function(new_value) {
+			// save changes
+			if (!ext_base_config) return; // race condition
+			
+			ext_base_config[ ext.id ] = JSON.parse(new_value); // pre-validated, guaranteed to parse
+			
+			Dialog.showProgress( 1.0, "Saving Configuration..." );
+			
+			app.api.post( 'app/admin_update_config', { extensions: ext_base_config }, function(resp) {
+				app.cacheBust = hires_time_now();
+				Dialog.hideProgress();
+				app.showMessage('success', "Your changes were saved successfully.");
+			});
+		}; // finish
+		
+		this.editCodeAuto({
+			title: `Edit ${meta.title} Configuration`, 
+			code: '', // lazy loaded
+			format: 'json',
+			button: ['floppy', 'Save Changes'],
+			callback: finish
+		});
+		
+		var editor = this.editor;
+		
+		app.api.get( 'app/admin_get_config', {}, function(resp) {
+			if (!self.active) return; // sanity
+			if (self.editor !== editor) return; // sanity
+			
+			var { config, overrides, sample, markdown } = resp;
+			
+			// save base config for saving
+			ext_base_config = overrides.extensions || config.extensions || sample.extensions || {};
+			
+			// config may be in overrides, config, or sample
+			// if none, allow client-side ext code to initialize it
+			var ext_config = ext_base_config[ ext.id ] || null;
+			if (!ext_config && ext.obj && ext.obj.initNewConfig) ext_config = ext.obj.initNewConfig();
+			if (!ext_config) ext_config = {};
+			
+			// populate editor
+			self.editor.setValue( JSON.stringify(ext_config, null, "\t") );
+			self.editor.focus();
+		} );
 	}
 	
 	removeExtension(elem) {

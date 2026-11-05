@@ -382,6 +382,28 @@ client: {
 }
 ```
 
+### Initial Configuration
+
+Define an optional `initNewConfig` function in your `client` object to provide initial settings when an administrator clicks **Configure** for your extension on the **System Status & Maintenance** page.  xyOps calls this function when the extension has no existing configuration, and displays its return value in the JSON editor.
+
+```js
+client: {
+	initNewConfig: function() {
+		// Supply editable defaults for the first configuration dialog.
+		return {
+			enabled: true,
+			greeting: "Hello from xyOps!"
+		};
+	}
+}
+```
+
+The function receives no arguments, and `this` refers to your browser-side client object.  Return a JSON-friendly configuration object synchronously; promises are not awaited.  Use the explicit function-expression syntax shown above, following the [serialization rules](#serialization-rules).
+
+The returned settings are only saved when the administrator clicks **Save Changes**.  Cancelling leaves the configuration unchanged, so the hook can run again on a later edit.  Existing configuration objects, including an empty `{}`, skip the hook.  If the hook is absent or returns no value, the editor starts with `{}`.
+
+This hook supplies defaults for the per-extension editor only.  It does not run when editing the `extensions` property on the main Configuration page or initialize server-side defaults at startup.  Keep any required runtime defaults in your server-side extension code.
+
 ### Serialization Rules
 
 Client functions must use explicit function expressions:
