@@ -215,7 +215,7 @@ var satellite = {
 			break;
 			
 			case 'hello':
-				// response to initial hello, should have nonce for us to hash
+				// The conductor has acknowledged our hello; use the configured server token.
 				// if we were assigned an ID, save it permanently
 				if (data.id && !this.config.get('server_id')) {
 					this.logComm(3, "We have been assigned a unique server ID: " + data.id);
@@ -224,18 +224,12 @@ var satellite = {
 					});
 				}
 				
-				// if debug level is 9, log partial token or secret + nonce (first 4 chars of each)
-				if (this.config.get('auth_token')) {
-					this.logComm(9, "Authenticating via auth_token: " + this.config.get('auth_token').substring(0, 4) + '****');
-				}
-				else {
-					this.logComm(9, "Authenticating via secret_key + nonce hash: " + 
-						this.config.get('secret_key').substring(0, 4) + '**** + ' + data.nonce.substring(0, 4) + '****');
-				}
+				// Log only the first four characters for troubleshooting.
+				this.logComm(9, "Authenticating via auth_token: " + this.config.get('auth_token').substring(0, 4) + '****');
 				
-				// continue auth challange
+				// Join using the same token authentication as a real satellite.
 				socket.send('join', {
-					token: this.config.get('auth_token') || Tools.digestHex( data.nonce + this.config.get('secret_key'), 'sha256' )
+					token: this.config.get('auth_token')
 				});
 			break;
 			

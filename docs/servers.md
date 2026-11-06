@@ -34,11 +34,12 @@ You can add servers in three ways:
 	- For autoscaling or ephemeral hosts, generate an API Key and use your provisioning to call the bootstrap endpoint to fetch a server token and installer command during first boot.
 	- See below for details. You can include this in cloud-init, AMIs, Packer templates, or custom init scripts.
 3. **Manual install**
-	- Install xySat on the host and configure it with your cluster URL and secret key. The secret key is used to generate an auth token. Start the service to join the cluster.
+	- Follow the [manual installation instructions](https://github.com/pixlcore/xysat#manual-installation) to download xySat and its generated configuration. The config includes your cluster connection settings, a unique `server_id`, and its matching `auth_token`. Start the service to join the cluster.
 	- This method is typically only used for development, testing and home labs.
 
 Notes:
 
+- xySat requires `auth_token` authentication. For an existing manual installation, download a fresh satellite configuration and use its matching `server_id` and `auth_token` together.
 - Server auth tokens do not expire. You can, however, [rotate your secret key](hosting.md#secret-key-rotation) (which regenerates all tokens) from the UI if needed.
 - Software upgrades for xySat are orchestrated from the UI and are designed to avoid interrupting running jobs.
 

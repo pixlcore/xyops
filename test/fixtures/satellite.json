@@ -8,5 +8,5 @@
 	"monitoring_enabled": true,
 	"quickmon_enabled": true,
 	"id": "satunit1",
-	"secret_key": "UNIT_TEST"
+	"auth_token": "57ec35a6427775ae37f781ca14ce64a2ebd445962d1fb57fd74baf3b61a7f524"
 }

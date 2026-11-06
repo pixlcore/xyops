@@ -57,6 +57,7 @@ module.exports = {
 			require('./suites/test-apikeys.js').tests,
 			require('./suites/test-tags.js').tests,
 			require('./suites/test-servers.js').tests,
+			require('./suites/test-satellite-auth.js').tests,
 			require('./suites/test-webhooks.js').tests,
 			require('./suites/test-tickets.js').tests,
 			require('./suites/test-jobs.js').tests,
