@@ -1,5 +1,12 @@
 # xyOps Changelog
 
+## Version v1.1.15
+
+> November 6, 2026
+
+- [`020e0643`](https://github.com/pixlcore/xyops/commit/020e06431e4dbe9e2b0e00a859bfad6bce759219): Version 1.1.15
+- [`a2c30539`](https://github.com/pixlcore/xyops/commit/a2c30539312dbb66456ca9de7e2b1a8a6318dd36): Fix: Remove stale xySat dependencies before extracting upgrades
+
 ## Version v1.1.14
 
 > November 6, 2026
