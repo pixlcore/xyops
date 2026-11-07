@@ -113,6 +113,9 @@ echo "Fetching package from $BASE_URL..."
 CORE_TGZ="./.satellite-core.tgz.$$"
 download_file "${BASE_URL}/api/app/satellite/core?s=${SERVER_ID}&t=${AUTH_TOKEN}&os=${OS}&arch=${ARCH}" "$CORE_TGZ"
 
+# Remove obsolete nested dependencies before extracting the new package.
+rm -rf "$INSTALL_DIR/node_modules"
+
 echo "Decompressing archive..."
 tar zxf "$CORE_TGZ"
 rm -f "$CORE_TGZ"

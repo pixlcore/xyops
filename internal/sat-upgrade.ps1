@@ -107,6 +107,12 @@ try {
 
 Write-Output "Extracting package..."
 try {
+	# Remove obsolete nested dependencies before extracting the new package.
+	$modulesDir = Join-Path $installDir "node_modules"
+	if (Test-Path -LiteralPath $modulesDir) {
+		Remove-Item -LiteralPath $modulesDir -Recurse -Force -ErrorAction Stop
+	}
+	
 	# Windows 10 and later include a tar utility.
 	$tarOutput = & $tarPath -xf $tempPackageFile -C $installDir 2>&1
 	if ($LastExitCode -ne 0) {
