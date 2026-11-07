@@ -1,5 +1,19 @@
 # xyOps Changelog
 
+## Version v1.1.14
+
+> November 6, 2026
+
+- [`373524b2`](https://github.com/pixlcore/xyops/commit/373524b25a69102dd61b832ded71a166cd07e3c3): Version 1.1.14
+- [`c2b906b5`](https://github.com/pixlcore/xyops/commit/c2b906b550ee0a35b3d8b4b8ff52e4db725a3b14): Dep: Bump pixl-logger to v2.0.5 for crash protection on sync log writes.
+- [`b7375a73`](https://github.com/pixlcore/xyops/commit/b7375a732f2f0dde8a3e89d50589ac0b2af56ba4): Fix: Remove legacy undocumented xySat secret key auth method.
+- [`2db96200`](https://github.com/pixlcore/xyops/commit/2db9620089f5d10aa851d2bd7740ff99801f4fea): Fix: Prevent unescaped HTML from appearing in magic link page body.
+- [`a3554b0a`](https://github.com/pixlcore/xyops/commit/a3554b0ac42fdec4c967c58b73a66c91f56e9a02): Feature: Allow installed extensions to be configured from their marketplace detail pages.
+- [`4cf8fdf9`](https://github.com/pixlcore/xyops/commit/4cf8fdf9e5fada979ba9a255988ea62f2ce36d50): Fix: Use secure JSON parsing across the app.
+- [`0304bc32`](https://github.com/pixlcore/xyops/commit/0304bc325dc127a5f1416aef895803d4d8124ea6): Dep: Bump several pixlcore modules to latest, for secure JSON parsing.
+- [`eaba303a`](https://github.com/pixlcore/xyops/commit/eaba303a71bad885b071be9002ffa6263108465d): Feature: Improve config update reload times for UI editor.
+- [`c2a8ec79`](https://github.com/pixlcore/xyops/commit/c2a8ec7944e8003e861f32d4a1fb3f25433dd7b5): Feature: Add per-extension configuration editor on the System UI page.
+
 ## Version v1.1.13
 
 > November 3, 2026
