@@ -54,13 +54,29 @@ Page.Base = class Base extends Page {
 		// get formatted group list
 		var self = this;
 		if (typeof(groups) == 'string') groups = groups.split(/\,\s*/);
+		
+		if (app.isUserLimited()) {
+			// prune groups user doesn't have access to
+			groups = groups.filter( group => {
+				if ((typeof(group) == 'string') && !find_object(app.groups, { id: group })) return false;
+				return true;
+			} );
+		}
+		
 		if (!groups || !groups.length) return none || '(None)';
 		return groups.map( function(group) { return self.getNiceGroup(group, false, icon_override); } ).join(', ');
 	}
 	
 	getNiceGroup(item, link, icon_override) {
 		// get formatted group with icon, plus optional link
-		if (typeof(item) == 'string') item = find_object(app.groups, { id: item });
+		if (typeof(item) == 'string') {
+			var group = find_object(app.groups, { id: item });
+			if (group) item = group;
+			else {
+				item = { id: item, title: item };
+				link = false;
+			}
+		}
 		if (!item) return '(None)';
 		
 		var html = '<span class="nowrap" title="' + encode_attrib_entities(item.title) + '">';
