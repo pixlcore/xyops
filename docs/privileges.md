@@ -173,3 +173,6 @@ Allow bulk data exports using the [admin_export_data](api.md#admin_export_data) 
 
 ### update_state
 Toggle scheduler, update event cursors and stats, and update the sync metadata.
+
+### see_all_users
+For category or group restricted users, allow them to see all users in the system.

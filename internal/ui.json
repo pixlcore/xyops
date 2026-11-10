@@ -59,7 +59,8 @@
 		{ "id": "update_servers", "title": "Update Servers", "icon": "server-network-outline" },
 		{ "id": "send_emails", "title": "Send Emails", "icon": "email-fast-outline" },
 		{ "id": "bulk_export", "title": "Bulk Export", "icon": "database-export-outline" },
-		{ "id": "update_state", "title": "Update State", "icon": "state-machine" }
+		{ "id": "update_state", "title": "Update State", "icon": "state-machine" },
+		{ "id": "see_all_users", "title": "See All Users", "icon": "account-multiple" }
 	],
 	
 	"globalMemoryLists": ["api_keys", "groups", "plugins", "categories", "events", "channels", "web_hooks", "buckets", "secrets", "monitors", "alerts", "tags", "roles"],
