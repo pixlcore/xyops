@@ -1861,6 +1861,7 @@ Page.PageUtils = class PageUtils extends Page.Base {
 				
 				case 'queue':
 					limit.amount = parseInt( $('#fe_erl_raw_amount').val() );
+					limit.duration = parseInt( $('#fe_erl_duration').val() );
 				break;
 				
 				case 'file':
@@ -1892,20 +1893,20 @@ Page.PageUtils = class PageUtils extends Page.Base {
 			
 			switch (new_type) {
 				case 'time':
-					$('#d_erl_duration').show();
+					$('#d_erl_duration').show().find('> .fr_label').html("Duration:");
 					$('#s_erl_duration_cap').html('Enter the maximum duration for the time limit.');
 				break;
 				
 				case 'mem':
 					$('#d_erl_byte_amount').show();
-					$('#d_erl_duration').show();
+					$('#d_erl_duration').show().find('> .fr_label').html("Sustain:");
 					$('#s_erl_duration_cap').html('Specify the amount of time the memory must stay over the limit before action is taken.');
 				break;
 				
 				case 'cpu':
 					$('#d_erl_raw_amount').show().find('> .fr_label').html("Max CPU Amount:");
 					$('#s_erl_raw_amount_cap').html('Enter the maximum CPU precentage for the limit (100 = 1 core maxed).');
-					$('#d_erl_duration').show();
+					$('#d_erl_duration').show().find('> .fr_label').html("Sustain:");
 					$('#s_erl_duration_cap').html('Specify the amount of time the CPU must stay over the limit before action is taken.');
 				break;
 				
@@ -1922,7 +1923,7 @@ Page.PageUtils = class PageUtils extends Page.Base {
 				case 'retry':
 					$('#d_erl_raw_amount').show().find('> .fr_label').html("Max Retries:");
 					$('#s_erl_raw_amount_cap').html('Enter the maximum number of retries to attempt before failing the job.');
-					$('#d_erl_duration').show();
+					$('#d_erl_duration').show().find('> .fr_label').html("Delay:");
 					$('#s_erl_duration_cap').html('Optionally set a delay to wait between retries.');
 					$('#d_erl_retry_force').show();
 				break;
@@ -1930,6 +1931,8 @@ Page.PageUtils = class PageUtils extends Page.Base {
 				case 'queue':
 					$('#d_erl_raw_amount').show().find('> .fr_label').html("Max Queue Size:");
 					$('#s_erl_raw_amount_cap').html('Enter the maximum number of queued jobs to allow.');
+					$('#d_erl_duration').show().find('> .fr_label').html("Max Wait Time:");
+					$('#s_erl_duration_cap').html('Optionally set the maximum amount of time jobs can stay waiting in the queue before they are aborted (0 = unlimited).');
 				break;
 				
 				case 'file':

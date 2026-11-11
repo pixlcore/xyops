@@ -356,6 +356,8 @@ This means:
 - If one job is already running, the new job waits in the event queue.
 - If 25 jobs are already waiting, the next launch is rejected.
 
+You can also set **Max Wait Time** on the **Max Queue Limit**.  For example, set it to one hour to abort jobs that stay queued longer than an hour.  Leave it at `0` for unlimited waiting.  This only limits time in the queue; startup and retry delays do not count, and running jobs are unaffected.
+
 This pair is also important when jobs can launch faster than your workers can accept them, such as web hook triggers, repeat workflows, multiplex workflows, or busy schedules.
 
 See [Max Jobs Limit](limits.md#max-jobs-limit) and [Max Queue Limit](limits.md#max-queue-limit) for the full behavior.

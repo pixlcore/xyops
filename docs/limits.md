@@ -158,7 +158,7 @@ Rate limits use simple fixed windows aligned to the local system time zone of th
 
 When the rate is exhausted, a [Max Queue Limit](#max-queue-limit) allows additional jobs to wait for the next available window.  Without queue capacity, excess jobs are aborted instead of waiting.
 
-If you configure a [Shared Capacity Key](#shared-capacity-key), the rate allowance is shared along with concurrency capacity.  All members of the shared pool should use identical concurrency, rate, window, and queue settings.
+If you configure a [Shared Capacity Key](#shared-capacity-key), the rate allowance is shared along with concurrency capacity.  All members of the shared pool must use identical concurrency, rate, window, and queue settings, including the maximum queue wait time.
 
 For a complete explanation of fixed windows, queue behavior, shared pools, workflow scope, configuration changes, resets, recovery, and operational caveats, see the [Job Rate Limits Wiki](https://github.com/pixlcore/xyops/wiki/Rate-Limits).
 
@@ -195,7 +195,7 @@ Capacity keys have the following requirements:
 - All members using rate limiting must use the same rate and window.  Members should either all enable the same rate limit or all leave it disabled.  xyOps emits a warning to the job meta log if it detects differing rate settings.
 - Each member must configure its own Max Queue limit if jobs should wait when the shared concurrency pool is full.
 
-All waiting jobs with the same capacity key share one priority-first, FIFO queue.  High-priority jobs are considered first, followed by the oldest waiting job.  A member's Max Queue amount is compared against the total number of jobs already waiting in the shared pool.  For predictable behavior, all members should use the same Max Queue amount.  xyOps emits a warning to the job meta log if it detects differing queue amounts.
+All waiting jobs with the same capacity key share one priority-first, FIFO queue.  High-priority jobs are considered first, followed by the oldest waiting job.  A member's Max Queue amount is compared against the total number of jobs already waiting in the shared pool.  All members must use the same Max Queue amount and maximum wait time (`duration`), including whether the wait time is unlimited.  xyOps emits a warning to the job meta log if it detects differing queue amounts or wait times.  Behavior is undefined when members use different settings.
 
 When capacity becomes available, xyOps examines the oldest waiting job, after considering high-priority jobs first.  If no eligible target server is available for that job, it remains at the front of the queue and later jobs continue waiting, even if their target servers are available.  This preserves queue ordering.  For best results, jobs sharing a capacity key should target similarly available infrastructure.
 
@@ -347,7 +347,7 @@ Other aborts do not retry by default.  For example, a job will not normally retr
 
 ### Max Queue Limit
 
-Cap how many jobs are allowed to wait in the queue when concurrency or server availability prevents immediate start. Without a queue limit, jobs are aborted when they cannot start due to `job` or server selection limits.
+Cap how many jobs are allowed to wait in the queue when concurrency limits, rate limits, or unavailable servers prevent immediate start.  You can also set a maximum wait time so jobs are aborted if they stay queued too long.  Without a queue limit, jobs are aborted when they cannot start due to `job` or server selection limits.
 
 Parameters:
 
@@ -355,16 +355,24 @@ Parameters:
 |------|------|----------|-------------|
 | `type` | String | Yes | Set to `queue` for max queue limit. |
 | `amount` | Number | Yes | Maximum number of queued jobs allowed. `0` disables queueing. |
+| `duration` | Number | No | Maximum queue wait time in seconds.  Omit or set to `0` for unlimited waiting.  Jobs are aborted if their queue wait exceeds this duration. |
 
-Example:
+In the limit editor, set **Max Queue Size** to control how many jobs may wait, and **Max Wait Time** to control how long they may wait.  Leave **Max Wait Time** at `0` to preserve unlimited waiting.
+
+Example allowing up to 25 waiting jobs, with a maximum wait of one hour:
 
 ```json
 {
 	"enabled": true,
 	"type": "queue",
-	"amount": 25
+	"amount": 25,
+	"duration": 3600
 }
 ```
+
+The wait time only covers time spent queued.  Startup and retry delays do not count toward it, and it does not limit how long a job may run after leaving the queue.  To limit execution time, use a [Max Time Limit](#max-time-limit).
+
+Queue timeouts do not retry by default; [Always Retry on Abort](#retry-eligibility) can allow retries if a Max Retry Limit is configured.
 
 > [!IMPORTANT]
 > If you include a max queue limit with a non-zero amount you must also include a [Max Jobs Limit](#max-jobs-limit).
@@ -465,6 +473,7 @@ Example:
 ## Notes and Behavior
 
 - Start-time enforcement: `job`, `queue`, and `file` limits are evaluated before launch. `job`/`queue` determine whether a job runs now, queues, or aborts. `file` prunes input.
+- Queue wait enforcement: A non-zero `duration` on a `queue` limit aborts jobs that wait too long, before they can leave the queue and start.
 - Runtime enforcement: `time`, `log`, `mem`, `cpu` are checked while the job runs. `mem` and `cpu` require sustained overages for their `duration` before triggering.
 - Triggered actions: For `time`, `log`, `mem`, `cpu`, when exceeded xyOps can apply tags, send emails, fire a web hook (with optional extra text), take a snapshot, and abort the job. All actions are recorded in the job's Activity log with details.
 - Multiple similar limits: If multiple sources define the same type, the event/workflow definition takes precedence for start-time checks.
