@@ -78,7 +78,7 @@
 		"pixl-server-web": "^3.0.7",
 		"pixl-server-debug": "^1.0.0",
 		"pixl-tools": "^2.0.7",
-		"pixl-xyapp": "^2.1.45",
+		"pixl-xyapp": "^2.1.46",
 		"better-sqlite3": "12.6.2",
 		"uglify-js": "3.19.3",
 		"useragent-ng": "2.4.5",
