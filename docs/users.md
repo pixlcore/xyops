@@ -89,7 +89,8 @@ xyOps handles account creation, login, session management, and password reset, a
 - Expiration: Sessions expire per the [User.session_expire_days](config.md#user-session_expire_days) configuration setting.
 - Lockouts: Multiple failed logins per hour trigger a lockout requiring password reset (configurable). Admins can "Reset Lockouts" on a user.
 - Password management: Users can change their password (must provide current password). Forgot/reset flows are supported via email templates.
-- Single Sign-On: xyOps supports trusted-header SSO via a proxy (e.g., OAuth2-Proxy), can auto-assign roles/privileges based on IdP groups, and can redirect on logout. See [SSO](sso.md).
+- Single Sign-On: xyOps supports trusted-header SSO via a proxy (e.g., OAuth2-Proxy) or an SSO Plugin (e.g., the OIDC Plugin), can auto-assign roles/privileges based on IdP groups, and can redirect on logout. Local username/password login is disabled when SSO is enabled unless hybrid mode is also enabled. See [SSO](sso.md).
+- Hybrid login: With a supported SSO Plugin, administrators can enable a login-screen choice between local accounts and SSO. Local sessions return to the login screen on logout; SSO sessions follow the configured external logout URL. See [Hybrid Login](sso.md#hybrid-login).
 
 ## Security Log
 

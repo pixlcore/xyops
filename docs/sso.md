@@ -21,6 +21,8 @@ Here are the main paths we recommend:
 - [OAuth2-Proxy](#oauth2-proxy) is a popular and widely tested solution.  It has more deployment pieces, but it is likely to be compatible with more OIDC providers and handle more provider edge cases.
 - [Authentik](#authentik), [Authelia](#active-directory), [Tailscale](#tailscale), and other trusted-header systems can also work well, depending on your environment.
 
+SSO normally starts automatically when a user visits xyOps without an existing session.  If you use an SSO Plugin that handles the browser login flow, such as the OIDC Plugin, you can enable [Hybrid Login](#hybrid-login) to offer a choice between local username/password login and SSO.
+
 ## MCP Clients
 
 The [MCP Server extension](https://github.com/pixlcore/xyext-mcp) exposes `/mcp` on the conductor's existing URL. MCP clients authenticate with `Authorization: Bearer YOUR_XYOPS_API_KEY`, so external authentication proxies must let this exact path bypass browser login. xyOps still validates the key and enforces its permissions when tools call the API.
@@ -42,6 +44,7 @@ All the SSO settings for xyOps are contained in the `sso.json` file, which is ty
 ```json
 {
 	"enabled": false,
+	"hybrid": false,
 	"whitelist": ["127.0.0.1", "10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16", "::1/128", "fd00::/8", "169.254.0.0/16", "fe80::/10"],
 	"header_map": {
 		"username": "x-forwarded-email",
@@ -67,7 +70,8 @@ Here are descriptions of all the SSO properties:
 
 | Property Name | Type | Description |
 |---------------|------|-------------|
-| `enabled` | Boolean | Set this to `true` to enable SSO login (and disable classic user/pass login!). |
+| `enabled` | Boolean | Set this to `true` to enable SSO login.  Local username/password login is disabled unless `hybrid` is also enabled. |
+| `hybrid` | Boolean | Set this to `true` to offer both local and SSO login (default: `false`).  Requires an SSO Plugin configured via `command`, with no upstream authentication proxy.  See [Hybrid Login](#hybrid-login). |
 | `whitelist` | Array or Boolean | This allows you to limit trusted headers to a specific proxy or network range.  Set to `false` when there is no separate trusted proxy, such as with the OIDC Plugin.  See [Live Production](#live-production) for more on this. |
 | `header_map` | Object | This allows you to map trusted headers to standard xyOps user properties.  See [Header Map](#header-map) below for details. |
 | `cleanup_username` | Boolean | Set this to `true` to cleanup the username received from the trusted headers.  See [Header Map](#header-map) below for details. |
@@ -78,11 +82,44 @@ Here are descriptions of all the SSO properties:
 | `replace_roles` | Boolean | Set this to `true` to replace **all** the user's roles with those mapped via `group_role_map` only.  See [User Groups](#user-groups) below for details. |
 | `replace_privileges` | Boolean | Set this to `true` to replace **all** the user's privileges with those mapped via `group_role_map` only.  See [User Groups](#user-groups) below for details. |
 | `admin_bootstrap` | String | Temporarily assign full administrator privileges to a given user.  This is used for bootstrapping the system on initial setup.  See [Admin Bootstrap](#admin-bootstrap) for more. |
-| `logout_url` | String | Set this to the URL to redirect the user to after xyOps performs its own logout.  See [Logging Out](#logging-out) below for details. |
+| `logout_url` | String | Set this to the URL to redirect the user to after xyOps performs its own logout.  In hybrid mode, this applies to SSO sessions; local sessions return to the login screen.  See [Logging Out](#logging-out) below for details. |
 | `command` | String | Optional custom shell command to filter all incoming SSO requests and inject headers.  See [Custom Command](#custom-command) below for details. |
 | `preset` | String | Optional preset ID which pre-configures SSO for specific providers.  Currently used for [Tailscale](tailscale.md). |
 
 Custom SSO commands may also define their own extra configuration blocks inside `sso.json`.  For example, the [xyOps OIDC Plugin](#xyops-oidc-plugin) uses an `oidc` object.  xyOps passes the full SSO configuration to the command, but only uses the standard properties itself.
+
+### Hybrid Login
+
+Hybrid login lets users choose between a local xyOps account and SSO from the login screen.  It is disabled by default, so typical SSO setups start the authentication flow automatically.
+
+This feature requires an SSO Plugin that handles the browser login flow, such as the [xyOps OIDC Plugin](#xyops-oidc-plugin).  The plugin must be configured using `SSO.command`.  If `SSO.enabled` and `SSO.hybrid` are both `true` without a `command`, xyOps rejects the configuration at startup.
+
+Hybrid login is **not supported** with an authentication proxy in front of xyOps, including the OAuth2-Proxy, Authentik proxy, and Tailscale Serve setups described in this guide.  Those systems establish the user's identity before the browser reaches xyOps.  A reverse proxy used only for TLS termination or load balancing can still be used, provided it allows the browser to reach the xyOps login screen without first requiring SSO.
+
+To enable hybrid login, add `"hybrid": true` to your existing `sso.json` configuration.  For example, these top-level settings enable it for an already configured OIDC Plugin:
+
+```json
+{
+	"enabled": true,
+	"command": "/usr/local/bin/xyplug-sso-oidc",
+	"hybrid": true
+}
+```
+
+Keep your existing `oidc`, `header_map`, `whitelist`, and other SSO settings, then restart xyOps.  The normal plugin configuration and identity validation still apply.
+
+For a browser without an active xyOps session, the login flow is:
+
+1. Visit the xyOps root URL.  The local login form appears with a **Login with SSO...** button.
+2. To use a local account, enter its username and password and click **Login**.
+3. To use SSO, click **Login with SSO...**.  xyOps reloads the page and launches the plugin's authentication flow.
+4. After successful authentication, xyOps creates its session and opens the application.
+
+Browsers with an existing valid xyOps session continue into the application.  If an SSO attempt fails, xyOps displays an error; return to the root URL to choose a login method again.
+
+Hybrid mode enables password login for your local accounts.  Review those accounts and their passwords before enabling it.  SSO account creation does not assign a usable local password.  Local and SSO users share the same username namespace, including any configured [username cleanup](#header-cleanup), so use distinct usernames for accounts you want to keep separate.
+
+See [Logging Out](#logging-out) for how each login method handles logout.  To restore automatic SSO login and disable new local password logins, set `hybrid` back to `false` and restart xyOps.  Existing valid sessions continue to work.
 
 ### Header Map
 
@@ -203,6 +240,13 @@ Note that the username must match exactly here, including any cleanup that may b
 
 When a user clicks the "Logout" button in the top-right corner of the xyOps UI, xyOps clears its own local session cookie.  In many SSO setups, there may also be an external auth proxy session and an identity provider session.  If you want to clear or continue through those systems too, configure a `logout_url` in `sso.json`.
 
+With [Hybrid Login](#hybrid-login) enabled, logout follows the method used to create the current session:
+
+- **Local login:** xyOps ends its session and returns to the local login screen, where the SSO button is available again.  It does not follow `logout_url`.
+- **SSO login:** xyOps ends its session and redirects to `logout_url`, when configured, so the external logout process can continue.
+
+An empty `logout_url` ends only the xyOps session.  The identity provider may still have an active session, so a later SSO login may complete without asking for credentials again.  Leaving this URL empty does not enable local password login when `hybrid` is `false`.
+
 For the [xyOps OIDC Plugin](#xyops-oidc-plugin) plugin, the plugin does not manage IdP logout directly.  Set `logout_url` to your provider's logout URL, if you have one:
 
 ```json
@@ -256,7 +300,7 @@ The tradeoff is provider coverage.  The plugin is intentionally lightweight and 
 
 ### How It Works
 
-The plugin runs during the xyOps SSO login flow:
+By default, the plugin runs automatically during the xyOps SSO login flow.  With [Hybrid Login](#hybrid-login) enabled, this flow starts after the user clicks **Login with SSO...**:
 
 1. xyOps receives a browser request for the app root URL.
 2. xyOps launches the configured SSO command and sends it request metadata over STDIN.
@@ -317,6 +361,7 @@ Here is a complete `sso.json` example utilizing the OIDC Plugin:
 ```json
 {
 	"enabled": true,
+	"hybrid": false,
 	"whitelist": false,
 	"header_map": {
 		"username": "x-forwarded-user",
@@ -350,6 +395,7 @@ Here is a complete `sso.json` example utilizing the OIDC Plugin:
 
 A few important notes:
 
+- Set `hybrid` to `true` to offer local username/password login alongside the SSO button.  See [Hybrid Login](#hybrid-login) for requirements and behavior.
 - `whitelist` is usually set to `false` for this plugin, because there is no separate trusted proxy IP.  The plugin itself performs the authentication bridge.
 - `header_map` should match the headers emitted by the plugin.
 - `state_secret`, `client_secret`, and SSO debug logs should be kept private.

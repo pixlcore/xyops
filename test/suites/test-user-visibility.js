@@ -1,6 +1,7 @@
 // Regression tests for user stub visibility at login and during live updates.
 const assert = require('node:assert/strict');
 const Tools = require('pixl-tools');
+const Config = require('pixl-config');
 const Engine = require('../../lib/engine.js');
 
 function makeUser(username, categories = [], groups = [], roles = [], privileges = {}) {
@@ -21,6 +22,8 @@ function makeEngine(users, roles = []) {
 	var engine = Object.create(Engine.prototype);
 	Object.assign( engine, {
 		master: true, roles, sockets: {}, api_keys: [],
+		// Use local authentication so the login hook can check its SSO policy.
+		config: new Config({ SSO: { enabled: false } }),
 		usermgr: { normalizeUsername: username => username.toLowerCase(), sanitizeUser() {} },
 		emit() {}, logActivity() {}, logUserActivity() {}, logDebug() {}, logError() {},
 		requireMaster() { return true; },
@@ -138,7 +141,7 @@ exports.tests = [
 		for (var item of fixture.cases) {
 			var args = { user: item.viewer };
 			await new Promise( (resolve, reject) => {
-				engine.beforeUserLogin(args, err => err ? reject(err) : resolve());
+				engine.beforeUserLogin('login', args, err => err ? reject(err) : resolve());
 			} );
 			assertNames(args.resp.users, item.visible, item.viewer.username + ' login visibility');
 			

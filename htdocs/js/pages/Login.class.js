@@ -81,8 +81,9 @@ Page.Login = class Login extends Page.Base {
 				// 	html += '<div class="button" onClick="$P().navCreateAccount()">Create Account...</div>';
 				// }
 				// html += '<div class="button mobile_hide" onClick="$P().cancelCreate()">Cancel</div>';
-				html += '<div class="button" onClick="$P().navPasswordRecovery()">Forgot Password...</div>';
-				html += '<div class="button primary" onClick="$P().doLogin()"><i class="mdi mdi-key">&nbsp;</i>Login</div>';
+				html += '<div class="button phone_collapse" onClick="$P().navPasswordRecovery()"><i class="mdi mdi-lock-reset">&nbsp;</i><span>Forgot Password...</span></div>';
+				if (config.sso_hybrid) html += '<div class="button phone_collapse" onClick="$P().navSSO()"><i class="mdi mdi-shield-account">&nbsp;</i><span>Login with SSO...</span></div>';
+				html += '<div class="button primary" onClick="$P().doLogin()"><i class="mdi mdi-key">&nbsp;</i><span>Login</span></div>';
 			html += '</div>';
 		
 		html += '</div>'; // box_content
@@ -105,6 +106,15 @@ Page.Login = class Login extends Page.Base {
 		}, 1 );
 		
 		return true;
+	}
+	
+	navSSO() {
+		// Request SSO authentication.
+		document.cookie = "ssologin=1; Max-Age=3600; Path=/";
+		
+		// Remove the hash and query string, then reload the root route.
+		window.history.replaceState(null, '', '/');
+		window.location.reload();
 	}
 	
 	doLogin() {

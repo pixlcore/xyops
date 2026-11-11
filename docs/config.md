@@ -1262,7 +1262,17 @@ This section configures Single Sign-On using trusted headers. See the [SSO guide
 
 ### SSO.enabled
 
-This boolean enables SSO and disables local username/password login (default: `false`).
+This boolean enables SSO (default: `false`).  When enabled, local username/password login is disabled unless [SSO.hybrid](#ssohybrid) is also enabled.
+
+### SSO.hybrid
+
+This boolean offers both local username/password login and a **Login with SSO...** button (default: `false`).  It requires `SSO.enabled` to be `true` and an SSO Plugin configured via [SSO.command](#ssocommand) that handles the browser login flow, such as the OIDC Plugin.  Enabling SSO with hybrid mode and no command causes a startup error.
+
+Hybrid mode is **not supported** with an upstream authentication proxy.  With hybrid mode disabled, SSO starts automatically and new local password logins are rejected.  See [Hybrid Login](sso.md#hybrid-login) for setup and logout behavior.
+
+### SSO.command
+
+This string specifies the shell command for an SSO Plugin (default: empty).  The command receives request metadata and SSO configuration, and can redirect the browser or supply trusted identity headers.  Hybrid login requires a plugin that handles the browser login flow.  See [Custom Command](sso.md#custom-command) and the [xyOps OIDC Plugin](sso.md#xyops-oidc-plugin).
 
 ### SSO.whitelist
 
@@ -1307,6 +1317,8 @@ This string temporarily grants full admin to the exact matching username to boot
 ### SSO.logout_url
 
 This string is the URL to redirect to after xyOps clears its session, so your auth proxy/IdP can complete logout (e.g., `/oauth2/sign_out?rd=...`).
+
+In hybrid mode, this redirect applies to sessions created through SSO.  Local password sessions return to the login screen.  If the URL is empty, logout ends only the xyOps session and leaves any external sessions intact.  See [Logging Out](sso.md#logging-out).
 
 
 
