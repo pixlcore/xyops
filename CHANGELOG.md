@@ -1,5 +1,19 @@
 # xyOps Changelog
 
+## Version v1.1.16
+
+> November 11, 2026
+
+- [`a30e92ee`](https://github.com/pixlcore/xyops/commit/a30e92ee4db7d2cf5957c2f29140a2b59dca23be): Version 1.1.16
+- [`3dd90faf`](https://github.com/pixlcore/xyops/commit/3dd90faf6eb354d64d8c0ed1f282b57b125110a9): Feature: Add plugin-based hybrid SSO and local login
+- [`ae2b2f33`](https://github.com/pixlcore/xyops/commit/ae2b2f330dc9af4a1d1996ad338d0c55b85c7af3): Feature: Add optional maximum queue wait time
+- [`27deb8ce`](https://github.com/pixlcore/xyops/commit/27deb8cea6bf990a9948f0d29279e7087568418a): Dep: Bump pixl-server-user to v2.0.4 for improved user prop sanitization.
+- [`061e0e4b`](https://github.com/pixlcore/xyops/commit/061e0e4b495d46cf405ebaa5109c2be383042d2c): Dep: Bump pixl-xyapp to v2.1.46 for more aggressive HTML stripping.
+- [`f9bb6e7b`](https://github.com/pixlcore/xyops/commit/f9bb6e7bf659939875f8afca8054438f73b70edc): Fix: Improve HTML stripping and preserve Markdown content
+- [`7432f0ce`](https://github.com/pixlcore/xyops/commit/7432f0ce9c048ad010fc2092bfc23bc837c7b8f6): Fix: Hide inaccessible group names in lists for restricted users.
+- [`c90ce4b7`](https://github.com/pixlcore/xyops/commit/c90ce4b72ebc558536ce4ab47808ac4b4d09b93c): Feature: Add see_all_users privilege for restricted users
+- [`9b8ae074`](https://github.com/pixlcore/xyops/commit/9b8ae0749588007aaef6a9501bb488a7a5496930): Feature: Restrict user visibility by computed category and group access
+
 ## Version v1.1.15
 
 > November 6, 2026
