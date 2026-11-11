@@ -2835,7 +2835,7 @@ Page.PageUtils = class PageUtils extends Page.Base {
 				if (in_group) html += `</fieldset>`;
 				html += `<fieldset class="info_fieldset">`;
 				html += `<legend>${strip_html(param.title)}</legend>`;
-				if (param.caption) html += `<div class="tool_desc">${inline_marked(strip_html(param.caption))}</div>`;
+				if (param.caption) html += `<div class="tool_desc">${renderMarkdownText(param.caption, true)}</div>`;
 				in_group = true;
 				return;
 			}
@@ -2985,18 +2985,18 @@ Page.PageUtils = class PageUtils extends Page.Base {
 						onChange: `$P().changePluginParamTool('${plugin_id}','${param.id}',${explore})` 
 					});
 					
-					if (param.caption) html += '<div class="info_caption">' + inline_marked( strip_html(param.caption) ) + '</div>';
+					if (param.caption) html += '<div class="info_caption">' + renderMarkdownText(param.caption, true) + '</div>';
 					
 					html += `<fieldset id="fs_toolset_${plugin_id}_${param.id}" class="info_fieldset">`;
 					html += `<legend>${strip_html(tool.title)}</legend>`;
-					if (tool.description) html += `<div class="tool_desc">${inline_marked(strip_html(tool.description))}</div>`;
+					if (tool.description) html += `<div class="tool_desc">${renderMarkdownText(tool.description, true)}</div>`;
 					if (tool.fields && tool.fields.length) html += self.getParamEditor(tool.fields, params, explore);
 					html += `</fieldset>`;
 				break;
 			} // switch type
 			
 			if (param.type != 'toolset') {
-				if (param.caption) html += '<div class="info_caption">' + inline_marked( strip_html(param.caption) ) + '</div>';
+				if (param.caption) html += '<div class="info_caption">' + renderMarkdownText(param.caption, true) + '</div>';
 				else if (elem_dis) html += '<div class="info_caption">This parameter is locked, and only editable by administrators.</div>';
 			}
 			
@@ -3058,7 +3058,7 @@ Page.PageUtils = class PageUtils extends Page.Base {
 		var html = '';
 		
 		html += `<legend>${strip_html(tool.title)}</legend>`;
-		if (tool.description) html += `<div class="tool_desc">${inline_marked(strip_html(tool.description))}</div>`;
+		if (tool.description) html += `<div class="tool_desc">${renderMarkdownText(tool.description, true)}</div>`;
 		if (tool.fields && tool.fields.length) html += this.getParamEditor(tool.fields, {}, explore);
 		
 		$fieldset.html(html).buttonize();
@@ -3963,6 +3963,7 @@ Page.PageUtils = class PageUtils extends Page.Base {
 	
 	getWFParamPreviewHTML(fields, params) {
 		// get HTML presentation for set of event fields, plugin params, or toolset fields
+		// Values may contain comparisons or code samples; escape them rather than strip.
 		var self = this;
 		var none = '<span>(None)</span>';
 		var html = '';
@@ -3990,7 +3991,7 @@ Page.PageUtils = class PageUtils extends Page.Base {
 				case 'textarea':
 					if ((elem_value !== null) && String(elem_value).length) {
 						html += '<i class="mdi mdi-' + elem_icon + '">&nbsp;</i>';
-						html += strip_html( elem_value );
+						html += encode_entities( elem_value );
 					}
 					else html += none;
 				break;
@@ -3998,7 +3999,7 @@ Page.PageUtils = class PageUtils extends Page.Base {
 				case 'code':
 					if (String(elem_value).length) {
 						html += '<i class="mdi mdi-' + elem_icon + '">&nbsp;</i>';
-						html += '<span class="monospace">' + strip_html(elem_value) + '</span>';
+						html += '<span class="monospace">' + encode_entities(elem_value) + '</span>';
 					}
 					else html += none;
 				break;
@@ -4006,7 +4007,7 @@ Page.PageUtils = class PageUtils extends Page.Base {
 				case 'json':
 					elem_value = JSON.stringify( elem_value || {} );
 					// html += '<i class="mdi mdi-' + elem_icon + '">&nbsp;</i>';
-					html += '<span class="monospace">' + strip_html(elem_value) + '</span>';
+					html += '<span class="monospace">' + encode_entities(elem_value) + '</span>';
 				break;
 				
 				case 'checkbox':
@@ -4564,8 +4565,9 @@ Page.PageUtils = class PageUtils extends Page.Base {
 		if (node.data.wide) classes.push('wf_wide');
 		if (node.data.color) classes.push('note_' + node.data.color);
 		
-		var text = strip_html( node.data.body.trim() || config.ui.messages.wf_note_empty );
-		var body = marked.parse(text, config.ui.marked_config);
+		// Preserve Markdown source and escape embedded HTML during rendering.
+		var text = node.data.body.trim() || config.ui.messages.wf_note_empty;
+		var body = renderMarkdownText(text);
 		
 		html += `<div id="d_wfn_${node.id}" class="${classes.join(' ')}" style="left:${pos.x}px; top:${pos.y}px;" aria-label="${config.ui.labels.wf_note}">
 			<div class="markdown-body">${body}</div>
@@ -4805,6 +4807,7 @@ Page.PageUtils = class PageUtils extends Page.Base {
 	
 	getParamsTable() {
 		// get html for params table
+		// Preserve literal text in defaults, hidden values and select menu choices.
 		var self = this;
 		var html = '';
 		var rows = this.params;
@@ -4845,7 +4848,7 @@ Page.PageUtils = class PageUtils extends Page.Base {
 							nice_icon = variant.icon;
 						}
 					}
-					if (has_value && (param.value !== null) && String(param.value).length) pairs.push([ 'Default', '&ldquo;' + strip_html(param.value) + '&rdquo;' ]);
+					if (has_value && (param.value !== null) && String(param.value).length) pairs.push([ 'Default', '&ldquo;' + encode_entities(param.value) + '&rdquo;' ]);
 					else pairs.push([ "(No default)" ]);
 				break;
 				
@@ -4874,12 +4877,12 @@ Page.PageUtils = class PageUtils extends Page.Base {
 				break;
 				
 				case 'hidden':
-					if (has_value) pairs.push([ 'Value', '&ldquo;' + strip_html(param.value) + '&rdquo;' ]);
+					if (has_value) pairs.push([ 'Value', '&ldquo;' + encode_entities(param.value) + '&rdquo;' ]);
 					else pairs.push([ "(No value)" ]);
 				break;
 				
 				case 'select':
-					pairs.push([ 'Items', '(' + strip_html(has_value ? param.value : '') + ')' ]);
+					pairs.push([ 'Items', '(' + encode_entities(has_value ? param.value : '') + ')' ]);
 					if (param.multiple) nice_type += ' (Multi)';
 				break;
 				
@@ -5679,7 +5682,7 @@ Page.PageUtils = class PageUtils extends Page.Base {
 				if (in_group) html += `</fieldset>`;
 				html += `<fieldset class="info_fieldset">`;
 				html += `<legend>${strip_html(param.title)}</legend>`;
-				if (param.caption) html += `<div class="tool_desc">${inline_marked(strip_html(param.caption))}</div>`;
+				if (param.caption) html += `<div class="tool_desc">${renderMarkdownText(param.caption, true)}</div>`;
 				in_group = true;
 				return;
 			}
@@ -5832,11 +5835,11 @@ Page.PageUtils = class PageUtils extends Page.Base {
 						onChange: `$P().changeParamTool('${param.id}',${explore})`
 					});
 					
-					if (param.caption) html += '<div class="info_caption">' + inline_marked( strip_html(param.caption) ) + '</div>';
+					if (param.caption) html += '<div class="info_caption">' + renderMarkdownText(param.caption, true) + '</div>';
 					
 					html += `<fieldset id="fs_toolset_${param.id}" class="info_fieldset">`;
 					html += `<legend>${strip_html(tool.title)}</legend>`;
-					if (tool.description) html += `<div class="tool_desc">${inline_marked(strip_html(tool.description))}</div>`;
+					if (tool.description) html += `<div class="tool_desc">${renderMarkdownText(tool.description, true)}</div>`;
 					if (tool.fields && tool.fields.length) html += self.getParamEditor(tool.fields, params, explore);
 					html += `</fieldset>`;
 				break;
@@ -5844,7 +5847,7 @@ Page.PageUtils = class PageUtils extends Page.Base {
 			} // switch type
 			
 			if (param.type != 'toolset') {
-				if (param.caption) html += '<div class="info_caption">' + inline_marked( strip_html(param.caption) ) + '</div>';
+				if (param.caption) html += '<div class="info_caption">' + renderMarkdownText(param.caption, true) + '</div>';
 				else if (elem_dis) html += '<div class="info_caption">This field is locked, and only editable by administrators.</div>';
 			}
 			
@@ -5869,7 +5872,7 @@ Page.PageUtils = class PageUtils extends Page.Base {
 		var html = '';
 		
 		html += `<legend>${strip_html(tool.title)}</legend>`;
-		if (tool.description) html += `<div class="tool_desc">${inline_marked(strip_html(tool.description))}</div>`;
+		if (tool.description) html += `<div class="tool_desc">${renderMarkdownText(tool.description, true)}</div>`;
 		if (tool.fields && tool.fields.length) html += this.getParamEditor(tool.fields, {}, explore);
 		
 		$fieldset.html(html).buttonize();

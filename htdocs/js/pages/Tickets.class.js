@@ -835,7 +835,7 @@ Page.Tickets = class Tickets extends Page.PageUtils {
 		// show dialog confirming ticket delete action
 		var self = this;
 		
-		Dialog.confirmDanger( 'Delete Ticket', "Are you sure you want to <b>permanently delete</b> ticket #" + this.ticket.num + " (&ldquo;" + this.ticket.subject + "&rdquo;)?  There is no way to undo this action.", 'Delete', function(result) {
+		Dialog.confirmDanger( 'Delete Ticket', "Are you sure you want to <b>permanently delete</b> ticket #" + this.ticket.num + " (&ldquo;" + strip_html(this.ticket.subject) + "&rdquo;)?  There is no way to undo this action.", 'Delete', function(result) {
 			if (result) {
 				Dialog.showProgress( 1.0, "Deleting Ticket..." );
 				app.api.post( 'app/delete_ticket', self.ticket, self.delete_ticket_finish.bind(self) );
@@ -1104,12 +1104,14 @@ Page.Tickets = class Tickets extends Page.PageUtils {
 		history.replaceState( null, '', '#' + ticket.num );
 		this.render_header();
 		
-		var body = '<div class="markdown-body">' + marked.parse( stripHTML(ticket.body), config.ui.marked_config) + '</div>';
+		// Render user-authored Markdown without stripping comparisons or code samples.
+		var body = '<div class="markdown-body">' + renderMarkdownText(ticket.body) + '</div>';
 		
 		html += '<div class="box">';
 			html += '<div id="d_ticket_main_body">';
 				html += '<div class="box_title grid subject">';
-					html += '<div class="btg_title">' + stripHTML(ticket.subject) + '</div>';
+					// Subjects are plain labels; also discard partial tags in older tickets.
+					html += '<div class="btg_title">' + strip_html(ticket.subject) + '</div>';
 					html += '<div class="btg_buttons">';
 						html += '<div class="button secondary" onClick="$P().prep_edit_ticket_body()"><i class="mdi mdi-text-box-edit-outline">&nbsp;</i>Edit Ticket...</div>';
 					html += '</div>';
@@ -2129,8 +2131,8 @@ Page.Tickets = class Tickets extends Page.PageUtils {
 			self.close_current_editor();
 			
 			// rerender subject and markdown
-			self.div.find('#d_ticket_main_body div.btg_title').html( ticket.subject );
-			self.div.find('#d_ticket_main_body div.markdown-body').html( marked.parse( stripHTML(ticket.body), config.ui.marked_config) );
+			self.div.find('#d_ticket_main_body div.btg_title').html( strip_html(ticket.subject) );
+			self.div.find('#d_ticket_main_body div.markdown-body').html( renderMarkdownText(ticket.body) );
 			
 			self.expandInlineImages('#d_ticket_main_body');
 			self.highlightCodeBlocks('#d_ticket_main_body');
@@ -2220,7 +2222,7 @@ Page.Tickets = class Tickets extends Page.PageUtils {
 					
 					html += '</div>';
 					
-					html += '<div class="message_body">' + '<div class="markdown-body">' + marked.parse( stripHTML(change.body), config.ui.marked_config) + '</div>' + '</div>';
+					html += '<div class="message_body">' + '<div class="markdown-body">' + renderMarkdownText(change.body) + '</div>' + '</div>';
 					// html += '<div class="message_footer">' + record.disp.foot_widgets.join('') + '<div class="clear"></div>' + '</div>';
 				html += '</div>'; // box
 				if (yes_hide) html += '</div>';
@@ -2241,7 +2243,7 @@ Page.Tickets = class Tickets extends Page.PageUtils {
 				
 				switch (change.key) {
 					case 'subject':
-						md += substitute( text, { disp: change.value } );
+						md += substitute( text, { disp: strip_html(change.value) } );
 					break;
 					
 					case 'status':
@@ -2670,7 +2672,8 @@ Page.Tickets = class Tickets extends Page.PageUtils {
 	
 	editShowPreview() {
 		// show popup preview of markdown
-		this.viewMarkdownAuto( "Markdown Preview", stripHTML( this.editor.getValue() ), " " );
+		// Unsaved source has not passed through the server's save-time filtering.
+		this.viewMarkdownAuto( "Markdown Preview", this.editor.getValue(), " ", true );
 	}
 	
 	toggleScrollLock() {
@@ -2694,8 +2697,8 @@ Page.Tickets = class Tickets extends Page.PageUtils {
 		app.cacheBust = hires_time_now();
 		
 		// rerender subject and markdown
-		this.div.find('#d_ticket_main_body div.btg_title').html( ticket.subject );
-		this.div.find('#d_ticket_main_body div.markdown-body').html( marked.parse( stripHTML(ticket.body), config.ui.marked_config) );
+		this.div.find('#d_ticket_main_body div.btg_title').html( strip_html(ticket.subject) );
+		this.div.find('#d_ticket_main_body div.markdown-body').html( renderMarkdownText(ticket.body) );
 		
 		this.expandInlineImages('#d_ticket_main_body');
 		this.highlightCodeBlocks('#d_ticket_main_body');

@@ -801,7 +801,8 @@ Page.Events = class Events extends Page.PageUtils {
 				if (event.notes) {
 					html += '<div class="summary_grid" style="grid-template-columns: 1fr; margin-top:30px;"><div>';
 					html += `<div class="info_label">${thing} Notes</div>`;
-					html += '<div class="info_value overflow" style="font-weight:normal; line-height:16px;">' + strip_html(event.notes).replace(/\n/g, '<br>') + '</div>';
+					// Notes may contain literal comparisons or code, so preserve their text.
+					html += '<div class="info_value overflow" style="font-weight:normal; line-height:16px;">' + encode_entities(event.notes).replace(/\n/g, '<br>') + '</div>';
 					html += '</div></div>';
 				}
 			html += '</div>'; // box content

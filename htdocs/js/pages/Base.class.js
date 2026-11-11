@@ -3033,8 +3033,9 @@ Page.Base = class Base extends Page {
 		};
 	}
 	
-	viewMarkdownAuto(title, text, btn) {
+	viewMarkdownAuto(title, text, btn, restricted = false) {
 		// popup dialog to show pretty-printed markdown
+		// User-authored previews can opt into escaping embedded HTML and filtering URLs.
 		var self = this;
 		this._temp_code = text;
 		var html = '';
@@ -3042,7 +3043,7 @@ Page.Base = class Base extends Page {
 		html += '<div class="code_viewer scroll_shadows">';
 		html += '<div class="markdown-body">';
 		
-		html += marked.parse(text, config.ui.marked_config);
+		html += restricted ? renderMarkdownText(text) : marked.parse(text, config.ui.marked_config);
 		
 		html += '</div>'; // markdown-body
 		html += '</div>'; // code_viewer
@@ -3065,7 +3066,8 @@ Page.Base = class Base extends Page {
 	copyMarkdownToClipboard() {
 		// copy markdown code from dialog to clipboard
 		if (this._temp_code) {
-			copyToClipboard( strip_html(this._temp_code) );
+			// Clipboard text is not HTML; retain code samples and angle brackets.
+			copyToClipboard(this._temp_code);
 			app.showMessage('info', "The markdown was copied to your clipboard.");
 		}
 	}

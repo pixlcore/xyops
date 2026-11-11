@@ -507,12 +507,48 @@ function always_string(thing) {
 	return Array.isArray(thing) ? String(thing[0]) : String(thing);
 }
 
-function stripHTML(text) {
-	// only strip html tags that would "render" in a browser -- avoid false positives
-	return String(text)
-		.replace(/<\s*(script|style|template|iframe|object|embed)\b[^>]*>[\s\S]*?<\s*\/\s*\1\s*>/gi, '')
-		.replace(/<!--[\s\S]*?-->|<![^>]*>|<\?[^>]*\?>/g, '')
-		.replace(/<\/?[A-Za-z][A-Za-z0-9:-]*(?:\s+(?:"[^"]*"|'[^']*'|[^'"<>])*)?\s*\/?>/g, '');
+function renderMarkdownText(text, inline = false) {
+	// Render user-authored Markdown without stripping comparisons or code samples.
+	// Keep this scoped to text-only Markdown fields; other viewers allow HTML.
+	if (text == null) return '';
+	
+	var options = { ...config.ui.marked_config };
+	var renderer = Object.create(options.renderer || marked.defaults.renderer || new marked.Renderer());
+	
+	// Escape HTML tokens after Markdown parsing, so blockquotes, autolinks and
+	// code spans retain their normal meaning.  Raw HTML blocks remain visible.
+	renderer.html = function(html) {
+		return encode_entities(html);
+	};
+	
+	// Marked may emit unescaped text while inside inline <script>/<code> tags.
+	// Escape brackets here too, preserving entities already produced by Marked.
+	renderer.text = function(text) {
+		return text.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+	};
+	
+	// Use Marked's built-in URL filtering and attribute rendering for links and
+	// images, without enabling its deprecated whole-document HTML sanitizer.
+	// The existing app link renderer does not perform this URL filtering.
+	var url_renderer = new marked.Renderer({ ...options, sanitize: true });
+	renderer.link = function(href, title, text) {
+		var html = url_renderer.link(href, title, text);
+		
+		// Preserve the app's external-link styling after the URL has been checked.
+		if ((html != text) && href.match(/^\w+\:\/\//) && !text.match(/<.+>/)) {
+			html = html.replace(/^<a /, '<a target="_blank" ')
+				.replace(/<\/a>$/, '<i style="padding-left:3px" class="mdi mdi-open-in-new"></i></a>');
+		}
+		return html;
+	};
+	renderer.image = function(href, title, text) {
+		return url_renderer.image(href, title, text);
+	};
+	
+	// Inherit the configured checkbox and blocknote renderers without changing
+	// global Marked defaults or sharing this renderer's options with other calls.
+	options.renderer = renderer;
+	return inline ? marked.parseInline(String(text), options) : marked.parse(String(text), options);
 }
 
 CodeMirror.defineMode("mustache", function(config, parserConfig) {
