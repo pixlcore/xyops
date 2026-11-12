@@ -870,6 +870,10 @@ Page.Servers = class Servers extends Page.ServerUtils {
 				
 				html += '<div class="button icon right secondary" id="btn_server_popup_history" title="Server History..." onClick="$P().popupServerHistory()"><i class="mdi mdi-history"></i></div>';
 				
+				if (app.hasPrivilege('create_events') && app.hasPrivilege('delete_events') && app.hasPrivilege('run_jobs') && this.online) {
+					html += '<div class="button icon right secondary" title="Quick Run..." onClick="$P().quickRun()"><i class="mdi mdi-run-fast"></i></div>';
+				}
+				
 				if (app.isAdmin() && this.online && this.server.info?.features?.terminal) {
 					html += '<div class="button icon right" title="Open Terminal..." onClick="$P().goServerTerminal()"><i class="mdi mdi-console"></i></div>';
 				}
@@ -1151,6 +1155,188 @@ Page.Servers = class Servers extends Page.ServerUtils {
 		}
 		
 		// SingleSelect.init( this.div.find('#fe_vs_mode, #fe_vs_year') );
+	}
+	
+	quickRun() {
+		// show dialog to run a quick job on the server
+		var self = this;
+		var title = "Quick Run";
+		var intro = `Use this to quickly run a custom job on the server.  Configure the job below.`;
+		var btn = ['run-fast', 'Run Now'];
+		
+		app.clearError();
+		
+		// privilege check
+		if (!app.requirePrivilege('create_events')) return;
+		if (!app.requirePrivilege('delete_events')) return;
+		if (!app.requirePrivilege('run_jobs')) return;
+		
+		// find default category
+		if (!app.categories.length) return app.doError("No categories found.  Please add a category before using quick run.");
+		var cat_def = find_object( app.categories, { id: 'general' } ) || app.categories[0];
+		
+		// find default event plugin
+		var event_plugins = app.plugins.filter( function(plugin) { return plugin.type == 'event'; } );
+		if (!event_plugins.length) return app.doError("No event plugins found.  Please add an event plugin before using quick run.");
+		var plug_def = find_object( event_plugins, { id: 'shellplug' } ) || event_plugins[0];
+		
+		// start creating event
+		var event = deep_copy_object( app.config.new_event_template );
+		event.targets = [ this.server.id ];
+		event.algo = 'random';
+		event.title = "Quick Run";
+		event.icon = 'run-fast';
+		
+		// self-delete action
+		event.actions.push( { type: "delete", enabled: true, condition: "complete" } );
+		
+		var html = '';
+		html += `<div class="dialog_intro">${intro}</div>`;
+		html += '<div class="dialog_box_content scroll maximize">';
+		
+		// category
+		html += this.getFormRow({
+			label: "Category:",
+			content: this.getFormMenuSingle({
+				id: 'fe_svd_cat',
+				title: "Select category for job",
+				options: this.getCategoriesForMenu(),
+				value: cat_def.id || '',
+				default_icon: 'folder-open-outline',
+				// 'data-shrinkwrap': 1
+			}),
+			caption: "Select a category for the job (category limits and actions will apply)."
+		});
+		
+		// tags
+		html += this.getFormRow({
+			label: "Tags:",
+			content: this.getFormMenuMulti({
+				id: 'fe_svd_tags',
+				title: "Select tags for job",
+				placeholder: "Select tags for job...",
+				options: app.tags,
+				values: event.tags || [],
+				default_icon: 'tag-outline',
+				// 'data-shrinkwrap': 1
+			}),
+			caption: "Optionally select tags to apply to the job."
+		});
+		
+		// plugin
+		html += this.getFormRow({
+			label: "Plugin:",
+			content: this.getFormMenuSingle({
+				id: 'fe_svd_plugin',
+				title: "Select Plugin for job",
+				options: event_plugins,
+				value: plug_def.id || '',
+				default_icon: 'power-plug-outline'
+				// 'data-shrinkwrap': 1
+			}),
+			caption: "Select the desired Plugin for the job.  Plugin parameters will appear below."
+		});
+		
+		// params
+		html += this.getFormRow({
+			id: 'd_svd_user_params',
+			label: "Plugin Parameters:",
+			content: '<div id="d_svd_param_editor" class="plugin_param_editor_cont"></div>',
+			caption: "Enter values for all the Plugin-defined parameters here."
+		});
+		
+		// files
+		html += this.getFormRow({
+			label: 'User Files:',
+			content: this.getDialogFileUploader(),
+			caption: 'Optionally upload and attach files to the job.'
+		});
+		
+		html += '</div>';
+		
+		Dialog.confirm( title, html, btn, function(result) {
+			if (!result) return;
+			app.clearError();
+			
+			// gather results from dialog form
+			event.category = $('#fe_svd_cat').val();
+			event.tags = $('#fe_svd_tags').val();
+			event.plugin = $('#fe_svd_plugin').val();
+			event.params = self.getPluginParamValues( event.plugin );
+			if (!event.params) return; // invalid
+			
+			var job = deep_copy_object(event);
+			job.label = "Quick Run";
+			job.icon = 'run-fast';
+			
+			// add files if user uploaded
+			if (self.dialogFiles && self.dialogFiles.length) {
+				if (!job.input) job.input = {};
+				job.input.files = self.dialogFiles;
+				delete self.dialogFiles; // destructive
+			}
+			
+			Dialog.hide();
+			Dialog.showProgress( 1.0, "Preparing Quick Run..." );
+			
+			app.api.post( 'app/create_event', event, function(resp) {
+				// now run the job
+				var event_id = job.id = resp.event.id;
+				
+				app.api.post( 'app/run_event', job, function(resp) {
+					// jump immediately to live details page
+					Dialog.hideProgress();
+					Nav.go('Job?id=' + resp.id);
+				}, 
+				function(err) {
+					Dialog.hideProgress();
+					app.doError("API Error: " + err.description);
+					app.api.post( 'app/delete_event', { id: event_id }, function(resp) {} );
+				}); // run_event error
+			},
+			function(err) {
+				app.doError("API Error: " + err.description);
+			} ); // create_event error
+		}); // Dialog.confirm
+		
+		Dialog.onDragDrop = function(files) {
+			// files dropped on dialog
+			ZeroUpload.upload( files, {}, app.csrf_token ? { csrf_token: app.csrf_token } : {} );
+		};
+		
+		Dialog.onHide = function() {
+			// cleanup
+			// FUTURE: If self.dialogFiles still exists here, delete in background (user canceled job)
+			delete self.dialogFiles;
+		};
+		
+		MultiSelect.init( $('#fe_svd_tags') );
+		SingleSelect.init( $('#fe_svd_cat, #fe_svd_plugin') );
+		
+		// handle plugin change
+		var initial_plugin_id = $('#fe_svd_plugin').val();
+		var old_plugin_id = '';
+		var plugin_param_cache = {};
+		plugin_param_cache[ initial_plugin_id ] = event.params || {};
+		
+		var do_change_plugin = function() {
+			// refresh plugin param editor
+			if (old_plugin_id) {
+				var old_params = self.getPluginParamValues( old_plugin_id, true );
+				if (old_params) plugin_param_cache[old_plugin_id] = old_params;
+			}
+			
+			var plugin_id = $('#fe_svd_plugin').val();
+			var new_params = plugin_param_cache[plugin_id] || {};
+			
+			$('#d_svd_param_editor').html( self.getPluginParamEditor( plugin_id, new_params, true ) ).buttonize();
+			Dialog.autoResize();
+			
+			old_plugin_id = plugin_id;
+		} // do_change_plugin
+		
+		$('#fe_svd_plugin').on('change', do_change_plugin);
+		do_change_plugin();
 	}
 	
 	renderContainers() {
