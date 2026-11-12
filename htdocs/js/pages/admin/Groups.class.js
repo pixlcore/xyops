@@ -1255,30 +1255,27 @@ Page.Groups = class Groups extends Page.ServerUtils {
 				delete self.dialogFiles; // destructive
 			}
 			
-			// pre-open new window/tab for job details
-			var win = window.open('', '_blank');
+			Dialog.hide();
+			Dialog.showProgress( 1.0, "Preparing Quick Run..." );
 			
 			app.api.post( 'app/create_event', event, function(resp) {
 				// now run the job
 				var event_id = job.id = resp.event.id;
 				
 				app.api.post( 'app/run_event', job, function(resp) {
-					// jump immediately to live details page in new window
-					win.location.href = '#Job?id=' + resp.id;
+					// jump immediately to live details page
+					Dialog.hideProgress();
+					Nav.go('Job?id=' + resp.id);
 				}, 
 				function(err) {
-					// capture error so we can close the window we just opened
-					win.close();
+					Dialog.hideProgress();
 					app.doError("API Error: " + err.description);
 					app.api.post( 'app/delete_event', { id: event_id }, function(resp) {} );
 				}); // run_event error
 			},
 			function(err) {
-				win.close();
 				app.doError("API Error: " + err.description);
 			} ); // create_event error
-			
-			Dialog.hide();
 		}); // Dialog.confirm
 		
 		Dialog.onDragDrop = function(files) {
