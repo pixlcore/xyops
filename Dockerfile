@@ -62,10 +62,12 @@ ENV XYOPS_echo="xyOps Transaction Error error API Unbase Action Comm Job Workflo
 
 # Install dependencies and clear the npm cache before this layer is saved.
 # Fix useragent-ng permissions, build the assets, and create runtime directories.
+# Remove generated config in this layer so each container initializes its own secret key.
 RUN npm install \
 	&& npm cache clean --force \
 	&& chmod 644 node_modules/useragent-ng/lib/regexps.js \
 	&& node bin/build.js dist \
+	&& rm -rf /opt/xyops/conf \
 	&& mkdir -p data logs temp
 
 # Install xysat locally and clear its npm cache in the same layer.
