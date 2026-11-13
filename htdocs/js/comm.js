@@ -154,6 +154,7 @@ app.comm = {
 			
 			case 'login':
 				// auth successful
+				if (data.csrf_token) app.csrf_token = data.csrf_token;
 				if (Dialog.progress) Dialog.hideProgress();
 				
 				Debug.trace('user', "WebSocket auth successful!");

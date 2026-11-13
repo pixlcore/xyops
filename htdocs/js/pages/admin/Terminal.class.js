@@ -59,6 +59,7 @@ Page.Terminal = class TermPage extends Page.PageUtils {
 		app.setWindowTitle( "Terminal" );
 		app.setHeaderTitle( '<i class="mdi mdi-console">&nbsp;</i>Terminal' );
 		app.showSidebar(false);
+		app.setupDragDrop();
 		
 		this.render();
 		
@@ -165,7 +166,7 @@ Page.Terminal = class TermPage extends Page.PageUtils {
 		
 		// Configure Windows compatibility using the remote server's OS version.
 		var server = data.server;
-		var info = server.info;
+		var info = this.serverInfo = server.info;
 		
 		if (info.platform === 'win32') {
 			// Windows releases use major.minor.build, optionally followed by a revision.
@@ -229,10 +230,121 @@ Page.Terminal = class TermPage extends Page.PageUtils {
 		this.term.write( data.data );
 	}
 	
+	comm_termStats(socket, data) {
+		// terminal has new stats for us!
+		this.termStats = data.data;
+	}
+	
 	comm_termClose(socket, data) {
 		// terminal has closed remotely
 		this.term.write( "\r\n\r\n(Terminal has closed on the remote side.)\r\n" );
 		delete this.termID;
+	}
+	
+	doUploadFiles(prefill) {
+		// show dialog to upload files to server
+		var self = this;
+		var title = "Upload Files to Server";
+		var btn = ['file-move', 'Transfer Now'];
+		var html = '';
+		
+		app.clearError();
+		
+		html += `<div class="dialog_intro">Upload and transfer files directly to a specific directory on the server.</div>`;
+		html += '<div class="dialog_box_content scroll maximize">';
+		
+		// files
+		html += this.getFormRow({
+			label: 'Upload Files:',
+			content: this.getDialogFileUploader(),
+			caption: 'Select one or more files to upload.'
+		});
+		
+		// cwd
+		html += this.getFormRow({
+			label: 'Target Directory:',
+			content: this.getFormText({
+				id: 'fe_t_cwd',
+				class: 'monospace',
+				spellcheck: 'false',
+				value: this.termStats?.cwd || ''
+			}),
+			caption: 'Enter the full path to the target directory, or leave blank to use the server\'s temp directory.'
+		});
+		
+		// UID
+		html += this.getFormRow({
+			id: 'd_t_uid',
+			label: 'Save as User:',
+			content: this.getFormText({
+				id: 'fe_t_uid',
+				class: 'monospace',
+				spellcheck: 'false',
+				value: this.termStats?.uid ?? ''
+			}),
+			caption: "Optionally set the User ID (UID) to save the files as.  The UID may be either numerical or a string (`root`, `www`, etc.).  Linux/macOS only."
+		});
+		
+		// GID
+		html += this.getFormRow({
+			id: 'd_t_gid',
+			label: 'Save as Group:',
+			content: this.getFormText({
+				id: 'fe_t_gid',
+				class: 'monospace',
+				spellcheck: 'false',
+				value: this.termStats?.gid ?? ''
+			}),
+			caption: "Optionally set the Group ID (GID) to save the files as.  The GID may be either numerical or a string (`wheel`, `admin`, etc.).  Linux/macOS only."
+		});
+		
+		html += '</div>';
+		
+		Dialog.confirm( title, html, btn, function(result) {
+			if (!result) return;
+			app.clearError();
+			
+			var cwd = $('#fe_t_cwd').val();
+			var uid = $('#fe_t_uid').val();
+			var gid = $('#fe_t_gid').val();
+			
+			if (!self.dialogFiles || !self.dialogFiles.length) {
+				return app.doError("Please upload one or more files to send to the server.");
+			}
+			
+			app.comm.sendCommand('termClientFiles', {
+				id: self.termID,
+				files: self.dialogFiles,
+				cwd: cwd,
+				uid: uid,
+				gid: gid
+			});
+			
+			Dialog.hide();
+			delete self.dialogFiles; // destructive
+			app.showMessage('info', "Your files are being transferred in the background.");
+		}); // Dialog.confirm
+		
+		Dialog.onDragDrop = function(files) {
+			// files dropped on dialog
+			ZeroUpload.upload( files, {}, app.csrf_token ? { csrf_token: app.csrf_token } : {} );
+		};
+		
+		Dialog.onHide = function() {
+			// cleanup
+			// FUTURE: If self.dialogFiles still exists here, delete in background (user canceled job)
+			delete self.dialogFiles;
+		};
+		
+		if (prefill) Dialog.onDragDrop(prefill);
+		
+		Dialog.autoResize();
+	}
+	
+	onDragDrop(files) {
+		if (!this.termID) return;
+		if (!this.serverInfo?.features?.termFiles) return app.doError("This server does not support file uploads.  Please upgrade to the latest xyOps Satellite.");
+		this.doUploadFiles(files);
 	}
 	
 	onResize() {
