@@ -1,5 +1,18 @@
 # xyOps Changelog
 
+## Version v1.1.17
+
+> November 13, 2026
+
+- [`8381f2c7`](https://github.com/pixlcore/xyops/commit/8381f2c799c032cbe80b56b4c313d1a41ebfa4a7): Version 1.1.17
+- [`190fd488`](https://github.com/pixlcore/xyops/commit/190fd488806a34f44dc01f0e159b83ddfcd60e31): Dep: Bump pixl-server-user to v2.0.5 for improved email and full name field hardening.
+- [`b9376e36`](https://github.com/pixlcore/xyops/commit/b9376e36444af44c34d2f2b81f8e1c73c01c03b1): Feature: Add drag-and-drop file uploads to server terminals
+- [`4bffa473`](https://github.com/pixlcore/xyops/commit/4bffa473492cfda6d978e698088260192c714427): Dep: Bump basic-ftp override to v6.2.6 for vuln fixes.
+- [`62e5f1ac`](https://github.com/pixlcore/xyops/commit/62e5f1ac9251db2f93bcc1c260b846c562a822c1): Feature: Include server and job code/description in workflow job report.
+- [`0a5a2b8a`](https://github.com/pixlcore/xyops/commit/0a5a2b8a73ce061b0e3658e1a919661208699790): Fix: Group "Quick View" was launching in a separate window needlessly.
+- [`82f351ed`](https://github.com/pixlcore/xyops/commit/82f351ed7fe0b444fcd0f0372810a91bf554e8c8): Feature: Add "Quick Run" to individual server view page.
+- [`82799a34`](https://github.com/pixlcore/xyops/commit/82799a340c36daaffd45d09d524c9c72d738f9da): Fix: Dockerfile: Remove generated config at build time so each container generates its own on first run.
+
 ## Version v1.1.16
 
 > November 11, 2026
