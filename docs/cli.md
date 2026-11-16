@@ -2,6 +2,8 @@
 
 ## Overview
 
+To manage Events, jobs, servers, Tickets, and other xyOps resources from your terminal, use [xyCLI](https://github.com/pixlcore/xycli), the official command-line interface. It connects to a running conductor through the REST API. See [xyCLI](#xycli) below for setup and examples.
+
 Here are all the xyOps services available to you on the command line.  Most of these are accessed via the following shell script:
 
 ```
@@ -115,28 +117,26 @@ If you upgrade to the `HEAD` version, this will grab the very latest from GitHub
 /opt/xyops/bin/control.sh upgrade HEAD
 ```
 
-## Database CLI
+## xyCLI
 
-xyOps comes with a simple DB CLI from which you can execute raw commands.  The responses are always in JSON format.  This is mainly used for debugging and troubleshooting.  The command is located here:
-
-```
-/opt/xyops/bin/db-cli.js COMMAND INDEX ARG1, ARG2, ...
-```
-
-To perform a search query on a specific database:
+Install [xyCLI](https://github.com/pixlcore/xycli) on your workstation or any machine that can reach your xyOps instance:
 
 ```sh
-/opt/xyops/bin/db-cli.js search tickets "status:open"
+npm install -g @pixlcore/xycli
 ```
 
-To fetch a single record from a database:
+Create an API Key in the xyOps web interface with the privileges and resource access you need, then save your connection settings. Use your instance's base URL without the `/api` suffix:
 
 ```sh
-/opt/xyops/bin/db-cli.js get alerts "amg6sl6z0cc"
+xy config --base_url https://xyops.example.com --api_key YOUR_API_KEY
 ```
 
-This is a low-level developer tool, and requires advanced knowledge of the database system in xyOps.  To learn more, see:
+Here are a few examples for working with Tickets:
 
-- The `/opt/xyops/internal/unbase.json` file, which describes all the database tables in xyOps.
-- The [Unbase](https://github.com/jhuckaby/pixl-server-unbase) database system which powers xyOps.
-- The [query syntax](https://github.com/jhuckaby/pixl-server-storage/blob/master/docs/Indexer.md#simple-queries) documentation.
+```sh
+xy tickets --status open
+xy ticket get --id TICKET_ID
+xy ticket delete --id TICKET_ID
+```
+
+xyCLI sends changes through the running conductor, which handles cache updates, permissions, notifications, and related record cleanup. See the [getting started guide](https://github.com/pixlcore/xycli#getting-started) and [command reference](https://github.com/pixlcore/xycli/blob/main/docs/help.md) for more commands, JSON output, and scripting options.
