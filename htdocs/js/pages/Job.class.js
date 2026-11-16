@@ -2133,7 +2133,7 @@ Page.Job = class Job extends Page.PageUtils {
 				html += '<div class="job_perf_unit">';
 					html += '<div class="job_perf_value">' + nice_value + '</div>';
 					html += '<div class="job_perf_bar" style="height:' + height + 'px; line-height:' + height + 'px; background-color:' + color + ';">' + nice_pct + '</div>';
-					html += '<div class="job_perf_label">' + pkey + '</div>';
+					html += '<div class="job_perf_label">' + encode_entities(pkey) + '</div>';
 				html += '</div>';
 			} );
 			
@@ -2160,7 +2160,7 @@ Page.Job = class Job extends Page.PageUtils {
 				html += '<div class="job_perf_unit">';
 					html += '<div class="job_perf_value">' + self.commify(value) + '</div>';
 					html += '<div class="job_perf_bar" style="height:' + height + 'px; background-color:' + color + ';"></div>';
-					html += '<div class="job_perf_label">' + pkey + '</div>';
+					html += '<div class="job_perf_label">' + encode_entities(pkey) + '</div>';
 				html += '</div>';
 			});
 			
