@@ -825,4 +825,4 @@ The installed package lives under `data/extensions/node_modules/@myorg/xyext-exa
 See these extensions for working references:
 
 - [selfh.st Icon Pack](https://github.com/pixlcore/xyext-selfhst-icons): Adds 2,386 icons to the standard xyOps picker, using locally served SVG data and monochrome CSS masks.
-- [Test Extension](https://github.com/pixlcore/xyext-test): Demonstrates server initialization, configuration hooks, static assets, a custom HTTP response, and serialized browser functions.
+- [xyOps MCP Server](https://github.com/pixlcore/xyext-mcp): Connect AI assistants to xyOps with an HTTP MCP server.
