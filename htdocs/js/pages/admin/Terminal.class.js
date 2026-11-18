@@ -164,6 +164,10 @@ Page.Terminal = class TermPage extends Page.PageUtils {
 		// terminal has started, save id
 		this.termID = data.id;
 		
+		// inject user and apply settings
+		app.user = data.user;
+		app.updateAccessibility();
+		
 		// Configure Windows compatibility using the remote server's OS version.
 		var server = data.server;
 		var info = this.serverInfo = server.info;
