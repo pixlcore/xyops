@@ -20,7 +20,11 @@ Page.Login = class Login extends Page.Base {
 			setTimeout( function() { Nav.go(app.navAfterLogin || config.DefaultPage) }, 1 );
 			return true;
 		}
-		else if (args.u && args.h) {
+		
+		// All logged-out forms use the default toast location.
+		Toaster.update('bottom_left');
+		
+		if (args.u && args.h) {
 			this.showPasswordResetForm(args);
 			return true;
 		}

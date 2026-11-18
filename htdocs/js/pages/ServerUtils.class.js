@@ -1739,7 +1739,7 @@ Page.ServerUtils = class ServerUtils extends Page.PageUtils {
 			id: 't_grp_conts',
 			item_name: 'container',
 			attribs: {
-				class: 'data_grid grp_cont_grid' // TODO: css
+				class: 'data_grid grp_cont_grid'
 			},
 			sort_by: 'cpu',
 			sort_dir: -1,

@@ -263,19 +263,6 @@ Page.MySettings = class MySettings extends Page.Base {
 			caption: 'Enable or disable page descriptions, which introduce each page in the app.  This can be helpful for new users.'
 		});
 		
-		// notifications
-		html += this.getFormRow({
-			label: 'Notifications:',
-			content: this.getFormCheckbox({
-				id: 'fe_ms_notify',
-				label: 'Use System Notifications',
-				checked: user.notifications,
-				disabled: !app.secure,
-				onChange: '$P().saveChanges()'
-			}),
-			caption: 'Enable or disable system notifications, for custom channel messages' + (app.secure ? '' : ' (requires SSL)') + '.'
-		});
-		
 		// whimsy (effects)
 		html += this.getFormRow({
 			label: 'Whimsy:',
@@ -308,6 +295,79 @@ Page.MySettings = class MySettings extends Page.Base {
 		// 	html += '<div class="button primary" onClick="$P().saveChanges()"><i class="mdi mdi-floppy">&nbsp;</i>Save Changes</div>';
 		// html += '</div>'; // box_buttons
 		
+		html += '</div>'; // box
+		
+		// notification settings
+		html += '<div class="box">';
+		html += '<div class="box_title">';
+			html += 'Notification Settings';
+			html += '<div class="button right phone_collapse" onClick="$P().reset_notify()"><i class="mdi mdi-undo-variant">&nbsp;</i><span>Reset to Defaults</span></div>';
+		html += '</div>';
+		html += '<div class="box_content" style="margin-bottom:30px">';
+		
+		// toast corner
+		html += this.getFormRow({
+			label: 'Screen Position:',
+			content: this.getFormMenuSingle({
+				id: 'fe_ms_toast_loc',
+				title: 'Select Position',
+				options: [ 
+					{ id: 'top_left', title: 'Top Left', icon: 'arrow-top-left-bold-box-outline' }, 
+					{ id: 'top_inset', title: 'Top Inset', icon: 'arrow-up-bold-box-outline' },
+					{ id: 'top_right', title: 'Top Right', icon: 'arrow-top-right-bold-box-outline' }, 
+					{ id: 'bottom_left', title: 'Bottom Left', icon: 'arrow-bottom-left-bold-box-outline' }, 
+					{ id: 'bottom_inset', title: 'Bottom Inset', icon: 'arrow-down-bold-box-outline' },
+					{ id: 'bottom_right', title: 'Bottom Right', icon: 'arrow-bottom-right-bold-box-outline' }, 
+				],
+				value: user.toast_loc || 'bottom_left',
+				onChange: '$P().previewToast()',
+			}),
+			suffix: '<div class="form_suffix_icon mdi mdi-play-circle-outline" title="Test Notification..." onClick="$P().testToast(event)" onMouseDown="event.preventDefault();"></div>',
+			caption: 'Select the desired position for notifications to show onscreen.'
+		});
+		
+		// toast_max_unstacked
+		html += this.getFormRow({
+			label: 'Max Unstacked:',
+			content: this.getFormRange({
+				id: 'fe_ms_toast_max_unstacked',
+				min: 1,
+				max: 50,
+				step: 1,
+				value: user.toast_max_unstacked || 2,
+				onChange: '$P().previewToast()'
+			}),
+			caption: 'Select the maximum number of individual notifications to allow per type, before they are collapsed into a stack.'
+		});
+		
+		// toast_max_stacked
+		html += this.getFormRow({
+			label: 'Max Per Type:',
+			content: this.getFormRange({
+				id: 'fe_ms_toast_max_stacked',
+				min: 1,
+				max: 50,
+				step: 1,
+				value: user.toast_max_stacked || 8,
+				onChange: '$P().previewToast()'
+			}),
+			caption: 'Select the total number of notifications to allow per type, before the oldest are deleted.'
+		});
+		
+		// os notifications
+		html += this.getFormRow({
+			label: 'System:',
+			content: this.getFormCheckbox({
+				id: 'fe_ms_notify',
+				label: 'Use System Notifications',
+				checked: user.notifications,
+				disabled: !app.secure,
+				onChange: '$P().saveChanges()'
+			}),
+			caption: 'Optionally use system notifications for custom channel messages' + (app.secure ? '' : ' (requires TLS)') + '.'
+		});
+		
+		html += '</div>'; // box_content
 		html += '</div>'; // box
 		
 		// a/v settings
@@ -485,9 +545,43 @@ Page.MySettings = class MySettings extends Page.Base {
 		} // admin
 		
 		this.div.html( html ).buttonize();
-		SingleSelect.init( this.div.find('#fe_ms_language, #fe_ms_region, #fe_ms_tz, #fe_ms_numformat, #fe_ms_hrcycle, #fe_ms_motionacc, #fe_ms_contrastacc') );
+		SingleSelect.init( this.div.find('#fe_ms_language, #fe_ms_region, #fe_ms_tz, #fe_ms_numformat, #fe_ms_hrcycle, #fe_ms_motionacc, #fe_ms_contrastacc, #fe_ms_toast_loc') );
 		MultiSelect.init( this.div.find('#fe_ms_sidebar') );
 		this.update_date_time_preview();
+	}
+	
+	testToast(event) {
+		// send a randomly generated test notification
+		var type = rand_array([ 'info', 'success', 'warning', 'error', 'critical', 'suspended', 'channel' ]);
+		var thing = config.ui.data_types[ rand_array( Object.keys(config.ui.data_types) ) ].name;
+		var action = rand_array([ 'created', 'updated', 'deleted' ]);
+		var verb = rand_array([ 'create', 'update', 'delete' ]);
+		var msg = '';
+		
+		switch (type) {
+			case 'info': msg = `Test Info: Here is some information about the ${thing}. Enjoy!`; break;
+			case 'success': msg = `Test Success: The ${thing} was ${action} successfully. Yay!`; break;
+			case 'warning': msg = `Test Warning: The ${thing} raised a concern, which is concerning.`; break;
+			case 'error': msg = `Test Error: Failed to ${verb} the ${thing}.`; break;
+			case 'critical': msg = `Test Critical: The ${thing} needs immediate attention. Yikes!`; break;
+			case 'suspended': msg = `Test Suspend: The job was suspended! User action required!`; break;
+			case 'channel':
+				var channel = rand_array( app.channels || [] ) || { id: 'unknown' };
+				app.showChannelMessage({ channel: channel.id, message: `Test: This is a custom channel message!`, lifetime: event.altKey ? 600 : 10, });
+				return;
+			break;
+		}
+		
+		app.showMessage(type, msg, event.altKey ? 600 : 10);
+	}
+	
+	previewToast() {
+		// set toast option and refresh toasts
+		app.user.toast_loc = $('#fe_ms_toast_loc').val();
+		app.user.toast_max_stacked = parseInt( $('#fe_ms_toast_max_stacked').val() );
+		app.user.toast_max_unstacked = parseInt( $('#fe_ms_toast_max_unstacked').val() );
+		app.updateAccessibility();
+		this.saveChanges();
 	}
 	
 	previewContrastMode(elem) {
@@ -755,8 +849,22 @@ Page.MySettings = class MySettings extends Page.Base {
 		user.flat_acc = !!defaults.flat_acc;
 		user.privacy_mode = defaults.privacy_mode;
 		user.page_info = defaults.page_info;
-		user.notifications = defaults.notifications;
 		user.effects = defaults.effects;
+		
+		this.receiveUser({ user: app.user });
+		app.updateAccessibility();
+		this.saveChanges();
+	}
+	
+	reset_notify() {
+		// reset notification settings
+		var user = app.user;
+		var defaults = config.default_user_prefs;
+		
+		user.toast_loc = defaults.toast_loc;
+		user.toast_max_stacked = defaults.toast_max_stacked || 8;
+		user.toast_max_unstacked = defaults.toast_max_unstacked || 2;
+		user.notifications = defaults.notifications;
 		
 		this.receiveUser({ user: app.user });
 		app.updateAccessibility();
@@ -809,6 +917,10 @@ Page.MySettings = class MySettings extends Page.Base {
 			sidebar: this.div.find('#fe_ms_sidebar').val(),
 			filters: {}
 		};
+		
+		settings.toast_loc = $('#fe_ms_toast_loc').val();
+		settings.toast_max_stacked = parseInt( $('#fe_ms_toast_max_stacked').val() );
+		settings.toast_max_unstacked = parseInt( $('#fe_ms_toast_max_unstacked').val() );
 		
 		var filters = settings.filters;
 		filters.brightness = parseInt( this.div.find('#fe_ms_brightness').val() );

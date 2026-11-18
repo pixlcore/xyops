@@ -17,6 +17,7 @@ Page.Magic = class Magic extends Page.PageUtils {
 		// title, icon, fields, limits, body
 		var self = this;
 		$('body').addClass('magic');
+		Toaster.update('bottom_left');
 		
 		if (!args) args = {};
 		this.args = args;

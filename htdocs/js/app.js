@@ -1319,7 +1319,7 @@ app.extend({
 			type: 'channel', 
 			icon: channel.icon || 'bullhorn-outline', 
 			msg: html,
-			lifetime: 0, 
+			lifetime: args.lifetime || 0, 
 			// loc: args.loc || '' 
 		});
 		
@@ -1405,7 +1405,7 @@ app.extend({
 	
 	confetti(args) {
 		// augment confetti with origin element (optional)
-		if (!this.user.effects) return;
+		if (!this.user?.effects) return;
 		if (!args) args = {};
 		
 		if (args.origin && args.origin.jquery) args.origin = args.origin.get(0);
@@ -1492,6 +1492,9 @@ app.extend({
 		// privacy mode
 		if (this.user.privacy_mode) $body.addClass('privacy'); else $body.removeClass('privacy');
 		
+		// apply toast placement and stack limits to the current notifications
+		Toaster.update();
+		
 		// filters
 		var filters = this.user.filters;
 		if (!filters) return; // sanity
@@ -1543,6 +1546,49 @@ app.extend({
 		if (window.innerHeight + window.scrollY < document.documentElement.scrollHeight - 1) {
 			window.scrollTo(0, document.documentElement.scrollHeight);
 		}
+	},
+	
+	onToastClick($toast, event) {
+		// Respect the app's Effects and Reduced Motion preferences.
+		if (!this.user?.effects || this.reducedMotion()) return;
+		
+		// Use a neutral color for channel messages and custom toast types.
+		var color_var;
+		switch ($toast.data('type')) {
+			case 'info': color_var = '--blue'; break;
+			case 'success': color_var = '--green'; break;
+			case 'warning': color_var = '--yellow'; break;
+			case 'error': color_var = '--red'; break;
+			case 'critical': color_var = '--purple'; break;
+			case 'suspended': color_var = '--orange'; break;
+			default: color_var = '--gray'; break;
+		}
+		var color = new Color( this.getCSSVar(color_var) );
+		
+		// Use the click position in canvas coordinates, or center on the toast for non-pointer clicks.
+		var origin = $toast;
+		if (event?.detail > 0 && Number.isFinite(event.clientX) && Number.isFinite(event.clientY)) {
+			origin = {
+				x: event.clientX / document.documentElement.clientWidth,
+				y: event.clientY / document.documentElement.clientHeight
+			};
+		}
+		
+		// A short, gravity-free burst keeps the dots close to the fading toast.
+		this.confetti({
+			origin: origin,
+			colors: [ color.hex(), color.clone().mix('#FFFFFF', 0.5).hex() ],
+			particleCount: 32,
+			spread: 360,
+			startVelocity: 9,
+			decay: 0.86,
+			gravity: 0,
+			ticks: 22,
+			// shapes: ['circle'],
+			// flat: true,
+			scalar: 0.65,
+			zIndex: 1000
+		});
 	},
 	
 	onKeyDown(event) {

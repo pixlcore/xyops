@@ -208,7 +208,8 @@ body.flatacc div.dash_unit_box,
 body.flatacc div.maint_unit,
 body.flatacc div.box,
 body.flatacc div.button:hover,
-body.flatacc div.box_buttons.floater {
+body.flatacc div.box_buttons.floater,
+body.flatacc div.toast {
 	box-shadow: none !important;
 }
 
