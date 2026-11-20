@@ -1,5 +1,20 @@
 # xyOps Changelog
 
+## Version v1.1.18
+
+> November 20, 2026
+
+- [`e4e105b9`](https://github.com/pixlcore/xyops/commit/e4e105b95a0e6d269d696365b979c5aedc19d5df): Version 1.1.18
+- [`1944f14e`](https://github.com/pixlcore/xyops/commit/1944f14eb52721921ece9f7b9231d310ec01f5d4): Feature: Add "Find" to the code editor dialog
+- [`c975afaa`](https://github.com/pixlcore/xyops/commit/c975afaa494e57293702fe27e3a2295291bca852): Dep: Bump pixl-xyapp to v2.1.48 for new toast APIs and dialog icon widgets.
+- [`89a49aef`](https://github.com/pixlcore/xyops/commit/89a49aefe08832519949fa838aa2e9c70d9e5ba0): Dep: Bump pixl-mail to v1.1.13 for TLS cert error crash fix.  Fixes #500
+- [`84bed640`](https://github.com/pixlcore/xyops/commit/84bed640109fa0daa73ab706cca2a31b294ed899): Feature: Enahnced toast notification system
+- [`d6504282`](https://github.com/pixlcore/xyops/commit/d65042820ee92f9cffb2c30536620562c4b8d1c1): Fix: Terminal Window: Apply user settings to match parent window.
+- [`f92da832`](https://github.com/pixlcore/xyops/commit/f92da832150902ec5751995b8ad5108c94ad2b91): Doc: Extensions: Add MCP server to example extensions list.
+- [`0c92d8c7`](https://github.com/pixlcore/xyops/commit/0c92d8c7d55d7f0da91679bec2a85fadded936bc): Fix: Deprecate old db-cli.js tool, point users at xyCLI.
+- [`1f965c16`](https://github.com/pixlcore/xyops/commit/1f965c16932ef29165031a1cc1773ce371390e0e): Fix: Harden job user supplied performance metrics
+- [`8f8ef1e7`](https://github.com/pixlcore/xyops/commit/8f8ef1e704c841182a5d481ff43f7bc8c79efc77): Fix: Harden file validation and attachment deletion
+
 ## Version v1.1.17
 
 > November 13, 2026
