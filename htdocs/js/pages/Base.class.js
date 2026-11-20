@@ -3417,16 +3417,19 @@ Page.Base = class Base extends Page {
 		buttons_html += '<div class="button phone_collapse" title="Copy to Clipboard" onClick="$P().copyCodeToClipboard()"><i class="mdi mdi-clipboard-text-outline">&nbsp;</i><span>Copy</span></div>';
 		buttons_html += '<div class="button phone_collapse" title="Upload File..." onClick="$P().uploadCodeFile()"><i class="mdi mdi-cloud-upload-outline">&nbsp;</i><span>Upload...</span></div>';
 		buttons_html += `<div id="btn_ceditor_confirm" class="button primary"><i class="mdi mdi-${btn[0]}">&nbsp;</i><span>${btn[1]}</span></div>`;
+				
+		title += '<div class="dialog_title_widget icon"><button class="link" title="' + (is_maxed ? 'Minimize' : 'Maximize') + '" onClick="$P().toggleDialogCodeEditorSize(this)">';
+		if (is_maxed) title += '<i class="mdi mdi-arrow-bottom-left-thick"></i></button></div>';
+		else title += '<i class="mdi mdi-arrow-top-right-thick"></i></button></div>';
 		
-		title += ' <div class="dialog_title_widget mobile_hide"><button class="link" onClick="$P().toggleDialogCodeEditorSize(this)">';
-		if (is_maxed) title += 'Minimize<i style="padding-left:3px" class="mdi mdi-arrow-bottom-left-thick"></i></button></div>';
-		else title += 'Maximize<i style="padding-left:3px" class="mdi mdi-arrow-top-right-thick"></i></button></div>';
+		title += '<div class="dialog_title_widget icon"><button id="btn_eca_find" class="link" title="Find..." onClick="$P().toggleDialogCodeEditorSearch()" data-popoverlay="hide"><i class="mdi mdi-magnify"></i></button></div>';
 		
 		CodeEditor.showSimpleDialog(title, html, buttons_html);
 		
 		CodeEditor.onHide = function() {
 			// clean shutdown of codemirror
 			app.clearError();
+			Popover.detach();
 			self.editor.setOption('mode', 'text');
 			
 			if (old_editor) {
@@ -3465,13 +3468,19 @@ Page.Base = class Base extends Page {
 		
 		CodeEditor.onKeyDown = function(event) {
 			// prevent esc from canceling if editor is focused
-			if (event.keyCode == 27) {
+			var key_id = KeySelect.getKeyID(event);
+			
+			if (key_id == 'Escape') {
 				if (document.activeElement && ((document.activeElement.nodeName == 'TEXTAREA') || (document.activeElement.className == 'CodeMirror-code'))) {
 					app.focusNext();
 					return;
 				}
 				event.preventDefault();
 				CodeEditor.hide();
+			}
+			else if ((key_id == 'Meta+KeyF') || (key_id == 'Control+KeyF')) {
+				event.preventDefault();
+				self.toggleDialogCodeEditorSearch();
 			}
 		};
 		
@@ -3565,11 +3574,151 @@ Page.Base = class Base extends Page {
 				}
 			} // json
 			
+			Popover.detach();
 			if (!opts.no_hide) CodeEditor.hide();
 			callback(value);
 		});
 		
 		this.editor.focus();
+	}
+	
+	toggleDialogCodeEditorSearch() {
+		// open or close the search arrow box
+		var self = this;
+		var cm = this.editor;
+		var $elem = $('#btn_eca_find');
+		
+		if ($elem.hasClass('popped')) {
+			Popover.detach();
+			return;
+		}
+		
+		var html = '';
+		html += '<div class="sel_dialog_label">Find Inside Editor</div>';
+		html += '<div class="sel_dialog_search_container">';
+			html += '<input type="text" id="fe_sel_dialog_text" class="sel_dialog_search" style="border-radius:2px;" autocomplete="off" value=""/>';
+			html += '<div class="sel_dialog_search_icon"><i class="mdi mdi-magnify"></i></div>';
+		html += '</div>';
+		
+		html += '<div id="d_sel_dialog_caption" class="sel_dialog_caption" style="display:none"></div>';
+		
+		html += '<div class="sel_dialog_button_container">';
+			html += '<div class="button" id="btn_sel_dialog_close">Close</div>';
+			html += '<div class="button primary" id="btn_sel_dialog_find">Find Next</div>';
+		html += '</div>';
+		
+		Popover.attach( $elem, '<div style="padding:15px;">' + html + '</div>', true );
+		
+		var $input = $('#fe_sel_dialog_text');
+		var $caption = $('#d_sel_dialog_caption');
+		var matches = null;
+		var line = null;
+		
+		function clearMatch() {
+			if (line) cm.removeLineClass(line, 'background', 'cm-find-line');
+			line = null;
+		}
+		
+		var doFind = function(backwards) {
+			var value = $input.val();
+			if (!value.length) {
+				$caption.hide();
+				clearMatch();
+				matches = null;
+				return;
+			}
+			
+			if (!matches) {
+				// find all matches first
+				matches = [];
+				var cursor = cm.getSearchCursor(value, CodeMirror.Pos(cm.firstLine(), 0), {
+					caseFold: true
+				});
+				
+				while (cursor.findNext()) {
+					matches.push({ from: cursor.from(), to: cursor.to() });
+				}
+			}
+			
+			if (!matches.length) {
+				$caption.show().text("No results found.");
+				clearMatch();
+				return;
+			}
+			
+			var start = cm.getCursor(backwards ? 'from' : 'to');
+			var count = matches.length;
+			var matchIdx = -1;
+			
+			// now find where we are in the matched set
+			if (backwards) {
+				matchIdx = count - 1;
+				while (matchIdx >= 0 && CodeMirror.cmpPos(matches[matchIdx].to, start) > 0) {
+					matchIdx--;
+				}
+				if (matchIdx < 0) matchIdx = count - 1;
+			}
+			else {
+				matchIdx = matches.findIndex(function(result) {
+					return CodeMirror.cmpPos(result.from, start) >= 0;
+				});
+				if (matchIdx < 0) matchIdx = 0;
+			}
+			
+			var match = matches[matchIdx];
+			cm.setSelection( match.from, match.to );
+			$caption.show().text( '' + Math.floor(matchIdx + 1) + ' of ' + commify(matches.length) + ' ' + pluralize('result', matches.length) );
+			
+			clearMatch();
+			line = cm.addLineClass(match.from.line, 'background', 'cm-find-line');
+			cm.scrollIntoView(match, 30);
+		}; // doFind
+		
+		Popover.onKeyDown = function(event) {
+			// handle keydown while popover is active
+			var key_id = KeySelect.getKeyID(event);
+			console.log(key_id);
+			
+			if (key_id == 'Escape') {
+				// close search widget
+				event.preventDefault();
+				Popover.detach();
+			}
+			else if ((key_id == 'Meta+KeyG') || (key_id == 'Control+KeyG')) {
+				// find next
+				event.preventDefault();
+				doFind();
+			}
+			else if ((key_id == 'Shift+Meta+KeyG') || (key_id == 'Shift+Control+KeyG')) {
+				// find prev
+				event.preventDefault();
+				doFind(true);
+			}
+		}; // onKeyDown
+		
+		$('#btn_sel_dialog_close').on('click', () => Popover.detach() );
+		$('#btn_sel_dialog_find').on('click', event => doFind( event.shiftKey || event.altKey ) );
+		
+		$input.focus().on('keydown', function(event) {
+			// capture enter key
+			if ((event.keyCode == 13) && this.value.length) {
+				event.preventDefault();
+				event.stopPropagation();
+				doFind( event.shiftKey || event.altKey );
+			}
+		}).on('input', function(event) {
+			// clear previous matches on input
+			$caption.hide();
+			matches = null;
+		});
+		
+		$elem.addClass('popped');
+		Popover.onDetach = function() { 
+			$elem.removeClass('popped');
+			clearMatch();
+			matches = null;
+			try { cm.focus(); } catch(e) {;}
+		};
 	}
 	
 	toggleDialogCodeEditorSize(span) {
@@ -3578,17 +3727,18 @@ Page.Base = class Base extends Page {
 		
 		if ($cm.hasClass('maximize')) {
 			$cm.removeClass('maximize');
-			$(span).html( 'Maximize<i style="padding-left:3px" class="mdi mdi-arrow-top-right-thick"></i>' );
+			$(span).attr('title', 'Maximize').html( '<i class="mdi mdi-arrow-top-right-thick"></i>' );
 			app.setPref('code_editor_max', false);
 		}
 		else {
 			$cm.addClass('maximize');
-			$(span).html( 'Minimize<i style="padding-left:3px" class="mdi mdi-arrow-bottom-left-thick"></i>' );
+			$(span).attr('title', 'Minimize').html( '<i class="mdi mdi-arrow-bottom-left-thick"></i>' );
 			app.setPref('code_editor_max', true);
 		}
 		
 		this.editor.refresh();
 		CodeEditor.autoResize();
+		Popover.detach();
 	}
 	
 	uploadCodeFile() {

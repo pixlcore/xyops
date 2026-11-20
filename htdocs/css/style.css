@@ -2353,6 +2353,9 @@ div.box.toggle.expanded > div.box_title > div {
 .CodeMirror.CodeMirror-focused {
 	border: 1px solid var(--theme-color-half);
 }
+#fe_dialog_editor .CodeMirror.CodeMirror-focused {
+	border: 1px solid transparent;
+}
 
 .CodeMirror-selected, .CodeMirror-focused .CodeMirror-selected { 
 	background: rgb(180, 213, 254) !important; 
@@ -2373,6 +2376,14 @@ body.dark .CodeMirror-selected, body.dark .CodeMirror-focused .CodeMirror-select
 
 .cm-error-line {
 	background-color: color-mix(in srgb, var(--red) 30%, transparent);
+}
+
+.cm-find-current {
+	background-color: color-mix(in srgb, var(--yellow) 45%, transparent);
+}
+
+.cm-find-line {
+	background-color: color-mix(in srgb, var(--yellow) 12%, transparent);
 }
 
 .CodeMirror-gutters {
