@@ -1994,23 +1994,26 @@ Page.PageUtils = class PageUtils extends Page.Base {
 		this.div.find('#d_' + dom_prefix + '_jobact_table').html( html ).buttonize();
 	}
 	
+	getJobActionCondition(condition) {
+		// Resolve the condition label independently of the action options.
+		if (typeof(condition) != 'string') return null;
+		var info = find_object( config.ui.action_condition_menu, { id: condition } ) ||
+			find_object( config.ui.alert_action_condition_menu, { id: condition } );
+		if (info) return info;
+		
+		var match = condition.match(/^tag:(\w+)$/);
+		if (match) {
+			var tag = find_object( app.tags, { id: match[1] } ) || { title: match[1] };
+			return { title: "On " + tag.title, icon: tag.icon || 'tag-outline' };
+		}
+		if (condition == 'instant') return { title: "Instant", icon: 'creation' };
+		return null;
+	}
+	
 	getJobActionDisplayArgs(action, link) {
 		// get display args for job action
 		// returns: { condition, type, text, desc, icon }
-		var disp = {
-			condition: find_object( config.ui.action_condition_menu, { id: action.condition } ) || 
-				find_object( config.ui.alert_action_condition_menu, { id: action.condition } )
-		};
-		
-		if (!disp.condition && action.condition.match(/^tag:(\w+)$/)) {
-			var tag_id = RegExp.$1;
-			var tag = find_object( app.tags, { id: tag_id } ) || { title: tag_id };
-			disp.condition = { title: "On " + tag.title };
-			disp.condition.icon = tag.icon || 'tag-outline';
-		}
-		else if (!disp.condition && (action.condition == 'instant')) {
-			disp.condition = { title: "Instant", icon: 'creation' };
-		}
+		var disp = { condition: this.getJobActionCondition(action.condition) };
 		
 		switch (action.type) {
 			case 'email':
@@ -2071,7 +2074,7 @@ Page.PageUtils = class PageUtils extends Page.Base {
 			
 			case 'ticket':
 				disp.type = 'Create Ticket';
-				var ticket_type = find_object( config.ui.ticket_types, { id: action.ticket_type } );
+				var ticket_type = find_object( config.ui.ticket_types, { id: action.ticket_type } ) || { title: "(Unknown)" };
 				disp.text = ticket_type.title;
 				disp.desc = this.getNiceTicketType(action.ticket_type);
 				disp.icon = 'text-box-plus-outline';
@@ -2080,7 +2083,7 @@ Page.PageUtils = class PageUtils extends Page.Base {
 			case 'suspend':
 				disp.type = "Suspend Job";
 				var label = "";
-				if ((action.users && action.users.length) || action.email.length) label = "Send Email";
+				if ((action.users && Array.isArray(action.users) && action.users.length) || action.email?.length) label = "Send Email";
 				if (action.web_hook) label += (label.length ? ', ' : '') + "Web Hook";
 				disp.text = disp.desc = label || 'n/a';
 				disp.icon = 'motion-pause-outline';

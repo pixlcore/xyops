@@ -1758,6 +1758,26 @@ Page.Job = class Job extends Page.PageUtils {
 		};
 		
 		html += this.getBasicGrid( grid_args, function(item, idx) {
+			var date = self.getRelativeDateTime(item.date, true);
+			var elapsed = '<i class="mdi mdi-clock-check-outline">&nbsp;</i>' + get_text_from_ms_round( Math.floor(item.elapsed_ms), true);
+			var result = self.getNiceActionResult(item);
+			
+			// Show the error and its labels as text. Rejected action options may still be malformed.
+			if (item.code === 'api') {
+				var condition = self.getJobActionCondition(item.condition);
+				var source = (typeof(item.source) == 'string') && item.source;
+				return [
+					condition ? encode_entities(condition.title) : 'n/a',
+					'Invalid action',
+					source ? encode_entities(ucfirst(source)) : 'n/a',
+					encode_entities(item.description || 'Invalid action'),
+					date,
+					elapsed,
+					result,
+					'n/a'
+				];
+			}
+			
 			var disp = self.getJobActionDisplayArgs(item, true); // condition, type, text, desc, icon
 			
 			var link = '';
@@ -1772,9 +1792,9 @@ Page.Job = class Job extends Page.PageUtils {
 				'<i class="mdi mdi-' + disp.icon + '">&nbsp;</i>' + disp.type,
 				self.getNiceActionSource(item.source || 'event') + ((item.count > 1) ? ` (x${commify(item.count)})` : ''),
 				disp.desc,
-				self.getRelativeDateTime(item.date, true),
-				'<i class="mdi mdi-clock-check-outline">&nbsp;</i>' + get_text_from_ms_round( Math.floor(item.elapsed_ms), true),
-				self.getNiceActionResult(item),
+				date,
+				elapsed,
+				result,
 				'<b>' + view_details + '</b>'
 			];
 		}); // grid
@@ -1787,6 +1807,8 @@ Page.Job = class Job extends Page.PageUtils {
 		// popup dialog to show action results
 		var self = this;
 		var action = this.actions[idx];
+		if (!action || (action.code === 'api')) return; // validation errors are shown inline
+		
 		var disp = self.getJobActionDisplayArgs(action); // condition, type, text, desc, icon
 		var details = action.details || "";
 		var nice_date = this.getRelativeDateTime(action.date, true).replace(/\&nbsp;<\/i>/g, '</i>');

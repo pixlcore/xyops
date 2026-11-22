@@ -83,7 +83,7 @@
 							"data": {
 								"enabled": true,
 								"type": "email",
-								"users": "admin"
+								"users": ["admin"]
 							},
 							"x": 797,
 							"y": 265

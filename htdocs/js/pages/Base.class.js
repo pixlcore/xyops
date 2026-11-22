@@ -681,16 +681,17 @@ Page.Base = class Base extends Page {
 	getNiceTagList(tags, link, glue) {
 		// get formatted tag group
 		var self = this;
-		if (!tags) return '(None)';
 		if (!glue) glue = ', ';
 		if (typeof(tags) == 'string') tags = tags.split(/\,\s*/);
-		tags = tags.filter( function(tag) { return !tag.match(/^_/); } ); // filter out system tags
+		if (!tags || !Array.isArray(tags)) return '(None)';
+		tags = tags.filter( function(tag) { return !String(tag).match(/^_/); } ); // filter out system tags
 		if (!tags.length) return '(None)';
 		return tags.map( function(tag) { return self.getNiceTag(tag, link); } ).join(glue);
 	}
 	
 	getNiceTagListText(tags) {
 		// just the text, ma'am
+		if (!tags || !Array.isArray(tags)) return '(None)';
 		return (tags || []).map( function(tag) {
 			var tag_def = find_object( app.tags, { id: tag } );
 			return tag_def ? tag_def.title : `(${tag})`;
@@ -709,6 +710,7 @@ Page.Base = class Base extends Page {
 				link = false;
 			}
 		}
+		else if (!isa_hash(tag)) return '(None)';
 		
 		var html = '<span class="nowrap" title="' + encode_attrib_entities(tag.title) + '">';
 		var icon = '<i class="mdi mdi-' + (tag.icon || 'tag-outline') + '"></i>';
