@@ -84,6 +84,7 @@ In addition to the standard JEXL operators, the following custom functions are a
 | `count` | `count(array)` | Returns the number of items in an array (as JEXL arrays don't have a `length` inside expressions). |
 | `total` | `total(array, key)` | Returns the sum of an array of numbers, or the numeric values at a specified key or dot path in an array of objects.  The `key` argument is optional. |
 | `average` | `average(array, key)` | Returns the arithmetic mean of an array of numbers, or the numeric values at a specified key or dot path in an array of objects.  The `key` argument is optional. |
+| `slice` | `slice(array, start, end)` | Returns a new array from the zero-based `start` index up to, but excluding, `end`.  Both indexes are optional. |
 
 The `total` and `average` functions accept an array of numbers directly:
 
@@ -107,6 +108,14 @@ average(items, 'stats.size')
 ```
 
 All array elements, or the values selected by the key or dot path, should be numbers.  Both functions return `0` for an empty array.
+
+The `slice` function defaults to the beginning of the array when you omit `start` and goes through the last item when you omit `end`.  Negative indexes count back from the end.  When passing a negative number directly as a JEXL argument, wrap it in parentheses, as in `(-2)`.
+
+Try these calls with `items` set to `[10, 20, 30, 40]`.
+
+- `slice(items, 1, 3)` returns `[20, 30]`.
+- `slice(items, 2)` returns `[30, 40]`.
+- `slice(items, (-2))` returns `[30, 40]`.
 
 ### Searching
 
