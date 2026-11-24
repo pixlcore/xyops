@@ -472,8 +472,8 @@ Page.Job = class Job extends Page.PageUtils {
 			var has_output_data = !!(job.data && first_key(job.data));
 			if (has_input_data || has_output_data) {
 				html += '<div class="box_grid double">';
-					html += '<div class="box_unit"><div class="box_title"><span>Input Data</span>' + (has_input_data ? '<div class="button icon right ghost" title="Copy input data to clipboard" onClick="$P().copyJobData(this)" data-path="input.data"><i class="mdi mdi-clipboard-text-outline"></i></div>' : '') + '</div>' + this.getJobDataDisplay( job.input ? job.input.data : null ) + '</div>';
-					html += '<div class="box_unit"><div class="box_title"><span>Output Data</span>' + (has_output_data ? '<div class="button icon right ghost" title="Copy output data to clipboard" onClick="$P().copyJobData(this)" data-path="data"><i class="mdi mdi-clipboard-text-outline"></i></div>' : '') + '</div>' + this.getJobDataDisplay( job.data || null ) + '</div>';
+					html += '<div class="box_unit"><div class="box_title"><span>Input Data</span>' + (has_input_data ? '<div class="button icon right ghost" title="Copy input data to clipboard" onClick="$P().copyJobData(this,event)" data-path="input.data"><i class="mdi mdi-clipboard-text-outline"></i></div>' : '') + '</div>' + this.getJobDataDisplay( job.input ? job.input.data : null ) + '</div>';
+					html += '<div class="box_unit"><div class="box_title"><span>Output Data</span>' + (has_output_data ? '<div class="button icon right ghost" title="Copy output data to clipboard" onClick="$P().copyJobData(this,event)" data-path="data"><i class="mdi mdi-clipboard-text-outline"></i></div>' : '') + '</div>' + this.getJobDataDisplay( job.data || null ) + '</div>';
 				html += '</div>';
 			}
 		}
@@ -1021,13 +1021,34 @@ Page.Job = class Job extends Page.PageUtils {
 		this.div.find('#d_event_params').show().find( '> .box_content').html( html );
 	}
 	
-	copyJobData(elem) {
+	copyJobData(elem, event) {
 		// copy job input or output data to clipboard
-		var payload = JSON.stringify( get_path( this.job, $(elem).data('path') ), null, "\t" );
-		copyToClipboard( payload );
-		$(elem).find('i.mdi').removeClass().addClass([ 'mdi', 'mdi-clipboard-check-outline' ]);
-		// $(elem).css('color', 'var(--green)');
-		app.showMessage('info', "The data was copied to your clipboard.");
+		var path = $(elem).data('path');
+		var payload = JSON.stringify( get_path( this.job, path ), null, "\t" );
+		
+		if (event.altKey) {
+			// altKey == download
+			var blob = new Blob([payload], { type: "application/json" });
+			
+			var link = document.createElement("a");
+			link.href = URL.createObjectURL(blob);
+			link.download = "xyops-job-" + path.replace(/\W+/, '-') + "-" + this.job.id + '.json';
+			
+			document.body.appendChild(link);
+			link.click();
+			
+			document.body.removeChild(link);
+			URL.revokeObjectURL(link.href);
+			
+			$(elem).find('i.mdi').removeClass().addClass([ 'mdi', 'mdi-clipboard-check-outline' ]);
+			app.showMessage('info', "The data was downloaded to your machine.");
+		}
+		else {
+			// no key == clipboard
+			copyToClipboard( payload );
+			$(elem).find('i.mdi').removeClass().addClass([ 'mdi', 'mdi-clipboard-check-outline' ]);
+			app.showMessage('info', "The data was copied to your clipboard.");
+		}
 	}
 	
 	getJobDataDisplay(json) {
