@@ -48,8 +48,8 @@ Categories can carry default job actions and resource limits that apply to all e
 
 ## Visuals: Color and Icon
 
-- **Color**: background tint appears in event lists and running job lists. Available colors: `plain`, `red`, `green`, `blue`, `skyblue`, `yellow`, `purple`, `orange`.
-- **Icon**: optional Material Design Icon (e.g., `folder-outline`, `shield-alert-outline`). Icons are visual only.
+- **Color** adds a background tint in event lists and running job lists. Available color IDs are `plain`, `red`, `fire`, `orange`, `tangerine`, `amber`, `gold`, `yellow`, `lemon`, `lime`, `grass`, `green`, `mint`, `emerald`, `aqua`, `teal`, `turquoise`, `cyan`, `ice`, `skyblue`, `azure`, `blue`, `sapphire`, `indigo`, `lavender`, `violet`, `orchid`, `purple`, `magenta`, `fuchsia`, `hotpink`, `pink`, `blush`, `rose`.
+- **Icon**: optional [Material Design Icon](https://pictogrammers.com/library/mdi/) ID (e.g., `folder-outline`, `shield-alert-outline`). Icons are visual only.
 
 ## Enable/Disable Behavior
 
