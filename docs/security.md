@@ -33,16 +33,16 @@ This email account is only accessible by members of the core team for the purpos
 1. The user privately reports a potential vulnerability.
 2. The report is acknowledged as received.
 3. The report is reviewed to ascertain if additional information is required. If it is required:
-   1. The user is informed that the additional information is required.
-   2. The user privately adds the additional information.
-   3. The process begins at step 3 again, proceeding to step 4 if the additional information provided is sufficient.
+	1. The user is informed that the additional information is required.
+	2. The user privately adds the additional information.
+	3. The process begins at step 3 again, proceeding to step 4 if the additional information provided is sufficient.
 4. The vulnerability is reproduced.
 5. The vulnerability is patched, and if possible the user reporting the bug is given access to a fixed binary, docker image, and git patch.
 6. The patch is confirmed to resolve the vulnerability.
 7. The fix is released and users are notified that they should update urgently.
 8. The [security advisory](https://github.com/pixlcore/xyops/security/advisories) is published when (whichever happens sooner):
-  - The CVE details are published by [MITRE](https://www.mitre.org/), [NIST](https://www.nist.gov/), etc.
-  - Roughly 7 days after users have been notified the update is available.
+	1. The CVE details are published by [MITRE](https://www.mitre.org/), [NIST](https://www.nist.gov/), etc.
+	2. Roughly 7 days after users have been notified the update is available.
 
 ## Credit
 
