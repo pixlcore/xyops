@@ -526,7 +526,7 @@ Page.System = class System extends Page.PageUtils {
 		html += this.getFormRow({
 			id: 'd_sys_im_fmt',
 			label: 'File Format:',
-			content: this.getFormMenuMulti({
+			content: this.getFormMenuSingle({
 				id: 'fe_sys_im_fmt',
 				title: 'Select File Format',
 				options: [{ id: 'xyops', title: 'xyOps Data Format', icon: 'rocket-launch' }, { id: 'cronicle', title: 'Cronicle Data Format', icon: 'progress-clock' }],
