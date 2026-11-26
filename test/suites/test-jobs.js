@@ -3,6 +3,8 @@ const fs = require('fs');
 const Tools = require('pixl-tools');
 const API = require('../../lib/api.js');
 const Jobs = require('../../lib/job.js');
+const Communication = require('../../lib/comm.js');
+const ServerManager = require('../../lib/server.js');
 const Workflows = require('../../lib/workflow.js');
 const Actions = require('../../lib/action.js');
 const Util = require('../../lib/util.js');
@@ -767,6 +769,76 @@ exports.tests = [
 			xy.jobRateLimits = original_rate_limits;
 			xy.appendMetaLog = original_append_meta_log;
 		}
+	},
+	
+	async function test_jobs_during_satellite_socket_replacement(test) {
+		const timeout = 120;
+		const secret_key = 'TEST_RECONNECT';
+		const server = { id: 'sworker', hostname: 'worker', ip: '127.0.0.1', socket_id: 'old', info: {} };
+		const lost = { id: 'jlost', server: server.id, state: 'active', remote: true, updated: Tools.timeNow() - timeout - 1 };
+		const surviving = { ...lost, id: 'jsurviving', limits: [] };
+		const refused = { id: 'jrefused', server: server.id, state: 'ready', event: 'etest', limits: [] };
+		const during_join = { ...refused, id: 'jduringjoin' };
+		const old_commands = [];
+		const new_commands = [];
+		const finished = [];
+		let finishJoin;
+		const old_socket = {
+			id: 'old', server, auth: true,
+			send(cmd) { old_commands.push(cmd); return false; },
+			close() { this.closed = true; }
+		};
+		const new_socket = {
+			id: 'new', server: { ...server, socket_id: 'new', pending: true },
+			send(cmd) { new_commands.push(cmd); return true; }
+		};
+		const conductor = Object.assign(new Jobs(), {
+			config: { get(key) { return { dead_job_timeout: timeout, secret_key }[key]; }, getPath() { return {}; } },
+			activeJobs: { [lost.id]: lost, [surviving.id]: surviving, [refused.id]: refused, [during_join.id]: during_join },
+			jobDetails: { [lost.id]: {}, [surviving.id]: {}, [refused.id]: {}, [during_join.id]: {} },
+			jobRateLimits: {}, events: [{ id: 'etest', enabled: true }], server: {}, plugins: [],
+			servers: { [server.id]: server }, sockets: { old: old_socket, new: new_socket },
+			handleSocketMessage: Communication.prototype.handleSocketMessage,
+			markServerJobsDisconnected: ServerManager.prototype.markServerJobsDisconnected,
+			logComm() {}, logJob() {}, appendMetaLog() {},
+			findActiveAlerts() { return []; },
+			getCommandsWithSecrets() { return []; },
+			getSecretsForJob() { return {}; },
+			runJobActions(job, condition, callback) { callback(); },
+			finishJob(job) { finished.push(job.id); },
+			addServer(server, callback) {
+				// Pause registration while the scheduler can still see the old server entry.
+				finishJoin = () => { this.servers[server.id] = server; callback(); };
+			}
+		});
+		
+		// Even an authenticated socket can refuse a send if it has started closing.
+		conductor.monitorJob(refused);
+		assert.deepEqual(old_commands, ['launch_job']);
+		assert.equal(refused.code, 'abort');
+		assert.equal(refused.retry_ok, true);
+		
+		const token = Tools.digestHex(server.id + secret_key, 'sha256');
+		conductor.handleSocketMessage(new_socket, { cmd: 'join', data: { token } });
+		assert.equal(old_socket.closed, true);
+		assert.equal(lost.remote, false);
+		assert.equal(surviving.remote, false);
+		conductor.monitorJob(during_join);
+		assert.equal(during_join.code, 'abort');
+		assert.deepEqual(old_commands, ['launch_job'], 'replacement prevents sends through the retired socket');
+		
+		// The new connection keeps jobs that report back. The others time out locally.
+		finishJoin();
+		conductor.handleSocketMessage(new_socket, { cmd: 'jobs', data: { [surviving.id]: { id: surviving.id } } });
+		conductor.monitorJob(surviving);
+		conductor.monitorJob(lost);
+		assert.equal(surviving.remote, true);
+		assert.equal(surviving.state, 'active');
+		assert.equal(lost.state, 'complete');
+		assert.equal(lost.code, 'abort');
+		assert.match(lost.description, /No updates received/);
+		assert.deepEqual(finished, [refused.id, during_join.id, lost.id]);
+		assert.deepEqual(new_commands, ['joined'], 'the replacement socket receives no abort for the lost job');
 	},
 	
 	async function test_recovered_finishing_job_timeout(test) {
