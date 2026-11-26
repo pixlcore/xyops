@@ -1,5 +1,22 @@
 # xyOps Changelog
 
+## Version v1.1.19
+
+> November 26, 2026
+
+- [`5d82f6ae`](https://github.com/pixlcore/xyops/commit/5d82f6aee282d7353b06c49ee80f3844a8ec8622): Version 1.1.19
+- [`675f1a7e`](https://github.com/pixlcore/xyops/commit/675f1a7e7bca70ea1f2845b85b99bf2be1dadb0b): Fix: Enforce plugin parameter locks on triggers and job resumes
+- [`642acfdd`](https://github.com/pixlcore/xyops/commit/642acfddb24338d8c823b8c22cf01c29d043378b): Fix: Prevent jobs from getting stuck after satellite reconnect
+- [`10f188d1`](https://github.com/pixlcore/xyops/commit/10f188d1645d448999f9e8ffda0acc98bbe948de): Fix: UI: System import data dialog was using incorrect select menu type.
+- [`f57d5af2`](https://github.com/pixlcore/xyops/commit/f57d5af2549e737f205b2c9f4afe8ebe21df42e3): Dep: Bump pixl-tools to v2.0.9 for upddated isaHash utility function.
+- [`624689f6`](https://github.com/pixlcore/xyops/commit/624689f6e50f2cb71d411f42767b012115e05aa3): Doc: Security: Fixed nested list indentations.
+- [`cabe35f2`](https://github.com/pixlcore/xyops/commit/cabe35f263728bda4cd7f942076355dd2fd25ec9): Doc: Categories: Updated color list and added a link.
+- [`3a255425`](https://github.com/pixlcore/xyops/commit/3a255425ee6524e0f5ec08d07107f9aa981ca22a): Feature: Job Details: Alt-click input or output data copy button to download a JSON file to your machine.
+- [`c856d0b2`](https://github.com/pixlcore/xyops/commit/c856d0b2c16f1722e57db7e7969bd660da5725a2): Fix: On conductor self-restart or self-shutdown initiated from API, add a short delay so response is sent.
+- [`ccf87a5e`](https://github.com/pixlcore/xyops/commit/ccf87a5ed061db1d97063f99e38e8162a72e4ac6): Feature: Add XYEXP "slice" helper function, for extracting sections out of arrays.
+- [`d3e120dc`](https://github.com/pixlcore/xyops/commit/d3e120dc615dd7c749c5976b2ca70c442d49be3c): Fix: Apply plugin defaults to missing job action parameters
+- [`e9699a28`](https://github.com/pixlcore/xyops/commit/e9699a28ceca11cae327df7b4635eeef768baa46): Fix: Validate dynamically pushed job actions
+
 ## Version v1.1.18
 
 > November 20, 2026
